@@ -169,6 +169,27 @@ Headphones. Zie `art/STYLE_GUIDE.md`.
 
 ---
 
+## Stand van zaken (v0.68.0)
+
+**HUD-iconen, shop met namen, snelheden 1/2/4/8 (v0.68.0) — allemaal uit tester-feedback.**
+- **`scripts/hud_icon.gd`** (nieuw): getekende HUD-iconen, een **bliksem** bij Focus en een
+  **kopje** bij Coffee. Getekend en niet als emoji, want het standaardfont rendert die niet.
+  De bliksem kleurt mee met de Focus-balk (groen → oranje → rood). *Let op de volgorde:* de
+  bliksem staat vóór de balk — stond hij erachter, dan leek hij bij Coffee te horen.
+- **Shop toont nu de naam onder elk icoon** (`_shop_cell`) en staat **in de volgorde waarin je
+  ze vrijspeelt**. `_buildable()` leidt die volgorde af uit `GameState.TOWERS_PER_LEVEL` in
+  plaats van uit de vaste `BAR_ORDER`, dus de sneltoetsnummers en de tegels kunnen niet uit
+  elkaar lopen. `BAR_ORDER`/`SPECIALS` bepalen nog wél wie core is en wie special.
+  *Valkuil:* het 48px-icoon rekte elke knop op tot ~60px per rij en dan viel de SPECIALS-sectie
+  onder de paneelrand. Opgelost met `add_theme_constant_override("icon_max_width", 15)` plus
+  compactere rijen; alle 12 core + 2 specials passen nu met naam binnen de 410px van het paneel.
+  Komt er een toren bij, dan moet dit opnieuw gemeten worden (of het paneel scrollbaar).
+- **Snelheden `SPEEDS := [1, 2, 4, 8]`** in plaats van 1/2/3 (verdubbelen leest lekkerder en is
+  een binaire knipoog). +/- lopen via `_speed_step()` door de reeks. Getest: een level draait op
+  8× zonder fouten — 4 waves in 6 echte seconden — en schakelt netjes terug naar 1×.
+- **Valkuil bij het testen:** een autotest die op een level wacht met `create_timer(t)` hangt,
+  want de plan-fase zet `time_scale` op 0. Gebruik `create_timer(t, true, false, true)`.
+
 ## Stand van zaken (v0.67.0)
 
 **Kale .exe in plaats van een zip (v0.67.0).** Testers downloaden nu één bestand en spelen;

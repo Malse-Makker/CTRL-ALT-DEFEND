@@ -13,6 +13,8 @@ const TOP_H := 34.0
 const SHOP_W := 154.0
 const LEFT_W := 174.0   # icoon + naam + aantal + NEW-badge moeten er samen in passen
 const CTRL_H := 96.0
+const HudIconScript = preload("res://scripts/hud_icon.gd")
+
 const GRID := 40.0
 const PATH_WIDTH := 40.0
 const BAR_ORDER := ["auto", "coffee", "ceo", "phones", "filter", "scrum", "trap", "chain", "machinegun", "multishot", "pomodoro", "splash"]
@@ -20,7 +22,46 @@ const BAR_ORDER := ["auto", "coffee", "ceo", "phones", "filter", "scrum", "trap"
 const SPECIALS := ["keyboard", "ctrlaltdel"]
 
 func _buildable() -> Array:
-	return BAR_ORDER + SPECIALS
+	# Volgorde = wanneer je ze vrijspeelt (GameState.TOWERS_PER_LEVEL), niet de volgorde waarin
+	# ze ooit gebouwd zijn. Zowel de shop-tegels als de sneltoetsnummers lopen hierlangs, dus
+	# die kunnen niet uit elkaar lopen. Core eerst, specials daarna (eigen sectie in de shop).
+	var seen: Array = []
+	for lvl in range(1, GameState.LEVEL_COUNT + 1):
+		for id in GameState.TOWERS_PER_LEVEL.get(lvl, []):
+			if not seen.has(id):
+				seen.append(id)
+	var core: Array = []
+	var specials: Array = []
+	for id in seen:
+		if SPECIALS.has(id):
+			specials.append(id)
+		elif BAR_ORDER.has(id):
+			core.append(id)
+	# Vangnet: een toren die nergens vrijgespeeld wordt, valt anders uit de shop.
+	for id in BAR_ORDER:
+		if not core.has(id):
+			core.append(id)
+	for id in SPECIALS:
+		if not specials.has(id):
+			specials.append(id)
+	return core + specials
+
+func _core_order() -> Array:
+	var out: Array = []
+	for id in _buildable():
+		if not SPECIALS.has(id):
+			out.append(id)
+	return out
+
+func _special_order() -> Array:
+	var out: Array = []
+	for id in _buildable():
+		if SPECIALS.has(id):
+			out.append(id)
+	return out
+# Snelheden verdubbelen telkens -- leest lekker en is een knipoog naar binair.
+const SPEEDS := [1.0, 2.0, 4.0, 8.0]
+
 const TARGET_MODES := ["first", "last", "closest", "farthest", "least_hp", "most_hp"]
 const TARGET_LABELS := ["First (furthest along)", "Last (just arrived)", "Closest",
 	"Farthest", "Least HP", "Most HP"]
@@ -134,6 +175,7 @@ var msg_label: Label
 var action_button: Button
 var pause_button: Button
 var speed_buttons: Dictionary = {}
+var focus_icon: Control = null
 var smoke_button: Button
 var bar_buttons: Dictionary = {}
 var shop_panel: Control
@@ -405,10 +447,10 @@ func _handle_key(k: InputEventKey) -> bool:
 			_toggle_pause()
 			return true
 		KEY_EQUAL, KEY_PLUS, KEY_KP_ADD:
-			_set_speed(minf(current_speed + 1.0, 3.0))
+			_set_speed(_speed_step(1))
 			return true
 		KEY_MINUS, KEY_KP_SUBTRACT:
-			_set_speed(maxf(current_speed - 1.0, 1.0))
+			_set_speed(_speed_step(-1))
 			return true
 	# Torenselectie: 1-9 → toren 1-9, 0 → toren 10, shift+1..4 → toren 11/12 + de twee specials.
 	var order: Array = _buildable()
@@ -1494,6 +1536,13 @@ func _finish_click(clicked: bool) -> void:
 		_play("sell")
 		_flash_msg("Handled. Where were we?" if hazard_type == "phone" else "Signed. Carry on.")
 
+func _speed_step(dir: int) -> float:
+	# +/- loopt door de vaste reeks; buiten de reeks blijven we op de rand staan.
+	var i := SPEEDS.find(current_speed)
+	if i == -1:
+		return SPEEDS[0]
+	return SPEEDS[clampi(i + dir, 0, SPEEDS.size() - 1)]
+
 func _set_speed(s: float) -> void:
 	if paused or game_over or phase != "run":
 		return
@@ -1545,7 +1594,7 @@ func _update_labels() -> void:
 	focus_label.text = str(focus)
 	var ratio: float = clampf(float(focus) / float(maxi(1, start_focus)), 0.0, 1.0)
 	if focus_bar != null:
-		focus_bar.size.x = 68.0 * ratio
+		focus_bar.size.x = 62.0 * ratio
 		# groen -> oranje -> rood, zodat je in één oogopslag ziet hoe je ervoor staat
 		if ratio > 0.5:
 			focus_bar.color = Color(0.35, 0.85, 0.45)
@@ -1553,7 +1602,9 @@ func _update_labels() -> void:
 			focus_bar.color = Color(0.95, 0.7, 0.3)
 		else:
 			focus_bar.color = Color(0.9, 0.35, 0.35)
-	coffee_label.text = "Coffee %d" % int(floor(coffee))
+		if focus_icon != null:
+			focus_icon.set_tint(focus_bar.color)
+	coffee_label.text = "%d" % int(floor(coffee))
 	score_label.text = "Score %d" % run_score
 	_update_bar()
 
@@ -2205,19 +2256,28 @@ func _build_hud() -> void:
 	canvas.add_child(top_bg)
 	# Focus als balk: een getal lees je te traag op het moment dat het spannend wordt.
 	var fb_bg := ColorRect.new()
-	fb_bg.position = Vector2(10, 10)
-	fb_bg.size = Vector2(70, 15)
+	fb_bg.position = Vector2(24, 10)
+	fb_bg.size = Vector2(64, 15)
 	fb_bg.color = Color(0, 0, 0, 0.45)
 	canvas.add_child(fb_bg)
 	focus_bar = ColorRect.new()
-	focus_bar.position = Vector2(11, 11)
-	focus_bar.size = Vector2(68, 13)
+	focus_bar.position = Vector2(25, 11)
+	focus_bar.size = Vector2(62, 13)
 	focus_bar.color = Color(0.35, 0.85, 0.45)
 	canvas.add_child(focus_bar)
 	# getal náást de balk, niet erin: anders botst het met het uiteinde als de balk krimpt
-	focus_label = _label("100", Vector2(84, 7), 14, canvas)
+	focus_label = _label("100", Vector2(92, 7), 14, canvas)
 	focus_label.add_theme_color_override("font_color", Color(0.75, 0.9, 1.0))
-	coffee_label = _label("Coffee 30", Vector2(110, 7), 16, canvas)
+	# Bliksem bij Focus, kopje bij Coffee: in één oogopslag te herkennen zonder te lezen.
+	focus_icon = HudIconScript.new()
+	focus_icon.setup("bolt", Color(0.35, 0.85, 0.45), Vector2(11, 15))
+	focus_icon.position = Vector2(9, 10)   # vóór de balk, anders lijkt hij bij Coffee te horen
+	canvas.add_child(focus_icon)
+	var cup := HudIconScript.new()
+	cup.setup("cup", Color(0.85, 0.7, 0.45), Vector2(15, 15))
+	cup.position = Vector2(126, 10)
+	canvas.add_child(cup)
+	coffee_label = _label("30", Vector2(145, 7), 16, canvas)
 	coffee_label.add_theme_color_override("font_color", Color(0.85, 0.7, 0.45))
 	score_label = _label("Score 0", Vector2(225, 7), 16, canvas)
 	wave_label = _label("Plan Phase", Vector2(330, 8), 15, canvas)
@@ -2303,17 +2363,17 @@ func _build_shop(canvas: CanvasLayer) -> void:
 	# 2-koloms grid (Bloons-achtig): core-towers boven, een SPECIALS-sectie eronder. Met
 	# icoontjes past een enkele kolom niet voor 8+ towers, en twee kolommen leest compacter.
 	var vb := VBoxContainer.new()
-	vb.position = Vector2(4, 22)
-	vb.add_theme_constant_override("separation", 4)
+	vb.position = Vector2(4, 20)
+	vb.add_theme_constant_override("separation", 2)
 	shop_panel.add_child(vb)
 	var order: Array = _buildable()
 	var core_grid := GridContainer.new()
 	core_grid.columns = 2
 	core_grid.add_theme_constant_override("h_separation", 3)
-	core_grid.add_theme_constant_override("v_separation", 3)
+	core_grid.add_theme_constant_override("v_separation", 1)
 	vb.add_child(core_grid)
-	for id in BAR_ORDER:
-		core_grid.add_child(_shop_button(String(id), order))
+	for id in _core_order():
+		core_grid.add_child(_shop_cell(String(id), order))
 	var sep := Label.new()
 	sep.text = "SPECIALS"
 	sep.add_theme_font_size_override("font_size", 10)
@@ -2322,14 +2382,32 @@ func _build_shop(canvas: CanvasLayer) -> void:
 	var spec_grid := GridContainer.new()
 	spec_grid.columns = 2
 	spec_grid.add_theme_constant_override("h_separation", 3)
-	spec_grid.add_theme_constant_override("v_separation", 3)
+	spec_grid.add_theme_constant_override("v_separation", 1)
 	vb.add_child(spec_grid)
-	for id in SPECIALS:
-		spec_grid.add_child(_shop_button(String(id), order))
+	for id in _special_order():
+		spec_grid.add_child(_shop_cell(String(id), order))
 
 	shop_toggle = _button("▶", _toggle_shop, 18, 44)
 	shop_toggle.position = Vector2(SCREEN_W - SHOP_W - 18, TOP_H + 6)
 	canvas.add_child(shop_toggle)
+
+func _shop_cell(sid: String, order: Array) -> Control:
+	# Eén tegel = knop met het icoon + de naam eronder. De naam stond eerst alleen in de
+	# tooltip, maar dan moet je elke toren aanwijzen om te weten wat het is.
+	var cell := VBoxContainer.new()
+	cell.add_theme_constant_override("separation", 0)
+	var b := _shop_button(sid, order)
+	cell.add_child(b)
+	var nm := Label.new()
+	nm.text = String(TowerScript.defs()[sid]["name"])
+	nm.add_theme_font_size_override("font_size", 8)
+	nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	nm.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	nm.custom_minimum_size = Vector2((SHOP_W - 11) / 2.0, 15)
+	nm.add_theme_color_override("font_color",
+		Color(0.78, 0.82, 0.9) if available_towers.has(sid) else Color(0.45, 0.48, 0.56))
+	cell.add_child(nm)
+	return cell
 
 func _shop_button(sid: String, order: Array) -> Button:
 	# Compacte grid-knop: icoon boven, daaronder de sneltoets + prijs. Naam/rol/uitleg in de
@@ -2340,7 +2418,10 @@ func _shop_button(sid: String, order: Array) -> Button:
 	var b := Button.new()
 	# Compacter (40 i.p.v. 50) + expand_icon: met 10 core-torens + specials moet alles binnen
 	# het paneel passen. expand_icon schaalt het icoon mee zodat de knop niet uitdijt.
-	b.custom_minimum_size = Vector2((SHOP_W - 11) / 2.0, 40)
+	b.custom_minimum_size = Vector2((SHOP_W - 11) / 2.0, 22)
+	# Zonder deze cap rekt het 48px-icoon de knop op tot ~60px per rij, en dan valt de
+	# SPECIALS-sectie onder de onderrand van het paneel.
+	b.add_theme_constant_override("icon_max_width", 15)
 	b.expand_icon = true
 	b.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	b.add_theme_font_size_override("font_size", 10)
@@ -2388,13 +2469,13 @@ func _build_controls(canvas: CanvasLayer) -> void:
 
 	var hb := HBoxContainer.new()
 	hb.position = Vector2(SCREEN_W - SHOP_W + 6, SCREEN_H - 42)
-	hb.add_theme_constant_override("separation", 3)
+	hb.add_theme_constant_override("separation", 2)
 	canvas.add_child(hb)
-	pause_button = _button("❚❚", _toggle_pause, 34, 26)
+	pause_button = _button("❚❚", _toggle_pause, 28, 26)
 	hb.add_child(pause_button)
-	for spd in [1.0, 2.0, 3.0]:
+	for spd in SPEEDS:
 		var sp: float = spd
-		var b := _button("%dx" % int(spd), func(): _set_speed(sp), 32, 26)
+		var b := _button("%dx" % int(spd), func(): _set_speed(sp), 25, 26)
 		hb.add_child(b)
 		speed_buttons[spd] = b
 

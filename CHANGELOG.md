@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.68.0 — 2026-07-25
+- Focus and Coffee now have icons in the top bar -- a lightning bolt and a coffee cup -- so you can read your status at a glance.
+- The tower shop now shows every tower's name, and lists them in the order you unlock them.
+- Game speed goes 1x, 2x, 4x, 8x instead of 1x, 2x, 3x. Powers of two, as nature intended.
+
 ## v0.67.0 — 2026-07-25
 - The download is now just CTRL-ALT-DEFEND.exe -- no zip, nothing to unpack. Download it and play.
 - Updates download the new .exe directly too, so updating is one click and one file.

@@ -103,7 +103,8 @@ ssh "$REMOTE" "cd ${REMOTE_DIR} && docker compose up -d" > /dev/null 2>&1
 
 echo "==> Controle"
 curl -sfI -L "${LATEST_EXE}" -o /dev/null -w "latest exe: HTTP %{http_code}, %{size_download} bytes\n"
-curl -sf "https://github.com/${REPO}/releases/latest/download/version.json" \
+# -L is hier niet optioneel: GitHub stuurt "latest/download" door naar zijn CDN.
+curl -sfL "https://github.com/${REPO}/releases/latest/download/version.json" \
 	| python3 -c 'import json,sys; d=json.load(sys.stdin); print("version.json (latest):", d["version"])'
 curl -sf "${SITE_URL}/changelog.html" > /dev/null && echo "changelog.html OK"
 
