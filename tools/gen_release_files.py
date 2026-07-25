@@ -51,7 +51,7 @@ def parse_changelog():
     return entries
 
 
-def render_changelog_html(entries, version, zip_sha, exe_sha):
+def render_changelog_html(entries, version, exe_sha):
     rows = []
     for e in entries:
         items = "\n".join(
@@ -119,10 +119,8 @@ def render_changelog_html(entries, version, zip_sha, exe_sha):
 
   <div class="verify">
     <h2>Verify your download (v{html.escape(version)})</h2>
-    <p>SHA-256 of the zip:</p>
-    <code>{html.escape(zip_sha)}</code>
-    <p>SHA-256 of CTRL-ALT-DEFEND.exe — this is the one the game shows (first 12 characters)
-    at the bottom of the main menu:</p>
+    <p>SHA-256 of CTRL-ALT-DEFEND.exe. The game shows the first 12 characters at the bottom
+    of the main menu, so you can check the two match:</p>
     <code>{html.escape(exe_sha)}</code>
   </div>
 
@@ -142,12 +140,10 @@ def main() -> int:
     ap.add_argument("--version", required=True)
     ap.add_argument("--check-only", action="store_true",
                     help="valideer + schrijf alleen changelog.json (vóór de build)")
-    ap.add_argument("--zip-name")
     ap.add_argument("--exe")
-    ap.add_argument("--zip-sha")
     ap.add_argument("--exe-sha")
     ap.add_argument("--size", type=int)
-    ap.add_argument("--zip-url")
+    ap.add_argument("--exe-url")
     ap.add_argument("--site-url")
     a = ap.parse_args()
 
@@ -178,7 +174,7 @@ def main() -> int:
         print(f"   changelog.json geschreven ({len(entries)} versies), changelog OK")
         return 0
 
-    missing = [n for n in ("zip_name", "exe", "zip_sha", "exe_sha", "size", "zip_url", "site_url")
+    missing = [n for n in ("exe", "exe_sha", "size", "exe_url", "site_url")
                if getattr(a, n) is None]
     if missing:
         print(f"!! ontbrekende argumenten: {', '.join(missing)}", file=sys.stderr)
@@ -190,10 +186,9 @@ def main() -> int:
             {
                 "version": a.version,
                 "date": datetime.date.today().isoformat(),
-                "zip": a.zip_url,
+                "exe_url": a.exe_url,
                 "exe": a.exe,
-                "sha256": a.zip_sha,
-                "exe_sha256": a.exe_sha,
+                "sha256": a.exe_sha,
                 "size": a.size,
                 "changes": entries[0]["items"],
                 "changelog_url": f"{a.site_url}/changelog.html",
@@ -204,7 +199,7 @@ def main() -> int:
         encoding="utf-8",
     )
     (PUBLIC / "changelog.html").write_text(
-        render_changelog_html(entries, a.version, a.zip_sha, a.exe_sha), encoding="utf-8"
+        render_changelog_html(entries, a.version, a.exe_sha), encoding="utf-8"
     )
     print(f"   changelog.json + version.json + changelog.html geschreven ({len(entries)} versies)")
     return 0

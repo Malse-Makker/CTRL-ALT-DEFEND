@@ -74,10 +74,12 @@ def notes_for(version: str) -> str:
             items.append(line)
     body = "\n".join(items) if items else "_Geen changelog-punten gevonden._"
     return (
-        f"{body}\n\n---\n\nUnzip and run `CTRL-ALT-DEFEND.exe`. Windows SmartScreen will warn "
-        "about the unsigned build: **More info -> Run anyway**.\n\n"
-        "The game checks for updates on startup, so this is the last version you need to "
-        "download by hand. Checksums are on https://game.makkers.net/changelog.html"
+        f"{body}\n\n---\n\nDownload `CTRL-ALT-DEFEND.exe` below and run it -- nothing to "
+        "unzip, no installer. Windows SmartScreen will warn about the unsigned build: "
+        "**More info -> Run anyway**.\n\n"
+        "The game checks for updates on startup and can update itself, so this is the last "
+        "version you need to download by hand. The checksum is on "
+        "https://game.makkers.net/changelog.html"
     )
 
 
@@ -105,10 +107,18 @@ def main() -> int:
                 "name": f"CTRL-ALT-DEFEND {a.tag}",
                 "body": notes_for(version),
                 "draft": False,
-                "prerelease": True,  # alpha
+                # BEWUST GEEN prerelease: GitHub's "releases/latest" slaat pre-releases over,
+                # en juist dat adres gebruiken de downloadknop en de updater. Als prerelease
+                # aan staat, geeft latest/download/... een 404. Dat het een alpha is, staat in
+                # de titel, de notes en op de site.
+                "prerelease": False,
             },
         )
         print(f"   release {a.tag} aangemaakt")
+    else:
+        # Corrigeer notes/flag als de release al bestond (bijv. van een eerdere poging).
+        call("PATCH", f"{API}/repos/{a.repo}/releases/{rel['id']}",
+             {"body": notes_for(version), "prerelease": False})
 
     existing = {asset["name"]: asset["id"] for asset in rel.get("assets", [])}
     for path_str in a.assets:

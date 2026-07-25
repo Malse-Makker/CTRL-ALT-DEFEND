@@ -1,8 +1,8 @@
-# Changelog — Office Tower Defense
+# Changelog — CTRL-ALT-DEFEND
 
 Dit bestand is de **bron van waarheid** voor de changelog. Hij wordt op drie plekken getoond:
 de website (`changelog.html`), het update-scherm in de game (`version.json`) en de
-"What's New"-pagina in de game (leest dit bestand rechtstreeks).
+"What's New"-pagina in de game (via het gegenereerde changelog.json).
 
 **Format — niet vrij invullen, er wordt op geparsed:**
 - `## v<versie> — <datum>` begint een versie. De bovenste moet gelijk zijn aan `VERSION`.
@@ -12,6 +12,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
+
+## v0.67.0 — 2026-07-25
+- The download is now just CTRL-ALT-DEFEND.exe -- no zip, nothing to unpack. Download it and play.
+- Updates download the new .exe directly too, so updating is one click and one file.
+- The download button on the site always gives you the newest release.
 
 ## v0.66.0 — 2026-07-25
 - The game is now called CTRL-ALT-DEFEND. Same game, better name.

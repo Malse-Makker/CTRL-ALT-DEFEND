@@ -36,6 +36,16 @@ We werken samen aan **Office Tower Defense**, een top-down tower defense in Godo
   `version.json` en `changelog.html` genereren → downloadknop bijwerken → **GitHub Release
   aanmaken + zip en version.json uploaden** → site naar OVH → controleren. `--dry-run` bouwt
   alles zonder te publiceren.
+- **We leveren een KALE .exe uit, geen zip** (v0.67.0, wens gebruiker): niets uitpakken, en de
+  downloadknop kan rechtstreeks naar het bestand wijzen. De assetnaam is bewust **vast**
+  (`CTRL-ALT-DEFEND.exe`, zonder versienummer), want alleen dan werkt
+  `releases/latest/download/<naam>` — en dat adres gebruiken zowel de knop als de updater, dus
+  per release hoeft er niets aan URL's bijgewerkt te worden. *Kosten:* ~105 MB per download in
+  plaats van ~37 MB ingepakt. Wordt dat vervelend, dan kan de zip terug voor de updater alleen.
+- **VALKUIL: zet een release NIET op `prerelease`.** GitHub's `releases/latest` slaat
+  pre-releases over, dus dan geeft `latest/download/...` een 404 — precies het adres waar de
+  knop en de updater op leunen. Dit is één keer misgegaan en door de controlestap in het
+  script gevangen. Dat het een alpha is, staat in de titel, de notes en op de site.
 - **De binary staat op GitHub Releases, niet op de eigen server** (sinds v0.66.0, na feedback
   dat zelf-hosten van een zichzelf-updatende .exe onveilig is). Redenering: wie de webserver
   overneemt bepaalt wat er bij elke tester geïnstalleerd wordt, en een checksum die op diezelfde
@@ -158,6 +168,25 @@ moet in één blik zien dat 3 beter is dan 2 beter dan 1. IJkpunt: Coffee Machin
 Headphones. Zie `art/STYLE_GUIDE.md`.
 
 ---
+
+## Stand van zaken (v0.67.0)
+
+**Kale .exe in plaats van een zip (v0.67.0).** Testers downloaden nu één bestand en spelen;
+er valt niets meer uit te pakken.
+- `tools/make_release.sh` maakt geen zip meer en publiceert `build/windows/CTRL-ALT-DEFEND.exe`
+  als asset met een **vaste naam** — nodig voor het `latest/download`-adres (zie het releaseblok
+  bovenaan). De downloadknop op de site wijst daarheen en hoeft dus nooit meer bijgewerkt te
+  worden; de sed daarvoor is geankerd op `<a class="dl" href=` en niet op de bestandsnaam
+  (die matchte niet meer toen de extensie veranderde).
+- `scripts/updater.gd` haalt de .exe rechtstreeks op (`exe_url` in version.json), controleert de
+  sha256 en wisselt 'm om — de ZIPReader-stap is weg. Route 2 zet de nieuwe .exe in Downloads.
+- `deploy/player_readme.txt` is vervallen (die zat in de zip); de speluitleg staat nu in de
+  GitHub-release-notes en op de site.
+- **Eerste echte publicatie gedaan.** Geverifieerd: de .exe van `latest/download` matcht exact
+  de sha256 in de gepubliceerde `version.json`, site en changelogpagina staan live op de nieuwe
+  naam, en de release-notes komen uit CHANGELOG.md.
+- **Nog steeds ongetest: de zelf-vervangende update op Windows.** Draai die één keer door
+  (v0.67.0 → volgende versie) voordat de rest automatisch update.
 
 ## Stand van zaken (v0.66.0)
 

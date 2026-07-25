@@ -2,12 +2,15 @@ extends CanvasLayer
 # Update-check bij het opstarten. Haalt version.json van de site, vergelijkt met res://VERSION
 # en biedt bij een nieuwere versie twee routes aan (keuze van de speler):
 #
-#   1. AUTOMATIC — download, vervang de .exe en herstart. Alleen op Windows.
+#   1. AUTOMATIC — download de nieuwe .exe, vervang de huidige en herstart. Alleen op Windows.
 #      Windows laat een DRAAIENDE .exe niet overschrijven of verwijderen, maar wel HERNOEMEN.
 #      Daarop rust de hele truc: huidige exe -> *_old.exe, nieuwe op de vrijgekomen plek,
 #      nieuwe starten, zelf afsluiten. De *_old.exe wordt bij de volgende start opgeruimd.
-#   2. SAFE — zet de zip in Downloads en toon 'm in de verkenner; de speler wisselt zelf.
-#      Werkt overal en raakt geen antivirus-heuristiek.
+#   2. SAFE — zet de nieuwe .exe in Downloads en toont 'm in de verkenner; de speler wisselt
+#      zelf. Werkt overal en raakt geen antivirus-heuristiek.
+#
+# We leveren een kále .exe uit, geen zip: dan hoeft niemand iets uit te pakken. Dat kost wel
+# bandbreedte — ~105 MB in plaats van ~37 MB ingepakt.
 #
 # Faalt de automatische route ergens (geen schrijfrechten, hernoemen geweigerd), dan draaien
 # we de boel terug en sturen we de speler naar route 2 — nooit een half vervangen installatie.
@@ -28,7 +31,7 @@ var _info: Dictionary = {}
 var _panel: Control = null
 var _http: HTTPRequest = null
 var _progress: Label = null
-var _zip_target: String = ""
+var _dl_target: String = ""
 var _auto_mode: bool = false
 
 
@@ -223,7 +226,7 @@ func _show_choice() -> void:
 		_text(vb, "Automatic updating is Windows-only. Use the safe option below.", 13, Color(0.95, 0.78, 0.45))
 
 	_text(vb, "2. SAFE  -  download it and swap it yourself", 15, Color(0.6, 0.85, 0.95))
-	_text(vb, "Downloads the zip to your Downloads folder and opens it for you. You unzip it and drag the new CTRL-ALT-DEFEND.exe over the old one. Always works, no antivirus trouble -- just a bit more work.", 12)
+	_text(vb, "Puts the new CTRL-ALT-DEFEND.exe in your Downloads folder and shows it to you. You close the game and drag it over the old one. Always works, no antivirus trouble -- just a bit more work.", 12)
 	_button(_row(vb), "Download the safe way", func(): _start_download(false), 300)
 	_button(_row(vb), "Back", _show_available, 140)
 
@@ -232,7 +235,7 @@ func _show_choice() -> void:
 
 func _start_download(auto: bool) -> void:
 	_auto_mode = auto
-	var url: String = str(_info.get("zip", ""))
+	var url: String = str(_info.get("exe_url", ""))
 	if url == "":
 		_show_failed("The update location is missing from version.json.")
 		return
@@ -244,12 +247,12 @@ func _start_download(auto: bool) -> void:
 		if not _can_write(target_dir):
 			_show_failed("The game folder is read-only, so it cannot update itself.\n\nUse the safe option instead, or move the game to a normal folder such as Downloads or your Desktop.")
 			return
-		_zip_target = target_dir.path_join("_update_%s.zip" % str(_info.get("version", "new")))
+		_dl_target = target_dir.path_join("_update_%s.exe" % str(_info.get("version", "new")))
 	else:
 		target_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOWNLOADS)
 		if target_dir == "":
 			target_dir = OS.get_user_data_dir()
-		_zip_target = target_dir.path_join(url.get_file())
+		_dl_target = target_dir.path_join(url.get_file())
 
 	var vb := _open_panel("DOWNLOADING")
 	_text(vb, "Fetching v%s ..." % str(_info.get("version", "?")), 14)
@@ -260,9 +263,9 @@ func _start_download(auto: bool) -> void:
 	_http.use_threads = true
 	_http.timeout = 0
 	_http.max_redirects = 8
-	_http.download_file = _zip_target
+	_http.download_file = _dl_target
 	add_child(_http)
-	_http.request_completed.connect(_on_zip_done)
+	_http.request_completed.connect(_on_download_done)
 	if _http.request(url) != OK:
 		_drop_http()
 		_show_failed("Could not start the download. Check your internet connection.")
@@ -281,19 +284,19 @@ func _process(_dt: float) -> void:
 		_progress.text = "%.1f MB" % [got / 1048576.0]
 
 
-func _on_zip_done(_result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
+func _on_download_done(_result: int, code: int, _headers: PackedStringArray, _body: PackedByteArray) -> void:
 	set_process(false)
 	_drop_http()
 	if code != 200:
-		DirAccess.remove_absolute(_zip_target)
+		DirAccess.remove_absolute(_dl_target)
 		_show_failed("The download failed (server said %d). Try again later." % code)
 		return
 
 	var want: String = str(_info.get("sha256", ""))
 	if want != "":
-		var got := FileAccess.get_sha256(_zip_target)
+		var got := FileAccess.get_sha256(_dl_target)
 		if got.to_lower() != want.to_lower():
-			DirAccess.remove_absolute(_zip_target)
+			DirAccess.remove_absolute(_dl_target)
 			_show_failed("The downloaded file did not match its checksum, so it was thrown away.\n\nThat usually means the download got interrupted. Please try again.")
 			return
 
@@ -308,64 +311,41 @@ func _on_zip_done(_result: int, code: int, _headers: PackedStringArray, _body: P
 func _show_downloaded() -> void:
 	var vb := _open_panel("DOWNLOAD READY")
 	_text(vb, "Saved v%s to:" % str(_info.get("version", "?")), 14, Color(0.6, 0.9, 0.7))
-	_text(vb, _zip_target, 12)
-	_text(vb, "Unzip it and replace your old CTRL-ALT-DEFEND.exe with the new one. Your saved progress lives elsewhere, so nothing is lost.", 13)
+	_text(vb, _dl_target, 12)
+	_text(vb, "Close the game, then drag this file over your old CTRL-ALT-DEFEND.exe to replace it. Your saved progress lives elsewhere, so nothing is lost.", 13)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	vb.add_child(row)
-	_button(row, "Show me the file", func(): OS.shell_show_in_file_manager(_zip_target, false), 220)
+	_button(row, "Show me the file", func(): OS.shell_show_in_file_manager(_dl_target, false), 220)
 	_button(row, "Close", _close_panel, 140)
 
 
 # ---------- Route 1: zichzelf vervangen ----------
 
 func _install() -> void:
+	# De download IS de nieuwe .exe (geen zip meer), en hij staat al naast de huidige — dus
+	# hier hoeft alleen nog omgewisseld te worden.
 	var exe := OS.get_executable_path()
 	var dir := exe.get_base_dir()
-	var entry: String = str(_info.get("exe", "CTRL-ALT-DEFEND.exe"))
 
-	var zr := ZIPReader.new()
-	if zr.open(_zip_target) != OK:
-		_fail_install("The downloaded file could not be opened.")
+	if not FileAccess.file_exists(_dl_target):
+		_fail_install("The downloaded file disappeared before it could be installed.")
 		return
-	var found := ""
-	for f in zr.get_files():
-		if f.get_file() == entry:
-			found = f
-			break
-	if found == "":
-		zr.close()
-		_fail_install("The update did not contain %s." % entry)
-		return
-	var data := zr.read_file(found)
-	zr.close()
-	if data.is_empty():
-		_fail_install("The new version came out empty.")
-		return
-
-	var staged := dir.path_join("_update_new.exe")
-	var f := FileAccess.open(staged, FileAccess.WRITE)
-	if f == null:
-		_fail_install("Could not write to the game folder.")
-		return
-	f.store_buffer(data)
-	f.close()
 
 	# Hernoemen mag op een draaiende .exe, verwijderen niet. Lukt stap 1 maar stap 2 niet,
 	# dan zetten we de oude terug -- liever geen update dan een kapotte installatie.
 	var backup := dir.path_join(exe.get_file().get_basename() + "_old.exe")
 	DirAccess.remove_absolute(backup)
 	if DirAccess.rename_absolute(exe, backup) != OK:
-		DirAccess.remove_absolute(staged)
+		DirAccess.remove_absolute(_dl_target)
 		_fail_install("Windows would not let the game rename itself.")
 		return
-	if DirAccess.rename_absolute(staged, exe) != OK:
+	if DirAccess.rename_absolute(_dl_target, exe) != OK:
 		DirAccess.rename_absolute(backup, exe)   # terugdraaien
-		DirAccess.remove_absolute(staged)
+		DirAccess.remove_absolute(_dl_target)
 		_fail_install("The new version could not be put in place, so nothing was changed.")
 		return
 
-	DirAccess.remove_absolute(_zip_target)
 	if OS.create_process(exe, []) == -1:
 		_show_failed("The update is installed, but the game could not restart itself.\n\nClose this window and start CTRL-ALT-DEFEND again.")
 		return
@@ -373,10 +353,10 @@ func _install() -> void:
 
 
 func _fail_install(reason: String) -> void:
-	DirAccess.remove_absolute(_zip_target)
+	DirAccess.remove_absolute(_dl_target)
 	var vb := _open_panel("AUTOMATIC UPDATE DID NOT WORK")
 	_text(vb, reason, 14, Color(0.95, 0.78, 0.45))
-	_text(vb, "Nothing was changed -- the game you are playing is untouched. If your antivirus blocked it, allow CTRL-ALT-DEFEND in Windows Security. Otherwise use the safe route: it downloads the zip and you swap the file yourself.", 13)
+	_text(vb, "Nothing was changed -- the game you are playing is untouched. If your antivirus blocked it, allow CTRL-ALT-DEFEND in Windows Security. Otherwise use the safe route: it downloads the new .exe and you swap the file yourself.", 13)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	vb.add_child(row)

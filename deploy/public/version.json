@@ -1,15 +1,14 @@
 {
-  "version": "0.66.0",
+  "version": "0.67.0",
   "date": "2026-07-25",
-  "zip": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.66.0/CTRL-ALT-DEFEND_v0.66.0_alpha_windows.zip",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.67.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "bfcdc8cd804a13d73f0c6a9ddc63b9e742681db654ab6ecca761ed1e97d75859",
-  "exe_sha256": "6868221e12b74b135b333af8f3baa1019804b55135b0f8c14dc94068dccfa0b2",
-  "size": 38830778,
+  "sha256": "88748f83b56ff7d7519b719393dcfa2c085f80e83346f26a521473a31568b42e",
+  "size": 110035416,
   "changes": [
-    "The game is now called CTRL-ALT-DEFEND. Same game, better name.",
-    "Downloads and updates now come from GitHub instead of my own server, which is a safer place to keep a program that updates itself.",
-    "The source code is public at github.com/Malse-Makker/CTRL-ALT-DEFEND."
+    "The download is now just CTRL-ALT-DEFEND.exe -- no zip, nothing to unpack. Download it and play.",
+    "Updates download the new .exe directly too, so updating is one click and one file.",
+    "The download button on the site always gives you the newest release."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

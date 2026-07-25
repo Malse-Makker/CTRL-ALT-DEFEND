@@ -1,6 +1,15 @@
 {
   "entries": [
     {
+      "version": "0.67.0",
+      "date": "2026-07-25",
+      "items": [
+        "The download is now just CTRL-ALT-DEFEND.exe -- no zip, nothing to unpack. Download it and play.",
+        "Updates download the new .exe directly too, so updating is one click and one file.",
+        "The download button on the site always gives you the newest release."
+      ]
+    },
+    {
       "version": "0.66.0",
       "date": "2026-07-25",
       "items": [
