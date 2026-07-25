@@ -14,6 +14,7 @@
     --blue: #4a8fe7;
     --green: #5fb98f;
     --red: #d95c5c;
+    --link: #79b8ff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -73,13 +74,16 @@
     font-size: 0.8rem;
     padding: 24px 20px;
   }
+  /* Zonder eigen kleur pakt de browser zijn donkerblauwe standaard -- onleesbaar op zwart. */
+  a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+  a:hover { color: var(--accent); }
   footer a { color: var(--dim); }
 </style>
 </head>
 <body>
 <main>
   <h1>CTRL-ALT-DEFEND</h1>
-  <p class="version">alpha v0.68.0 — Windows (runs on Linux via Proton/Wine)</p>
+  <p class="version">alpha v0.69.0 — Windows (runs on Linux via Proton/Wine)</p>
 
   <p class="pitch">A top-down tower defense about defending your workday.
   Meetings that could have been an email, reply-all storms and consultants

@@ -143,7 +143,7 @@ static func defs() -> Dictionary:
 		},
 		"filter": {
 			"name": "The Shredder", "role": "area", "color": Color(0.35, 0.7, 0.7),
-			"desc": "Zone that shreds and slows. Great vs paper swarms.",
+			"desc": "Zone that slows everything inside it. Its damage is shared out over everyone in the zone, so it holds swarms up rather than deleting them.",
 			"levels": [
 				{"name": "Wastebasket", "flavour": "Round filing.", "cost": 30, "range": 95.0, "dot": 2.0, "slow": 0.6},
 				{"name": "Paper Shredder", "flavour": "Cross-cut, obviously.", "cost": 30, "range": 110.0, "dot": 5.0, "slow": 0.5},
@@ -471,19 +471,28 @@ func _process(delta: float) -> void:
 		"area":
 			if get_enemies.is_valid() and not suppressed:
 				var r: float = range_radius * buff_range_mult
+				var in_zone: Array = []
 				for e in get_enemies.call().duplicate():
 					if not is_instance_valid(e):
 						continue
 					if position.distance_to(e.position) <= r:
-						if e.invisible and not e.revealed:
-							e.call("reveal")
-						e.call("apply_slow", area_slow, 0.3)
-						# zone_mult: papier gaat er extra hard doorheen (1.6), een archief met
-						# bewaarplicht helemaal niet (0.0).
-						var amt: float = area_dot * buff_dmg_mult * e.zone_mult * delta
-						e.call("take_damage", amt)
-						if on_damage.is_valid():
-							on_damage.call(def_id, amt)
+						in_zone.append(e)
+				# De zone heeft een VAST schadebudget dat over iedereen erin wordt verdeeld
+				# (playtest-feedback v0.68: per vijand volle schade maakte hem een
+				# swarm-verdelger die alle andere torens overbodig maakte). Tegen één doel
+				# doet hij nog steeds alles; tegen tien doet hij een tiende per stuk. Zijn
+				# rol is nu vertragen, en de damage-torens maken het af.
+				var share: float = 1.0 / float(maxi(1, in_zone.size()))
+				for e in in_zone:
+					if e.invisible and not e.revealed:
+						e.call("reveal")
+					e.call("apply_slow", area_slow, 0.3)
+					# zone_mult: papier gaat er extra hard doorheen (1.6), een archief met
+					# bewaarplicht helemaal niet (0.0).
+					var amt: float = area_dot * share * buff_dmg_mult * e.zone_mult * delta
+					e.call("take_damage", amt)
+					if on_damage.is_valid():
+						on_damage.call(def_id, amt)
 		"stun":
 			if not silenced:
 				_cooldown -= delta

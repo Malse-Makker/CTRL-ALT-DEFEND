@@ -13,6 +13,17 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.69.0 — 2026-07-25
+- The Shredder no longer deletes swarms: its damage is now shared out over everyone in the zone, so it slows things down and your damage towers finish the job.
+- Buying another tower of a type you already own costs more each time, so upgrading is now worth it instead of spamming level 1 towers.
+- You now get paid a little Coffee for every wave you survive, so a bad opening no longer locks you out of the run.
+- The enemy list stays closed if you closed it. It used to pop back open every time a new enemy showed up.
+- Sound starts a lot quieter. Turn it back up in Settings if you want.
+- The Tutorial now sits at the top of the level select, on its own, instead of among the levels.
+- Boss Rush and Endless are hidden until you make Specialist -- they are a reward, not a starting option.
+- The colleagues question is now a list: every enemy with what it does, and a box to name the colleague who behaves like that.
+- Website: links were dark blue on black. Readable now.
+
 ## v0.68.0 — 2026-07-25
 - Focus and Coffee now have icons in the top bar -- a lightning bolt and a coffee cup -- so you can read your status at a glance.
 - The tower shop now shows every tower's name, and lists them in the order you unlock them.

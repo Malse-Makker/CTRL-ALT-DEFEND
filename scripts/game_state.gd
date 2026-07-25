@@ -22,12 +22,14 @@ var enemy_panel_open: bool = false    # laatste keuze van de speler, onthouden p
 var resolution_index: int = 1   # standaard 1920x1080 (2x)
 var display_mode: int = 0        # 0 windowed, 1 borderless, 2 fullscreen
 var integer_scale: bool = true   # pixel-perfect schalen (kan randen geven)
-var master_volume: float = 0.9  # regelt de Master-bus; op 0 = alles stil
-var music_volume: float = 0.8
-var shoot_volume: float = 0.8
-var buy_volume: float = 0.8
-var coffee_volume: float = 0.8  # eigen bus: horen wanneer de economie oplevert
-var event_volume: float = 0.8   # alarm, lunchbel, geroezemoes, focus-verlies
+# Standaardvolumes bewust laag: testers meldden dat het spel op de oude waarden veel te
+# hard startte ("je kan snel doof worden"). Wie meer wil, schuift het in Settings omhoog.
+var master_volume: float = 0.55  # regelt de Master-bus; op 0 = alles stil
+var music_volume: float = 0.5
+var shoot_volume: float = 0.45
+var buy_volume: float = 0.6
+var coffee_volume: float = 0.6  # eigen bus: horen wanneer de economie oplevert
+var event_volume: float = 0.55   # alarm, lunchbel, geroezemoes, focus-verlies
 
 func _ready() -> void:
 	load_game()

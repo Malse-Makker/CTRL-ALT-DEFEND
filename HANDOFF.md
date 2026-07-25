@@ -169,6 +169,42 @@ Headphones. Zie `art/STYLE_GUIDE.md`.
 
 ---
 
+## Stand van zaken (v0.69.0)
+
+**Eerste tester-feedback verwerkt (v0.69.0).** Bron: `feedback/2026-07-25_tester1.md`.
+- **Shredder deelt zijn schade nu.** `tower.gd` "area": eerst iedereen in de zone verzamelen,
+  dan `share = 1/aantal` -- het schadebudget (`dot`) is vast en wordt verdeeld. Gemeten: 1 vijand
+  = 11/s, 8 vijanden = 1,4 per stuk, totaal altijd 11. Was 11 **per vijand**, dus 88/s tegen een
+  zwerm; daarmee was hij de swarm-verdelger die de rest overbodig maakte (2× genoemd, sterkste
+  signaal van de playtest). Zijn rol is nu vertragen. `desc` + tooltip aangepast, anders klopt
+  wat er in het spel staat niet meer met wat hij doet. **Meteen ook de "Shredder en Headphones
+  lijken op elkaar"-klacht:** area-controle vs. één doel hard stilzetten is nu een echt verschil.
+- **Prijsopslag op duplicaten** (`DUPLICATE_SURCHARGE` 25% per exemplaar, max +100%, alleen bij
+  plaatsen). Reden: een rekensom over alle torens liet zien dat upgraden bij Auto-Reply maar 4%
+  beter was dan een tweede exemplaar en bij Coffee Machine **exact gelijk** -- en een tweede toren
+  geeft óók nog dekking, dus spammen won altijd. Dit lost de hele klasse in één keer op **zonder
+  de torens sterker te maken** (buffen zou het spel makkelijker maken, en L1 is al te makkelijk).
+  Gemeten: Auto-Reply 10 → 13 → 15 → 18, upgraden blijft 12. `_update_bar` schrijft de prijs nu
+  live op de knop, anders staat er een bedrag dat niet klopt met wat er afgeschreven wordt.
+- **Salaris per overleefde wave** (`WAVE_INCOME` = 4, via `_add_coffee` zodat half_coffee en de
+  Out of Order-boss gelden). Tegen "verkeerde openingskeuze = ronde verloren". Gemeten: +4
+  normaal, +2 met half_coffee.
+- **Enemy-paneel blijft dicht** als de speler het zelf dichtdeed (`_left_user_closed`). Het
+  klapte terug open bij elk nieuw vijandtype.
+- **Volumes fors omlaag** (master 0.9 → 0.55, schoten 0.8 → 0.45, rest navenant): "je kan snel
+  doof worden".
+- **Tutorial bovenaan in het midden** van de level-select, los van de blokken.
+- **Boss Rush + Endless pas zichtbaar bij rang specialist** -- de gate die al als polish-punt
+  openstond.
+- **Colleagues-vraag is een invullijst** (`FB_COLLEAGUES` + `_fb_colleague_list`): per vijand wat
+  hij doet, met een veld ernaast. De Kletskous staat als voorbeeld in de intro. Komt als eigen
+  blok in de export.
+- **Site:** links waren donkerblauw op zwart (browserstandaard, er stond geen kleurregel). Nu een
+  eigen `--link`-kleur op beide pagina's.
+- **Niet gedaan:** "onduidelijk wat elke vijand doet" (de uitleg zit nu in tooltips + het
+  enemy-paneel; vraagt een eigen ontwerpronde) en L1 die na wave 10 makkelijk wordt (tester noemde
+  dat zelf acceptabel voor een eerste level).
+
 ## Stand van zaken (v0.68.0)
 
 **HUD-iconen, shop met namen, snelheden 1/2/4/8 (v0.68.0) — allemaal uit tester-feedback.**

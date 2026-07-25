@@ -75,7 +75,7 @@ def render_changelog_html(entries, version, exe_sha):
 <style>
   :root {{
     --bg: #1f2126; --panel: #2a2d34; --text: #e8e6e3; --dim: #9a9da6;
-    --accent: #e7c84a; --green: #5fb98f;
+    --accent: #e7c84a; --green: #5fb98f; --link: #79b8ff;
   }}
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
   body {{
@@ -107,6 +107,9 @@ def render_changelog_html(entries, version, exe_sha):
     font-family: inherit; font-size: 0.72rem; word-break: break-all; margin-bottom: 8px;
   }}
   footer {{ text-align: center; color: var(--dim); font-size: 0.8rem; padding: 24px 20px; }}
+  /* Eigen linkkleur: de browserstandaard is donkerblauw en dus onleesbaar op zwart. */
+  a {{ color: var(--link); text-decoration: underline; text-underline-offset: 2px; }}
+  a:hover {{ color: var(--accent); }}
   footer a, .back {{ color: var(--dim); }}
 </style>
 </head>

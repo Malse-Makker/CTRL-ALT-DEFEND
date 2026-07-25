@@ -176,6 +176,7 @@ var action_button: Button
 var pause_button: Button
 var speed_buttons: Dictionary = {}
 var focus_icon: Control = null
+var _left_user_closed: bool = false
 var smoke_button: Button
 var bar_buttons: Dictionary = {}
 var shop_panel: Control
@@ -606,7 +607,7 @@ func _tower_summary(id: String, lvl: int) -> String:
 				int(float(s.get("slow", 1.0)) * 100.0), float(s.get("slow_dur", 0.0)),
 				float(s.get("rate", 1.0))]
 		"area":
-			return "\n%.0f damage/s in the zone, slows" % float(s.get("dot", 0.0))
+			return "\n%.0f damage/s shared across the zone, slows" % float(s.get("dot", 0.0))
 		"support":
 			return "\n+%d%% damage to chosen towers" % int((float(s.get("buff_dmg", 1.0)) - 1.0) * 100.0)
 		"multi":
@@ -641,10 +642,29 @@ func _select_def(id: String) -> void:
 	_close_upgrade()
 	_update_bar()
 
+# Elke toren van hetzelfde type die je al hebt maakt de vólgende duurder. Zonder dit is
+# vijf keer level 1 neerzetten altijd beter dan één toren upgraden (playtest-feedback v0.68:
+# "je doet meer damage en je verspreidt het"), en dan is de hele upgrade-ladder decoratie.
+# Alleen op plaatsen (lvl 1) -- upgraden zelf wordt nooit duurder.
+const DUPLICATE_SURCHARGE := 0.25
+const DUPLICATE_SURCHARGE_MAX := 1.0
+
+func _duplicate_mult(id: String) -> float:
+	var n: int = 0
+	for t in towers:
+		if is_instance_valid(t) and t.def_id == id:
+			n += 1
+	return 1.0 + minf(float(n) * DUPLICATE_SURCHARGE, DUPLICATE_SURCHARGE_MAX)
+
 func _tower_cost(id: String, lvl: int) -> int:
-	return int(round(float(TowerScript.defs()[id]["levels"][lvl - 1]["cost"]) * cost_mult))
+	var base: float = float(TowerScript.defs()[id]["levels"][lvl - 1]["cost"]) * cost_mult
+	if lvl == 1:
+		base *= _duplicate_mult(id)
+	return int(round(base))
 
 const FEW_SPOTS_CAP := 8
+# Vast bedrag per overleefde wave; loopt via _add_coffee en volgt dus half_coffee.
+const WAVE_INCOME := 4
 
 func _try_place(p: Vector2) -> void:
 	if building_blocked:
@@ -924,6 +944,15 @@ func _start_next_wave() -> void:
 	if wave_index >= total_waves:
 		return
 	var w: Array = waves[wave_index]
+	# Salaris per overleefde wave. Zonder dit zit je vast aan je openingskeuze: koop je twee
+	# torens die niet werken tegen dit level, dan komt er nooit genoeg Coffee binnen om het
+	# recht te trekken (playtest-feedback v0.68). Klein bedrag -- het is een vangnet, geen
+	# inkomstenbron die de Coffee Machine overbodig maakt.
+	# Via _add_coffee, zodat de half_coffee-modifier en de Out of Order-boss (die alle
+	# koffie-inkomsten stopzet) hier net zo goed voor gelden als voor kills.
+	if wave_index > 0 and not _coffee_blocked():
+		_add_coffee(float(WAVE_INCOME))
+		_flash_msg("Payday: +%dC for surviving wave %d." % [WAVE_INCOME, wave_index])
 	wave_index += 1
 	# Onthul-paden: bij elke trigger-wave opent een extra vijand-pad. In corridor-levels wordt de
 	# strook eromheen meteen bouwbaar. De speler zag dit vooraf niet aankomen.
@@ -1625,11 +1654,15 @@ func _update_flow() -> void:
 			action_button.disabled = true
 
 func _update_bar() -> void:
+	var order: Array = _buildable()
 	for id in bar_buttons.keys():
 		var b: Button = bar_buttons[id]
 		var cost: int = _tower_cost(String(id), 1)
 		var sel: bool = (id == selected_def_id)
 		var afford: bool = coffee >= cost
+		# De prijs loopt op met het aantal dat je al hebt, dus die moet live meelopen --
+		# anders staat er een bedrag op de knop dat niet klopt met wat er afgeschreven wordt.
+		b.text = "%d · %dC" % [order.find(String(id)) + 1, cost]
 		b.modulate = Color(1.0, 0.9, 0.4) if sel else (Color(1, 1, 1) if afford else Color(0.55, 0.55, 0.55))
 
 func _flash_msg(text: String) -> void:
@@ -1753,7 +1786,9 @@ func _update_enemy_panel() -> void:
 		if not GameState.seen_enemies.has(id):
 			found_new = true
 			break
-	if found_new and not left_open:
+	# Alleen ongevraagd openklappen als de speler het paneel niet zelf heeft dichtgedaan;
+	# anders klapt het bij elk nieuw vijandtype terug open (playtest-feedback v0.68).
+	if found_new and not left_open and not _left_user_closed:
 		_toggle_left()
 	for id in enemy_rows.keys():
 		var row: Dictionary = enemy_rows[id]
@@ -2550,12 +2585,16 @@ func _build_left_panel(canvas: CanvasLayer) -> void:
 		vb.add_child(row)
 		enemy_rows[sid] = {"root": row, "count": cnt, "new": badge}
 
-	left_toggle = _button("◀" if left_open else "▶", _toggle_left, 18, 44)
+	left_toggle = _button("◀" if left_open else "▶", func(): _toggle_left(true), 18, 44)
 	left_toggle.position = Vector2((LEFT_W + 2) if left_open else 2, TOP_H + 6)
 	canvas.add_child(left_toggle)
 
-func _toggle_left() -> void:
+func _toggle_left(by_player: bool = false) -> void:
 	left_open = not left_open
+	if by_player and not left_open:
+		_left_user_closed = true
+	elif left_open:
+		_left_user_closed = false
 	left_panel.visible = left_open
 	left_toggle.text = "◀" if left_open else "▶"
 	left_toggle.position.x = (LEFT_W + 2) if left_open else 2

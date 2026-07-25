@@ -24,6 +24,7 @@ var _fb_up_btns: Array = []
 var _fb_dn_btns: Array = []
 var _fb_comment_edits: Array = []
 var _fb_fields: Dictionary = {}
+var _fb_colleague_edits: Dictionary = {}
 
 func _ready() -> void:
 	show_main_menu()
@@ -212,10 +213,11 @@ func show_feedback() -> void:
 	# --- Vrije velden ---
 	_fb_section(vb, "TELL US MORE")
 	_fb_fields = {}
+	_fb_colleague_edits = {}
 	_fb_field(vb, "towers", "Towers - which would you change and how? Any you're missing, and what would they do?")
 	_fb_field(vb, "enemies", "Enemies - which would you change and how? Any you're missing, and what would they do?")
 	_fb_field(vb, "maps", "Maps - which would you change and how? Any you're missing?")
-	_fb_field(vb, "colleagues", "Big idea on the table: turn every object-enemy (Notification, Nudge, Thread, Error...) into a COLLEAGUE (a person), same behaviour. What colleague names fit these behaviours?")
+	_fb_colleague_list(vb)
 	_fb_field(vb, "ideas", "Your own ideas:")
 
 	# --- Export ---
@@ -344,6 +346,44 @@ func _fb_field(vb: VBoxContainer, key: String, prompt: String) -> void:
 	_fb_fields[key] = te
 	vb.add_child(te)
 
+# De grote "maak van elke voorwerp-vijand een collega"-vraag was eerst één open tekstvak; een
+# tester merkte terecht op dat je dan moet raden waar het over gaat. Nu staat er per bestaande
+# vijand wat hij DOET, met een veld ernaast voor de collega die dat gedrag heeft.
+const FB_COLLEAGUES := [
+	["noti", "The Notification", "Plain and fast, no tricks. Just keeps coming."],
+	["hulp", "The Question", "A tougher version of the same thing."],
+	["nudge", "The Nudge", "Very fast, arrives as a swarm. Needs area damage or slows."],
+	["thread", "The Thread", "Arrives as one big pile at once. Paper -- the shredder eats it."],
+	["change", "The Change", "Splits into two smaller ones when you kill it."],
+	["micro", "The Micro-manager", "Speeds up the more damage it takes."],
+	["printer", "The Printer", "Jams every few seconds and spits out Error messages."],
+	["phish", "Suspicious Link", "Invisible until a Shredder zone reveals it."],
+	["board", "The Board Member", "Immune to burst damage -- never physically there."],
+	["cold", "The Cold Caller", "Immune to chip damage. Only burst stops it."],
+	["tank", "The Old Guard", "Shielded and slow. Break the shield first."],
+	["update", "System Update", "Briefly invulnerable while it installs, then keeps coming."],
+]
+
+func _fb_colleague_list(vb: VBoxContainer) -> void:
+	_fb_note(vb, "Big idea on the table: every enemy that is now an OBJECT becomes a COLLEAGUE -- a person who behaves exactly the same. The towers stay objects. We already have one: The Chatterbox, the colleague who corners you and talks until your towers go quiet.")
+	_fb_note(vb, "Below is what each enemy does. Write the kind of colleague that fits that behaviour -- a job title, a nickname, whatever. Leave blank what you have no idea for.")
+	for item in FB_COLLEAGUES:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		var l := Label.new()
+		l.text = "%s -- %s" % [String(item[1]), String(item[2])]
+		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_color_override("font_color", Color(0.78, 0.8, 0.88))
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(600, 0)
+		row.add_child(l)
+		var e := LineEdit.new()
+		e.placeholder_text = "which colleague?"
+		e.custom_minimum_size = Vector2(240, 26)
+		_fb_colleague_edits[String(item[0])] = e
+		row.add_child(e)
+		vb.add_child(row)
+
 func _fb_run_line(r: Dictionary) -> String:
 	# De versie hoort er per ronde bij: zonder dat weten we niet of een klacht over iets gaat
 	# dat inmiddels al gerepareerd is.
@@ -373,7 +413,14 @@ func _fb_compose() -> String:
 			line += "   | comment: " + c
 		lines.append(line)
 	lines.append("")
-	for key in ["towers", "enemies", "maps", "colleagues", "ideas"]:
+	lines.append("== COLLEAGUES (which colleague fits this behaviour?) ==")
+	for item in FB_COLLEAGUES:
+		var ed: LineEdit = _fb_colleague_edits.get(String(item[0]), null)
+		var val: String = ed.text.strip_edges() if ed != null else ""
+		if val != "":
+			lines.append("%-20s -> %s" % [String(item[1]), val])
+	lines.append("")
+	for key in ["towers", "enemies", "maps", "ideas"]:
 		lines.append("== " + key.to_upper() + " ==")
 		var te: TextEdit = _fb_fields.get(key, null)
 		lines.append(te.text.strip_edges() if te != null else "")
@@ -455,10 +502,18 @@ func show_level_select() -> void:
 	info.position = Vector2(SCREEN_W - 340, 40)
 	root.add_child(info)
 
+	# Tutorial staat los van de carrière (GDD §8): niet verplicht, telt niet mee voor sterren.
+	# Daarom bovenaan in het midden en niet tussen de levels -- daar las hij als "level 0"
+	# (playtest-feedback v0.68).
+	var tut := _btn("TUTORIAL  ·  learn the basics", func(): start_level(101), 300, 34)
+	tut.position = Vector2(SCREEN_W / 2.0 - 150, 56)
+	tut.add_theme_font_size_override("font_size", 13)
+	root.add_child(tut)
+
 	# Carrière in blokken van vijf (GDD §8): junior / medior / senior.
 	var block_titles := ["JUNIOR  ·  levels 1-5", "MEDIOR  ·  levels 6-10", "SENIOR  ·  levels 11-15"]
 	var vb := VBoxContainer.new()
-	vb.position = Vector2(44, 96)
+	vb.position = Vector2(44, 100)
 	vb.add_theme_constant_override("separation", 8)
 	root.add_child(vb)
 	var block_count: int = int(ceil(GameState.LEVEL_COUNT / 5.0))
@@ -491,23 +546,26 @@ func show_level_select() -> void:
 				b.disabled = true
 			hb.add_child(b)
 
-	# Extra modi (Tutorial altijd beschikbaar; Boss Rush + Endless: specialist-gate volgt in de polish-fase).
-	var modes_hdr := Label.new()
-	modes_hdr.text = "SPECIAL MODES"
-	modes_hdr.add_theme_font_size_override("font_size", 13)
-	modes_hdr.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
-	vb.add_child(modes_hdr)
-	var mhb := HBoxContainer.new()
-	mhb.add_theme_constant_override("separation", 10)
-	vb.add_child(mhb)
-	for m in [[101, "Tutorial"], [102, "Boss Rush"], [103, "Endless"]]:
-		var mb := Button.new()
-		mb.custom_minimum_size = Vector2(168, 46)
-		mb.add_theme_font_size_override("font_size", 12)
-		mb.text = String(m[1])
-		var mid: int = int(m[0])
-		mb.pressed.connect(func(): start_level(mid))
-		mhb.add_child(mb)
+	# Boss Rush en Endless zijn de specialist-beloning: pas zichtbaar als je die rang haalt
+	# (playtest-feedback v0.68 -- ze stonden er al vanaf level 1, waardoor ze als gewone
+	# levels lazen in plaats van als iets dat je verdient).
+	if GameState.current_rank() == "specialist":
+		var modes_hdr := Label.new()
+		modes_hdr.text = "SPECIAL MODES"
+		modes_hdr.add_theme_font_size_override("font_size", 13)
+		modes_hdr.add_theme_color_override("font_color", Color(0.6, 0.65, 0.75))
+		vb.add_child(modes_hdr)
+		var mhb := HBoxContainer.new()
+		mhb.add_theme_constant_override("separation", 10)
+		vb.add_child(mhb)
+		for m in [[102, "Boss Rush"], [103, "Endless"]]:
+			var mb := Button.new()
+			mb.custom_minimum_size = Vector2(168, 46)
+			mb.add_theme_font_size_override("font_size", 12)
+			mb.text = String(m[1])
+			var mid: int = int(m[0])
+			mb.pressed.connect(func(): start_level(mid))
+			mhb.add_child(mb)
 
 	var back := _vbox(root, Vector2(44, SCREEN_H - 62))
 	back.add_child(_btn("< Back", show_main_menu, 130, 36))

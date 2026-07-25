@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg: #1f2126; --panel: #2a2d34; --text: #e8e6e3; --dim: #9a9da6;
-    --accent: #e7c84a; --green: #5fb98f;
+    --accent: #e7c84a; --green: #5fb98f; --link: #79b8ff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -39,6 +39,9 @@
     font-family: inherit; font-size: 0.72rem; word-break: break-all; margin-bottom: 8px;
   }
   footer { text-align: center; color: var(--dim); font-size: 0.8rem; padding: 24px 20px; }
+  /* Eigen linkkleur: de browserstandaard is donkerblauw en dus onleesbaar op zwart. */
+  a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+  a:hover { color: var(--accent); }
   footer a, .back { color: var(--dim); }
 </style>
 </head>
@@ -50,13 +53,27 @@
   same list under <em>What's New</em>.</p>
 
   <div class="verify">
-    <h2>Verify your download (v0.68.0)</h2>
+    <h2>Verify your download (v0.69.0)</h2>
     <p>SHA-256 of CTRL-ALT-DEFEND.exe. The game shows the first 12 characters at the bottom
     of the main menu, so you can check the two match:</p>
-    <code>198c92873f495bd222b928ea4b066f77b89911d9095ee4fa89b2868707297ce5</code>
+    <code>cad855c4f756c480870efbb313376a9e4aba5d2da624e1519a8f030e5d5c3764</code>
   </div>
 
   <section class="current">
+    <h2>v0.69.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>The Shredder no longer deletes swarms: its damage is now shared out over everyone in the zone, so it slows things down and your damage towers finish the job.</li>
+      <li>Buying another tower of a type you already own costs more each time, so upgrading is now worth it instead of spamming level 1 towers.</li>
+      <li>You now get paid a little Coffee for every wave you survive, so a bad opening no longer locks you out of the run.</li>
+      <li>The enemy list stays closed if you closed it. It used to pop back open every time a new enemy showed up.</li>
+      <li>Sound starts a lot quieter. Turn it back up in Settings if you want.</li>
+      <li>The Tutorial now sits at the top of the level select, on its own, instead of among the levels.</li>
+      <li>Boss Rush and Endless are hidden until you make Specialist -- they are a reward, not a starting option.</li>
+      <li>The colleagues question is now a list: every enemy with what it does, and a box to name the colleague who behaves like that.</li>
+      <li>Website: links were dark blue on black. Readable now.</li>
+    </ul>
+  </section>
+  <section>
     <h2>v0.68.0 <span class="date">2026-07-25</span></h2>
     <ul>
       <li>Focus and Coffee now have icons in the top bar -- a lightning bolt and a coffee cup -- so you can read your status at a glance.</li>
