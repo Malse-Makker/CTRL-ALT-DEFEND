@@ -1,6 +1,14 @@
 {
   "entries": [
     {
+      "version": "0.70.0",
+      "date": "2026-07-25",
+      "items": [
+        "The Art Room is readable again: it scrolls, everything has room, and nothing overlaps.",
+        "It now shows all 14 towers (Pomodoro, Reply All and Ctrl+Alt+Del were missing) and lets you try all five mini-games, not just the projector."
+      ]
+    },
+    {
       "version": "0.69.0",
       "date": "2026-07-25",
       "items": [

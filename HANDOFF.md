@@ -28,6 +28,27 @@ We werken samen aan **Office Tower Defense**, een top-down tower defense in Godo
 > (`~/.ssh/makkersgames`) staan **lokaal in deze repo**, zodat andere projecten hun eigen
 > instellingen houden. Dus: **na elke wijziging committen én pushen.**
 
+## CHECKLIST VOOR DE OFFICIËLE RELEASE (pas doen als al het andere af is)
+
+Niet aan beginnen tijdens de alpha — dit is de lijst voor als de game inhoudelijk klaar is:
+balans uitgespeeld, maps niet meer greybox, audio af.
+
+- [ ] **Alle sprites opnieuw met RD Pro.** `rd_pro__topdown` accepteert referentiebeelden (Plus
+  niet), dus dan pas kun je de héle set op één consistente stijl trekken door bestaande sprites
+  als ijkpunt mee te geven. Ook 256x256 in plaats van 96x96, dus meer detail om vanaf terug te
+  schalen. **Kosten:** 60 gameplay-sprites ~ $11, inclusief UI ~ $20, reken op $14-26 met
+  mislukte pogingen. Zie de vergelijkingstabel verderop. **Eerst een sprite proberen** --
+  `rd_pro__*` gaf op dit account ooit HTTP 400. Doe dit als laatste art-stap: nu genereren
+  betekent straks nog een keer.
+- [ ] **Playtest-telemetrie eruit:** `ENABLED := false` bovenin `scripts/playtest.gd`. Dat haalt
+  het feedback-formulier na elke ronde weg en de Feedback-knop in het hoofdmenu.
+- [ ] **Feedback-pagina zelf weghalen of verbergen** (`show_feedback` + de knop in `app.gd`) --
+  die is voor pre-release-testers, niet voor spelers.
+- [ ] **Art Room verbergen** in het hoofdmenu; het is een ontwikkelgereedschap.
+- [ ] **Code-signing overwegen** zodat SmartScreen niet meer waarschuwt (zie de notitie
+  hieronder), of via Steam uitbrengen -- dan speelt het niet meer.
+- [ ] **Versie naar 1.0.0** en de disclaimer op de site/README bijstellen.
+
 **Releasen — vaste werkwijze sinds v0.64.0 (LEES DIT VOOR JE IETS WIJZIGT):**
 - **Na elke aanpassing uitbrengen.** Testers draaien de alpha; een wijziging die niet geüpload
   is, bestaat voor hen niet.
@@ -205,6 +226,25 @@ op wringt.
 mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst opwaarderen.
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
+
+## Stand van zaken (v0.70.0)
+
+**Art Room opgeknapt (v0.70.0).** Was onleesbaar: alles geperst in 540px, met overlappende
+namen, en je kon er maar een mini-game in testen.
+- **Scrollbaar.** Alle inhoud hangt onder een `content`-Node2D die met het muiswiel verschuift
+  (`_scroll_by`), met een vaste kop erboven. **Geen ScrollContainer:** towers en enemies zijn
+  Node2D's en die scrollen daar niet in mee.
+- **Secties** met kop, uitleg en een scheidingslijn (`_section`), en knoprijen die vanzelf
+  afbreken (`_row`) zodat er nooit iets buiten beeld valt.
+- **Alle 14 torens** -- `TOWER_ORDER` stond nog op 11, dus Pomodoro, Reply All en Ctrl+Alt+Del
+  ontbraken. Nu 5 per rij (was alles op een rij van 11, met kolommen van 60px).
+- **Alle 5 mini-games** testbaar: projector, Eat the Pizza, No Internet, telefoon en formulier.
+  Er zat alleen de projector in. Escape sluit eerst de mini-game, daarna pas de Art Room.
+  Auto-skip geldt nu voor alle vijf.
+- **Valkuil:** een Label buiten een container maakt zichzelf net zo breed als zijn tekst, dus
+  `autowrap_mode` doet daar niets -- namen liepen het scherm uit en over elkaar. Oplossing:
+  `clip_text` + `OVERRUN_TRIM_ELLIPSIS` en bredere cellen (6 kolommen). En bossprites zijn ~48px,
+  dus hun naam moet 44px onder het midden staan, anders lopen ze er op hun rondje overheen.
 
 ## Stand van zaken (v0.69.0)
 

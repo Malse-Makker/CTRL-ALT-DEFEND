@@ -13,6 +13,10 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.70.0 — 2026-07-25
+- The Art Room is readable again: it scrolls, everything has room, and nothing overlaps.
+- It now shows all 14 towers (Pomodoro, Reply All and Ctrl+Alt+Del were missing) and lets you try all five mini-games, not just the projector.
+
 ## v0.69.0 — 2026-07-25
 - The Shredder no longer deletes swarms: its damage is now shared out over everyone in the zone, so it slows things down and your damage towers finish the job.
 - Buying another tower of a type you already own costs more each time, so upgrading is now worth it instead of spamming level 1 towers.
