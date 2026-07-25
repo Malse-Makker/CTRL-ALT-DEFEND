@@ -169,6 +169,43 @@ Headphones. Zie `art/STYLE_GUIDE.md`.
 
 ---
 
+## Ondertekening & SmartScreen (uitgezocht 2026-07-25)
+
+De waarschuwing komt doordat de .exe **niet ondertekend** is en geen reputatie heeft. Opties,
+van goedkoop naar duur:
+- **Azure Trusted Signing** — maandabonnement (orde $10/mnd), het gangbare pad voor hobby-devs;
+  vraagt identiteitsverificatie en een Azure-abonnement.
+- **EV code-signing-certificaat** — enkele honderden euro's per jaar, hardware-token/HSM
+  verplicht; geeft de snelste SmartScreen-reputatie.
+- **OV-certificaat** — goedkoper, maar SmartScreen blijft in het begin waarschuwen tot er genoeg
+  downloads zijn.
+- **Via een platform uitbrengen** (Steam/itch-app): de launcher haalt het bestand op, dus geen
+  browser-download en geen Mark-of-the-Web → de waarschuwing verdwijnt in de praktijk. Steam
+  Direct kost eenmalig $100 per game.
+*Let op:* prijzen en voorwaarden wijzigen; controleer ze vóór je iets koopt. **Auto-updates
+triggeren SmartScreen niet** — de updater schrijft het bestand zelf weg, dus dat krijgt geen
+Mark-of-the-Web. Het speelt dus alleen bij de allereerste handmatige download.
+
+## RD Plus vs RD Pro (uitgezocht 2026-07-25, prijzen via de gratis cost-check)
+
+| | rd_plus__topdown_item | rd_pro__topdown |
+|---|---|---|
+| Prijs per sprite | **$0,038** | **$0,18** (4,7×) |
+| Max resolutie | 96×96 | 256×256 |
+| `reference_images` | **nee** | **ja** (tot 9) |
+| Batchkorting | geen | geen (4 stuks = 4×) |
+
+**Waarom Pro voor consistentie beter is:** alleen Pro accepteert referentiebeelden, dus je kunt
+bestaande sprites meegeven als stijl-ijkpunt. Bij Plus kun je alleen een palet + de vaste
+stijl-zin meegeven, en blijft elke generatie een losse gok. Dat is precies waar de huidige set
+op wringt.
+
+**Kosten van een volledige overstap** (110 PNG's in `art/`: 31 towers, 29 enemies, 9 UI):
+60 gameplay-sprites × $0,18 ≈ **$11**, alles inclusief UI ≈ **$20** — reken op ~30% extra voor
+mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst opwaarderen.
+**Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
+(zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
+
 ## Stand van zaken (v0.69.0)
 
 **Eerste tester-feedback verwerkt (v0.69.0).** Bron: `feedback/2026-07-25_tester1.md`.
@@ -323,9 +360,12 @@ als de QTE-componenten; toegevoegd in `app.gd _ready`):
   tijdelijke env-hook gerenderd), veilige download inclusief **sha256-verificatie** ✓, live
   `version.json` matcht de live zip op size én sha256 ✓, `updater.gdc` + `VERSION` zitten in de
   gepubliceerde build ✓, headless schoon ✓. Testcode weer verwijderd.
-- **NIET getest: de zelf-vervangende route** — die is Windows-only en er is hier geen Windows.
-  De gebruiker heeft een Windows-machine die aangezet moet worden. **Laat die de update één keer
-  doorlopen (v0.64.0 → volgende versie) vóór je de rest een nieuwe versie laat installeren.**
+- ✅ **De zelf-vervangende route is op een échte Windows-machine getest en werkt** (gebruiker,
+  2026-07-25). De hernoem-truc op een draaiende .exe doet wat hij moet doen. Daarmee is het
+  laatste ongeteste stuk van de updater dicht.
+- **SmartScreen blijft waarschuwen** bij de eerste handmatige download: de build is niet
+  ondertekend. Dat is geen bug maar het ontbreken van een code-signing-certificaat; zie de
+  notitie hieronder bij v0.69.0.
 - *Let op:* de v0.63.0 die eventueel al rondgaat heeft nog geen updater; die moet één keer
   handmatig. Vanaf v0.64.0 gaat het vanzelf.
 
