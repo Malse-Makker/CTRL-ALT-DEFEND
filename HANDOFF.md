@@ -20,13 +20,34 @@ We werken samen aan **Office Tower Defense**, een top-down tower defense in Godo
    (Ter referentie ook: `FABLE5_MAP_REVIEW_PROMPT.md` + `FABLE5_LAYOUT_REVIEW_FOLLOWUP.md` — de prompts
    waarmee die review is opgehaald.)
 
+> **De game heet sinds v0.66.0 CTRL-ALT-DEFEND** (was werktitel "Office Tower Defense").
+> Projectmap: `/Users/nijntje/Documents/projecten/CTRL-ALT-DEFEND` — een **publieke git-repo**
+> op `git@github.com:Malse-Makker/CTRL-ALT-DEFEND.git`. De oude map `projecten/game` is een
+> kopie van vóór de verhuizing en mag weg zodra de gebruiker het zegt; **werk daar niet meer in**.
+> Commits gaan als `malse-makker <games@makkers.net>` — die identiteit en de SSH-sleutel
+> (`~/.ssh/makkersgames`) staan **lokaal in deze repo**, zodat andere projecten hun eigen
+> instellingen houden. Dus: **na elke wijziging committen én pushen.**
+
 **Releasen — vaste werkwijze sinds v0.64.0 (LEES DIT VOOR JE IETS WIJZIGT):**
 - **Na elke aanpassing uitbrengen.** Testers draaien de alpha; een wijziging die niet geüpload
   is, bestaat voor hen niet.
 - **Altijd via `tools/make_release.sh`** — nooit handmatig exporteren/uploaden. Het script doet:
   changelog valideren → headless check → exporteren → zippen → sha256 → `changelog.json`,
-  `version.json` en `changelog.html` genereren → downloadpagina bijwerken → rsync naar OVH →
-  controleren. `--dry-run` bouwt alles zonder te uploaden.
+  `version.json` en `changelog.html` genereren → downloadknop bijwerken → **GitHub Release
+  aanmaken + zip en version.json uploaden** → site naar OVH → controleren. `--dry-run` bouwt
+  alles zonder te publiceren.
+- **De binary staat op GitHub Releases, niet op de eigen server** (sinds v0.66.0, na feedback
+  dat zelf-hosten van een zichzelf-updatende .exe onveilig is). Redenering: wie de webserver
+  overneemt bepaalt wat er bij elke tester geïnstalleerd wordt, en een checksum die op diezelfde
+  server staat bewijst dan niets. De OVH-server serveert alleen nog de pagina's.
+  `scripts/updater.gd` leest `releases/latest/download/version.json` — dat adres wijst vanzelf
+  naar de nieuwste release, dus er hoeft per release niets aan URL's bijgewerkt te worden.
+  *Nog niet gedaan (de eigenlijke bescherming):* **handtekeningverificatie** — release
+  ondertekenen met een privésleutel die alleen lokaal staat, publieke sleutel in de game
+  (Godot `Crypto`). Dan maakt het niet meer uit wie welke server overneemt.
+- **Publiceren vraagt een GitHub-token** met *Contents: read and write* op deze repo, in
+  `~/.config/makkers/github_token` (chmod 600) of `$GITHUB_TOKEN`. Zonder token stopt
+  `tools/github_release.py` met uitleg. De gebruiker maakt dat token zelf aan.
 - **Stappen:** `CHANGELOG.md` bovenaan een `## v<nieuwe versie> — <datum>`-sectie zetten (Engels,
   speler-gericht), `VERSION` bumpen, `./tools/make_release.sh` draaien. Het script **weigert** als
   de bovenste changelog-sectie niet gelijk is aan `VERSION` — dat is expres.
@@ -137,6 +158,25 @@ moet in één blik zien dat 3 beter is dan 2 beter dan 1. IJkpunt: Coffee Machin
 Headphones. Zie `art/STYLE_GUIDE.md`.
 
 ---
+
+## Stand van zaken (v0.66.0)
+
+**Hernoemd naar CTRL-ALT-DEFEND + releases naar GitHub (v0.66.0).**
+- **Naam.** Overal waar een speler het ziet: titelscherm (ondertitel is nu de IT Crowd-knipoog
+  *"I'll put this with the rest of the focus."*), venstertitel, `CTRL-ALT-DEFEND.exe`, de zip,
+  de site, de feedback-header en de mail-onderwerpregel. Feedbackbestanden heten nu
+  `ctrl_alt_defend_*`. Interne def_id's zijn **niet** aangeraakt (breekt saves).
+- **Publieke repo** `Malse-Makker/CTRL-ALT-DEFEND`. `feedback/` staat bewust in `.gitignore`:
+  daar staan opmerkingen en speler-id's van testers in en de repo is openbaar. `build/` en
+  `.godot/` ook. De spelers-README voor in de zip is daarom verhuisd naar
+  `deploy/player_readme.txt` (stond in `build/`, dat niet meer meegaat).
+- **Nieuw:** `tools/github_release.py` (alleen stdlib, geen `gh` nodig): maakt de release aan
+  of hergebruikt 'm, verwijdert een gelijknamig asset vóór het uploaden (anders plakt GitHub er
+  "-1" achter), en haalt de release-notes uit `CHANGELOG.md` zodat GitHub, de site en het
+  update-scherm hetzelfde vertellen. Releases zijn `prerelease: true` (alpha).
+- Getest: dry-run bouwt de hernoemde zip + exe ✓, `version.json` wijst naar het GitHub-asset ✓,
+  downloadknop op de site wijst naar dezelfde URL ✓, headless schoon ✓, broncode gepusht ✓.
+- **Nog niet gedraaid: de echte publicatie** — daarvoor is het GitHub-token nodig (zie boven).
 
 ## Stand van zaken (v0.65.0)
 
