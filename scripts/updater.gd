@@ -15,8 +15,12 @@ extends CanvasLayer
 # Uitzetten: ENABLED op false.
 
 const ENABLED := true
-const VERSION_URL := "https://game.makkers.net/version.json"
-const CHECK_TIMEOUT := 6.0
+# "releases/latest/download/..." wijst altijd naar de nieuwste release, dus dit adres hoeft
+# bij een nieuwe versie nooit bijgewerkt te worden. Bewust GitHub en niet de eigen server:
+# de game installeert wat hier staat, en dan wil je die binary niet naast tien andere
+# diensten op een zelfbeheerde VPS hebben liggen.
+const VERSION_URL := "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/latest/download/version.json"
+const CHECK_TIMEOUT := 8.0
 
 const PlaytestScript = preload("res://scripts/playtest.gd")
 
@@ -54,6 +58,9 @@ func _cleanup_leftovers() -> void:
 func _check() -> void:
 	_http = HTTPRequest.new()
 	_http.timeout = CHECK_TIMEOUT
+	# GitHub stuurt "latest/download/..." door naar zijn opslag-CDN; zonder redirects krijg je
+	# alleen de 302 te pakken.
+	_http.max_redirects = 8
 	add_child(_http)
 	_http.request_completed.connect(_on_check_done)
 	if _http.request(VERSION_URL) != OK:
@@ -210,13 +217,13 @@ func _show_choice() -> void:
 	if can_auto:
 		_text(vb, "1. AUTOMATIC  -  the game replaces itself and restarts", 15, Color(0.6, 0.9, 0.7))
 		_text(vb, "Downloads the new version, swaps it in and restarts. Takes about a minute; your progress and settings are kept.", 12)
-		_text(vb, "Heads up: some antivirus software distrusts a program that replaces its own .exe -- it looks like malware behaviour, even though it isn't. If the update gets blocked or the game disappears after restarting, open Windows Security -> Virus & threat protection -> Protection history and choose Allow / Restore for Office Tower Defense. Or just use option 2, which never runs into this.", 12, Color(0.95, 0.78, 0.45))
+		_text(vb, "Heads up: some antivirus software distrusts a program that replaces its own .exe -- it looks like malware behaviour, even though it isn't. If the update gets blocked or the game disappears after restarting, open Windows Security -> Virus & threat protection -> Protection history and choose Allow / Restore for CTRL-ALT-DEFEND. Or just use option 2, which never runs into this.", 12, Color(0.95, 0.78, 0.45))
 		_button(_row(vb), "Update automatically", func(): _start_download(true), 300)
 	else:
 		_text(vb, "Automatic updating is Windows-only. Use the safe option below.", 13, Color(0.95, 0.78, 0.45))
 
 	_text(vb, "2. SAFE  -  download it and swap it yourself", 15, Color(0.6, 0.85, 0.95))
-	_text(vb, "Downloads the zip to your Downloads folder and opens it for you. You unzip it and drag the new OfficeTowerDefense.exe over the old one. Always works, no antivirus trouble -- just a bit more work.", 12)
+	_text(vb, "Downloads the zip to your Downloads folder and opens it for you. You unzip it and drag the new CTRL-ALT-DEFEND.exe over the old one. Always works, no antivirus trouble -- just a bit more work.", 12)
 	_button(_row(vb), "Download the safe way", func(): _start_download(false), 300)
 	_button(_row(vb), "Back", _show_available, 140)
 
@@ -252,6 +259,7 @@ func _start_download(auto: bool) -> void:
 	_http = HTTPRequest.new()
 	_http.use_threads = true
 	_http.timeout = 0
+	_http.max_redirects = 8
 	_http.download_file = _zip_target
 	add_child(_http)
 	_http.request_completed.connect(_on_zip_done)
@@ -301,7 +309,7 @@ func _show_downloaded() -> void:
 	var vb := _open_panel("DOWNLOAD READY")
 	_text(vb, "Saved v%s to:" % str(_info.get("version", "?")), 14, Color(0.6, 0.9, 0.7))
 	_text(vb, _zip_target, 12)
-	_text(vb, "Unzip it and replace your old OfficeTowerDefense.exe with the new one. Your saved progress lives elsewhere, so nothing is lost.", 13)
+	_text(vb, "Unzip it and replace your old CTRL-ALT-DEFEND.exe with the new one. Your saved progress lives elsewhere, so nothing is lost.", 13)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	vb.add_child(row)
@@ -314,7 +322,7 @@ func _show_downloaded() -> void:
 func _install() -> void:
 	var exe := OS.get_executable_path()
 	var dir := exe.get_base_dir()
-	var entry: String = str(_info.get("exe", "OfficeTowerDefense.exe"))
+	var entry: String = str(_info.get("exe", "CTRL-ALT-DEFEND.exe"))
 
 	var zr := ZIPReader.new()
 	if zr.open(_zip_target) != OK:
@@ -359,7 +367,7 @@ func _install() -> void:
 
 	DirAccess.remove_absolute(_zip_target)
 	if OS.create_process(exe, []) == -1:
-		_show_failed("The update is installed, but the game could not restart itself.\n\nClose this window and start Office Tower Defense again.")
+		_show_failed("The update is installed, but the game could not restart itself.\n\nClose this window and start CTRL-ALT-DEFEND again.")
 		return
 	get_tree().quit()
 
@@ -368,7 +376,7 @@ func _fail_install(reason: String) -> void:
 	DirAccess.remove_absolute(_zip_target)
 	var vb := _open_panel("AUTOMATIC UPDATE DID NOT WORK")
 	_text(vb, reason, 14, Color(0.95, 0.78, 0.45))
-	_text(vb, "Nothing was changed -- the game you are playing is untouched. If your antivirus blocked it, allow Office Tower Defense in Windows Security. Otherwise use the safe route: it downloads the zip and you swap the file yourself.", 13)
+	_text(vb, "Nothing was changed -- the game you are playing is untouched. If your antivirus blocked it, allow CTRL-ALT-DEFEND in Windows Security. Otherwise use the safe route: it downloads the zip and you swap the file yourself.", 13)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	vb.add_child(row)

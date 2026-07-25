@@ -71,7 +71,7 @@ def render_changelog_html(entries, version, zip_sha, exe_sha):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Office Tower Defense — changelog</title>
+<title>CTRL-ALT-DEFEND — changelog</title>
 <style>
   :root {{
     --bg: #1f2126; --panel: #2a2d34; --text: #e8e6e3; --dim: #9a9da6;
@@ -114,14 +114,14 @@ def render_changelog_html(entries, version, zip_sha, exe_sha):
 <main>
   <a class="back" href="/">&larr; back to the download</a>
   <h1>CHANGELOG</h1>
-  <p class="lead">Every version of Office Tower Defense, newest first. The game shows this
+  <p class="lead">Every version of CTRL-ALT-DEFEND, newest first. The game shows this
   same list under <em>What's New</em>.</p>
 
   <div class="verify">
     <h2>Verify your download (v{html.escape(version)})</h2>
     <p>SHA-256 of the zip:</p>
     <code>{html.escape(zip_sha)}</code>
-    <p>SHA-256 of OfficeTowerDefense.exe — this is the one the game shows (first 12 characters)
+    <p>SHA-256 of CTRL-ALT-DEFEND.exe — this is the one the game shows (first 12 characters)
     at the bottom of the main menu:</p>
     <code>{html.escape(exe_sha)}</code>
   </div>
@@ -147,7 +147,8 @@ def main() -> int:
     ap.add_argument("--zip-sha")
     ap.add_argument("--exe-sha")
     ap.add_argument("--size", type=int)
-    ap.add_argument("--base-url")
+    ap.add_argument("--zip-url")
+    ap.add_argument("--site-url")
     a = ap.parse_args()
 
     entries = parse_changelog()
@@ -177,7 +178,7 @@ def main() -> int:
         print(f"   changelog.json geschreven ({len(entries)} versies), changelog OK")
         return 0
 
-    missing = [n for n in ("zip_name", "exe", "zip_sha", "exe_sha", "size", "base_url")
+    missing = [n for n in ("zip_name", "exe", "zip_sha", "exe_sha", "size", "zip_url", "site_url")
                if getattr(a, n) is None]
     if missing:
         print(f"!! ontbrekende argumenten: {', '.join(missing)}", file=sys.stderr)
@@ -189,13 +190,13 @@ def main() -> int:
             {
                 "version": a.version,
                 "date": datetime.date.today().isoformat(),
-                "zip": f"{a.base_url}/{a.zip_name}",
+                "zip": a.zip_url,
                 "exe": a.exe,
                 "sha256": a.zip_sha,
                 "exe_sha256": a.exe_sha,
                 "size": a.size,
                 "changes": entries[0]["items"],
-                "changelog_url": f"{a.base_url}/changelog.html",
+                "changelog_url": f"{a.site_url}/changelog.html",
             },
             indent=2,
         )

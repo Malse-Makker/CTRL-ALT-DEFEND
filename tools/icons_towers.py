@@ -1,4 +1,4 @@
-"""Modellen voor de tower-iconen (Office Tower Defense).
+"""Modellen voor de tower-iconen (CTRL-ALT-DEFEND).
 
 Elke functie bouwt één icoon uit primitieven van blender_icon_rig. De rig levert camera,
 licht en palet; hier staat alleen de vorm. Draaien:

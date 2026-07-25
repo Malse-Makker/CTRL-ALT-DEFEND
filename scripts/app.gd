@@ -71,9 +71,9 @@ func _vbox(root: Control, pos: Vector2) -> VBoxContainer:
 # ---------- Main menu ----------
 
 func show_main_menu() -> void:
-	var root := _screen("OFFICE TOWER DEFENSE")
+	var root := _screen("CTRL-ALT-DEFEND")
 	var sub := Label.new()
-	sub.text = "This meeting could have been an email."
+	sub.text = "I'll put this with the rest of the focus."
 	sub.add_theme_font_size_override("font_size", 14)
 	sub.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8))
 	sub.position = Vector2(42, 66)
@@ -358,7 +358,7 @@ func _fb_run_line(r: Dictionary) -> String:
 
 func _fb_compose() -> String:
 	var lines: Array = []
-	lines.append("OFFICE TOWER DEFENSE - FEEDBACK")
+	lines.append("CTRL-ALT-DEFEND - FEEDBACK")
 	lines.append("version: " + PlaytestScript.version())
 	lines.append("player: " + PlaytestScript.player_id())
 	lines.append("timestamp: " + Time.get_datetime_string_from_system())
@@ -406,7 +406,7 @@ func _email_feedback(result: Label) -> void:
 	# lege mail met het juiste adres + onderwerp openen, zodat de tester alleen hoeft te plakken.
 	var text: String = _fb_all_text()
 	DisplayServer.clipboard_set(text)
-	var subject: String = "Office Tower Defense feedback - v%s - %s" % [
+	var subject: String = "CTRL-ALT-DEFEND feedback - v%s - %s" % [
 		PlaytestScript.version(), PlaytestScript.player_id()]
 	var body: String = "Paste the feedback here (it is already on your clipboard: Ctrl+V)."
 	OS.shell_open("mailto:%s?subject=%s&body=%s" % [FEEDBACK_EMAIL, subject.uri_encode(), body.uri_encode()])
@@ -418,10 +418,10 @@ func _export_feedback(result: Label) -> void:
 	if dir == "":
 		dir = OS.get_user_data_dir()
 	var stamp: String = Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var fpath: String = "%s/office_td_feedback_%s.txt" % [dir, stamp]
+	var fpath: String = "%s/ctrl_alt_defend_feedback_%s.txt" % [dir, stamp]
 	var f := FileAccess.open(fpath, FileAccess.WRITE)
 	if f == null:
-		fpath = "%s/office_td_feedback_%s.txt" % [OS.get_user_data_dir(), stamp]
+		fpath = "%s/ctrl_alt_defend_feedback_%s.txt" % [OS.get_user_data_dir(), stamp]
 		f = FileAccess.open(fpath, FileAccess.WRITE)
 	if f == null:
 		result.add_theme_color_override("font_color", Color(1.0, 0.7, 0.4))

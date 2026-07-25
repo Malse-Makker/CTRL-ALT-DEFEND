@@ -1,17 +1,15 @@
 {
-  "version": "0.65.0",
+  "version": "0.66.0",
   "date": "2026-07-25",
-  "zip": "https://game.makkers.net/OfficeTowerDefense_v0.65.0_alpha_windows.zip",
-  "exe": "OfficeTowerDefense.exe",
-  "sha256": "edf32962197b656b6198e724638731ee904f71325b412eb5894ef9433559a579",
-  "exe_sha256": "9ad448463dfd409f596da4e69b387ae13f7c65f813b7a7cac516a55f4ef1fd46",
-  "size": 38830273,
+  "zip": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.66.0/CTRL-ALT-DEFEND_v0.66.0_alpha_windows.zip",
+  "exe": "CTRL-ALT-DEFEND.exe",
+  "sha256": "bfcdc8cd804a13d73f0c6a9ddc63b9e742681db654ab6ecca761ed1e97d75859",
+  "exe_sha256": "6868221e12b74b135b333af8f3baa1019804b55135b0f8c14dc94068dccfa0b2",
+  "size": 38830778,
   "changes": [
-    "The rating after each level now asks how much FUN it was (0 = no fun, 10 = loved it) instead of how hard it was. The old question was ambiguous and the answers contradicted what people wrote.",
-    "Feedback can now be emailed straight to games@makkers.net, on top of copy-paste and saving files.",
-    "Your feedback now lists which version you played each level on, so old reports about already-fixed things can be spotted.",
-    "New \"What's New\" page in the main menu with the full changelog.",
-    "The main menu now shows a short build fingerprint you can check against the website."
+    "The game is now called CTRL-ALT-DEFEND. Same game, better name.",
+    "Downloads and updates now come from GitHub instead of my own server, which is a safer place to keep a program that updates itself.",
+    "The source code is public at github.com/Malse-Makker/CTRL-ALT-DEFEND."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

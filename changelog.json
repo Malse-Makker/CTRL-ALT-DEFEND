@@ -1,6 +1,15 @@
 {
   "entries": [
     {
+      "version": "0.66.0",
+      "date": "2026-07-25",
+      "items": [
+        "The game is now called CTRL-ALT-DEFEND. Same game, better name.",
+        "Downloads and updates now come from GitHub instead of my own server, which is a safer place to keep a program that updates itself.",
+        "The source code is public at github.com/Malse-Makker/CTRL-ALT-DEFEND."
+      ]
+    },
+    {
       "version": "0.65.0",
       "date": "2026-07-25",
       "items": [

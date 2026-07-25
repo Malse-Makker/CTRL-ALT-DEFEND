@@ -150,11 +150,11 @@ static func export_csv() -> String:
 	if dir == "":
 		dir = OS.get_user_data_dir()
 	var stamp := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var path := "%s/office_td_playtest_%s.csv" % [dir, stamp]
+	var path := "%s/ctrl_alt_defend_playtest_%s.csv" % [dir, stamp]
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f == null:
 		# Downloads kan geblokkeerd zijn; val terug op de user-map
-		path = "%s/office_td_playtest_%s.csv" % [OS.get_user_data_dir(), stamp]
+		path = "%s/ctrl_alt_defend_playtest_%s.csv" % [OS.get_user_data_dir(), stamp]
 		f = FileAccess.open(path, FileAccess.WRITE)
 		if f == null:
 			return ""

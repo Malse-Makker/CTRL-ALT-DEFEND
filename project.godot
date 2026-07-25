@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Office Tower Defense"
+config/name="CTRL-ALT-DEFEND"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.7")
 

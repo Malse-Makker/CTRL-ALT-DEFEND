@@ -1,4 +1,4 @@
-"""Vaste Blender-rig voor de icon-set (Office Tower Defense).
+"""Vaste Blender-rig voor de icon-set (CTRL-ALT-DEFEND).
 
 Draai dit via de Blender MCP (execute_blender_code) of in Blenders scripting-tab.
 Het zet camera, belichting, palet en render-instellingen op. Daarna bouw je per icoon

@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.66.0 — 2026-07-25
+- The game is now called CTRL-ALT-DEFEND. Same game, better name.
+- Downloads and updates now come from GitHub instead of my own server, which is a safer place to keep a program that updates itself.
+- The source code is public at github.com/Malse-Makker/CTRL-ALT-DEFEND.
+
 ## v0.65.0 — 2026-07-25
 - The rating after each level now asks how much FUN it was (0 = no fun, 10 = loved it) instead of how hard it was. The old question was ambiguous and the answers contradicted what people wrote.
 - Feedback can now be emailed straight to games@makkers.net, on top of copy-paste and saving files.
