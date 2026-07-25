@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "godot": {
+      "command": "/opt/homebrew/bin/node",
+      "args": ["/Users/nijntje/.claude/mcp-servers/godot-mcp/build/index.js"],
+      "env": {
+        "GODOT_PATH": "/Applications/Godot.app/Contents/MacOS/Godot"
+      }
+    },
+    "blender": {
+      "command": "/opt/homebrew/bin/uvx",
+      "args": ["blender-mcp"]
+    },
+    "retro-diffusion": {
+      "type": "http",
+      "url": "https://mcp.retrodiffusion.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${RETRO_DIFFUSION_API_KEY}"
+      }
+    }
+  }
+}

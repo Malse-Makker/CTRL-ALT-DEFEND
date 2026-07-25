@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office Tower Defense — changelog</title>
+<style>
+  :root {
+    --bg: #1f2126; --panel: #2a2d34; --text: #e8e6e3; --dim: #9a9da6;
+    --accent: #e7c84a; --green: #5fb98f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: "Courier New", ui-monospace, monospace;
+    line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh;
+  }
+  main { max-width: 680px; margin: 0 auto; padding: 48px 20px 32px; flex: 1; width: 100%; }
+  h1 { color: var(--accent); font-size: 1.6rem; letter-spacing: 1px; margin-bottom: 4px; }
+  .lead { color: var(--dim); margin-bottom: 28px; }
+  .back { display: inline-block; color: var(--dim); margin-bottom: 24px; }
+  section {
+    background: var(--panel); border-radius: 8px;
+    padding: 16px 20px; margin-bottom: 14px;
+  }
+  section.current { border-left: 3px solid var(--green); }
+  section h2 { font-size: 1rem; color: var(--accent); margin-bottom: 8px; }
+  section.current h2 { color: var(--green); }
+  .date { color: var(--dim); font-size: 0.8rem; font-weight: normal; }
+  ul { padding-left: 20px; }
+  li { font-size: 0.9rem; margin-bottom: 4px; }
+  .verify {
+    background: var(--panel); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px;
+  }
+  .verify h2 { font-size: 0.95rem; margin-bottom: 8px; }
+  .verify p { font-size: 0.85rem; color: var(--dim); margin-bottom: 8px; }
+  code {
+    display: block; background: #1a1c20; padding: 8px 10px; border-radius: 4px;
+    font-family: inherit; font-size: 0.72rem; word-break: break-all; margin-bottom: 8px;
+  }
+  footer { text-align: center; color: var(--dim); font-size: 0.8rem; padding: 24px 20px; }
+  footer a, .back { color: var(--dim); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">&larr; back to the download</a>
+  <h1>CHANGELOG</h1>
+  <p class="lead">Every version of Office Tower Defense, newest first. The game shows this
+  same list under <em>What's New</em>.</p>
+
+  <div class="verify">
+    <h2>Verify your download (v0.65.0)</h2>
+    <p>SHA-256 of the zip:</p>
+    <code>edf32962197b656b6198e724638731ee904f71325b412eb5894ef9433559a579</code>
+    <p>SHA-256 of OfficeTowerDefense.exe — this is the one the game shows (first 12 characters)
+    at the bottom of the main menu:</p>
+    <code>9ad448463dfd409f596da4e69b387ae13f7c65f813b7a7cac516a55f4ef1fd46</code>
+  </div>
+
+  <section class="current">
+    <h2>v0.65.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>The rating after each level now asks how much FUN it was (0 = no fun, 10 = loved it) instead of how hard it was. The old question was ambiguous and the answers contradicted what people wrote.</li>
+      <li>Feedback can now be emailed straight to games@makkers.net, on top of copy-paste and saving files.</li>
+      <li>Your feedback now lists which version you played each level on, so old reports about already-fixed things can be spotted.</li>
+      <li>New &quot;What&#x27;s New&quot; page in the main menu with the full changelog.</li>
+      <li>The main menu now shows a short build fingerprint you can check against the website.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>v0.64.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>The game checks for updates when it starts and can update itself.</li>
+      <li>You choose how to update: automatic (the game replaces itself and restarts) or safe (it downloads the zip and you swap the file yourself).</li>
+      <li>Downloads are verified against a checksum, so a corrupted download can never overwrite your game.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>v0.63.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>Feedback: new COPY ALL TO CLIPBOARD button, so you can paste it straight into Discord without wrestling with files.</li>
+      <li>Fixed: the feedback export said &quot;version: ?&quot; instead of the version you played.</li>
+      <li>Fixed: vote arrows now clearly turn green or red, so you can see your vote registered. Before this, votes looked like they did nothing.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>v0.62.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>First public alpha build for Windows, with a download page.</li>
+    </ul>
+  </section>
+  <section>
+    <h2>v0.61.0 <span class="date">2026-07-25</span></h2>
+    <ul>
+      <li>New Feedback page in the main menu: vote on the plans, tell us what is missing, and export it all.</li>
+    </ul>
+  </section>
+</main>
+<footer>
+  Part of the <a href="https://projecten.makkers.net">makkers collection</a> —
+  free hobby projects, non-commercial, made for fun and learning.
+</footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Godot
+.godot/
+*.translation
+
+# Builds — die horen bij een GitHub Release, niet in de repo
+build/
+deploy/public/*.zip
+
+# Playtest-feedback van testers: bevat hun opmerkingen en speler-id. Deze repo is
+# openbaar, dus die zetten we er bewust niet in.
+feedback/
+
+# macOS
+.DS_Store

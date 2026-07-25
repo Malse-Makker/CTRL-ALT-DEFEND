@@ -1,0 +1,47 @@
+{
+  "entries": [
+    {
+      "version": "0.65.0",
+      "date": "2026-07-25",
+      "items": [
+        "The rating after each level now asks how much FUN it was (0 = no fun, 10 = loved it) instead of how hard it was. The old question was ambiguous and the answers contradicted what people wrote.",
+        "Feedback can now be emailed straight to games@makkers.net, on top of copy-paste and saving files.",
+        "Your feedback now lists which version you played each level on, so old reports about already-fixed things can be spotted.",
+        "New \"What's New\" page in the main menu with the full changelog.",
+        "The main menu now shows a short build fingerprint you can check against the website."
+      ]
+    },
+    {
+      "version": "0.64.0",
+      "date": "2026-07-25",
+      "items": [
+        "The game checks for updates when it starts and can update itself.",
+        "You choose how to update: automatic (the game replaces itself and restarts) or safe (it downloads the zip and you swap the file yourself).",
+        "Downloads are verified against a checksum, so a corrupted download can never overwrite your game."
+      ]
+    },
+    {
+      "version": "0.63.0",
+      "date": "2026-07-25",
+      "items": [
+        "Feedback: new COPY ALL TO CLIPBOARD button, so you can paste it straight into Discord without wrestling with files.",
+        "Fixed: the feedback export said \"version: ?\" instead of the version you played.",
+        "Fixed: vote arrows now clearly turn green or red, so you can see your vote registered. Before this, votes looked like they did nothing."
+      ]
+    },
+    {
+      "version": "0.62.0",
+      "date": "2026-07-25",
+      "items": [
+        "First public alpha build for Windows, with a download page."
+      ]
+    },
+    {
+      "version": "0.61.0",
+      "date": "2026-07-25",
+      "items": [
+        "New Feedback page in the main menu: vote on the plans, tell us what is missing, and export it all."
+      ]
+    }
+  ]
+}
