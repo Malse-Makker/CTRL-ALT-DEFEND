@@ -28,6 +28,32 @@ We werken samen aan **Office Tower Defense**, een top-down tower defense in Godo
 > (`~/.ssh/makkersgames`) staan **lokaal in deze repo**, zodat andere projecten hun eigen
 > instellingen houden. Dus: **na elke wijziging committen én pushen.**
 
+## PLAYTEST-DATA LEZEN (verplichte stap vóór je aan balans sleutelt)
+
+De CSV vertelt je wát er gebeurde, niet wáárom. Deze valkuilen zijn we al ingelopen:
+
+- **`early_calls` is een BESMET signaal.** Hoge waardes correleren met verliezen, maar
+  veroorzaken het niet. Spelers roepen waves vroeg op **omdat de ronde al verloren is** en ze
+  hem willen afraffelen -- niemand zit te wachten tot hij langzaam doodgaat. In v0.76.0 las ik
+  dit als "hij spamt zichzelf dood" en dat was fout.
+  **Controleer altijd:** `coffee_earned` en de `kill_*`-kolommen. Staat daar bijna niets, dan was
+  de ronde al voorbij vóór het spammen begon (voorbeeld: 21 vroege oproepen bij 1 verdiende
+  Coffee = afraffelen, niet de oorzaak).
+- **Vergelijk met de winnende run van dezelfde speler.** Dezelfde tester haalde het level met
+  7 vroege oproepen en 550 Coffee in 434s, tegenover 21 oproepen en 1 Coffee in 61s. Dát verschil
+  is het verhaal, niet één kolom.
+- **Doet een speler iets "verkeerd", vraag eerst wat het spel hem liet doen.** Bij het spammen
+  bleek doodgaan de énige route naar het eindscherm met cijfers en feedbackformulier -- de speler
+  koos rationeel binnen de uitgangen die wij boden. De fix was een **Give up**-knop, niet een
+  waarschuwing aan de speler.
+- **Waarschuwingen nooit tonen aan wie al verliest.** Dat leest als napieken op het slechtste
+  moment. De vroeg-oproepen-melding verschijnt daarom alleen boven de helft van je Focus.
+- **Kijk naar `leak_*` vóór je aan torens sleutelt.** "Level 2 is te zwaar" bleek 69/88/98
+  doorgelaten Nudges te zijn: het lág aan de wave-tabel (312 Nudges, 50 in één wave), niet aan
+  de torens. Zonder die kolommen had ik torens zitten buffen.
+- **Let op de versie per ronde** (`version`-kolom, staat ook in de leesbare export). De helft van
+  een feedbackronde ging over dingen die in een nieuwere versie al gerepareerd waren.
+
 ## CHECKLIST VOOR DE OFFICIËLE RELEASE (pas doen als al het andere af is)
 
 Niet aan beginnen tijdens de alpha — dit is de lijst voor als de game inhoudelijk klaar is:
