@@ -1,12 +1,14 @@
 {
-  "version": "0.75.0",
+  "version": "0.76.0",
   "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.75.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.76.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "6a08117d3120c578ac7ac94cd2d0dac3483e977aa9bc0fd29852c03684e1ffe5",
-  "size": 110068936,
+  "sha256": "dcfa89eb0d6f364d5c2d8aa12261231924c674543526d4931a98f0373fe66891",
+  "size": 110069160,
   "changes": [
-    "Click any tower you have placed and it now tells you what that particular tower has actually done: total damage dealt, and how much damage it earned per Coffee you put into it. Coffee Machines show what they have made."
+    "You now start every level with 45 Coffee instead of 30. Thirty was exactly one Shredder and nothing else, so picking it meant losing before you began.",
+    "Coffee Corner had 312 Nudges in it, up to 50 in a single wave, and the first swarm arrived on wave 2 while you still had one tower. That is 167 now, spread out, and the first swarm comes later.",
+    "Calling a wave early now warns you when the board is already full. It still pays points, but waves stack, and it was cheerfully saying \"nice\" while burying you."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

@@ -227,6 +227,24 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.76.0)
+
+**Playtest-data van v0.71.0 verwerkt (v0.76.0).** 7 runs; Coffee Corner 3x verloren, fun 2/10.
+- **Uit de CSV bleek waar het misging:** 69, 88 en 98 **doorgelaten Nudges** in de verliesrondes.
+  Level 2 had **312 Nudges**, tot **50 in één wave**, en de eerste zwerm kwam al in **wave 2** --
+  met 30 startkoffie sta je daar met één toren. Nu 167 Nudges, max 28 per wave, eerste zwerm later.
+- **Startkoffie 30 -> 45 voor élk level.** 30 was precies de prijs van één Shredder, dus wie daarmee
+  opende had niets meer over ("dan heb je eigenlijk al verloren"). 45 = Shredder + Auto-Reply.
+- **Wave-spam was een verborgen valkuil:** in de verliesrondes stond `early_calls` op 20-21 van de
+  22 waves, met een speelduur van 61-91 seconden. De winnende run had er 7 en duurde 434s. Het
+  spel gaf alleen maar punten en geen enkele hint dat waves stapelen. Nu een waarschuwing zodra
+  er 25+ vijanden op het bord staan.
+- **Al opgelost vóór deze data:** de tutorial-klachten (Headphones vs 20 Nudges, Artillery tegen
+  3 tanks) zijn v0.74.0; de tester speelde v0.71.0.
+- **Nog open uit deze ronde:** "auto reply meta" (Auto-Reply domineert; Artillery is per Coffee
+  sterker maar traag, dus tegen zwermen verliest hij) en **te makkelijke bosses** op L2 en L3
+  (Out of Order blokkeert koffie, maar tegen die tijd staan je torens er al).
+
 ## Stand van zaken (v0.75.0)
 
 **Toren-detailpaneel (v0.75.0)** -- het laatste openstaande punt uit de feedbackronde van v0.72.

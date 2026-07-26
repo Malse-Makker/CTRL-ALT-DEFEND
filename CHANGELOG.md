@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.76.0 — 2026-07-26
+- You now start every level with 45 Coffee instead of 30. Thirty was exactly one Shredder and nothing else, so picking it meant losing before you began.
+- Coffee Corner had 312 Nudges in it, up to 50 in a single wave, and the first swarm arrived on wave 2 while you still had one tower. That is 167 now, spread out, and the first swarm comes later.
+- Calling a wave early now warns you when the board is already full. It still pays points, but waves stack, and it was cheerfully saying "nice" while burying you.
+
 ## v0.75.0 — 2026-07-25
 - Click any tower you have placed and it now tells you what that particular tower has actually done: total damage dealt, and how much damage it earned per Coffee you put into it. Coffee Machines show what they have made.
 

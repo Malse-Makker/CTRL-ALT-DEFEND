@@ -950,7 +950,13 @@ func _call_next_wave() -> void:
 	var bonus: int = mini(int(ceil(next_wave_timer)) * EARLY_POINTS_PER_SEC, EARLY_POINTS_MAX)
 	run_score += bonus
 	_stats["early_calls"] = int(_stats["early_calls"]) + 1
-	_flash_msg("Wave called early! +%d points." % bonus)
+	# Vroeg oproepen geeft punten, maar waves stapelen op. In de playtest riep een tester
+	# 21 van de 22 waves vroeg op en werd bedolven -- het spel juichte alleen maar mee.
+	# Nu waarschuwt hij zodra het bord al vol staat.
+	if enemies.size() >= 25:
+		_flash_msg("+%d points -- but %d are still on the board. Waves stack up." % [bonus, enemies.size()])
+	else:
+		_flash_msg("Wave called early! +%d points." % bonus)
 	_start_next_wave()
 
 func _start_next_wave() -> void:
