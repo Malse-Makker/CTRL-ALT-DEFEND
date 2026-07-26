@@ -13,6 +13,15 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.72.0 — 2026-07-25
+- Fixed the empty boxes for good: every symbol in the interface is now plain text or drawn. The START and pause buttons were the worst offenders.
+- After finishing a level you can go straight to Retry or Next Level, not just back to the level select.
+- The score summary no longer runs into the buttons, and the stars sit above it instead of through it.
+- Recognition is now a fixed amount per level, unlocked by stars only: 3 stars pays the whole thing, 2 stars pays two thirds, and coming back later to improve pays only the difference. It no longer scales with score, which was handing out far too much.
+- New hidden reward: finish a level without losing a single Focus and you get a big extra star and a Recognition bonus.
+- Every tower now starts on First targeting, which is what you usually want.
+- Level select: the stars sit centred under each level, and the Tutorial button no longer overlaps your rank.
+
 ## v0.71.0 — 2026-07-25
 - Stars and the feedback vote arrows showed up as empty boxes on Linux/Proton. They are drawn now, so they look the same everywhere.
 - Eat the Pizza: you can bite with a mouse click as well as the space bar.

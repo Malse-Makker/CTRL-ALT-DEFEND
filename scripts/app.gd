@@ -195,7 +195,7 @@ func show_feedback() -> void:
 	_fb_section(vb, "YOUR PLAYTESTS")
 	var runs: Array = PlaytestScript.all_runs()
 	if runs.is_empty():
-		_fb_note(vb, "No playtests logged yet — play a few rounds first.")
+		_fb_note(vb, "No playtests logged yet - play a few rounds first.")
 	else:
 		_fb_note(vb, "%d rounds logged. Most recent:" % runs.size())
 		for i in range(maxi(0, runs.size() - 8), runs.size()):
@@ -512,7 +512,7 @@ func show_art_room() -> void:
 func show_level_select() -> void:
 	var root := _screen("SELECT LEVEL")
 	var info := Label.new()
-	info.text = "Rank: %s   ·   Recognition: %d" % [GameState.current_rank().capitalize(), GameState.recognition]
+	info.text = "Rank: %s   -   Recognition: %d" % [GameState.current_rank().capitalize(), GameState.recognition]
 	info.add_theme_font_size_override("font_size", 16)
 	info.position = Vector2(SCREEN_W - 340, 40)
 	root.add_child(info)
@@ -520,15 +520,15 @@ func show_level_select() -> void:
 	# Tutorial staat los van de carrière (GDD §8): niet verplicht, telt niet mee voor sterren.
 	# Daarom bovenaan in het midden en niet tussen de levels -- daar las hij als "level 0"
 	# (playtest-feedback v0.68).
-	var tut := _btn("TUTORIAL  ·  learn the basics", func(): start_level(101), 300, 34)
-	tut.position = Vector2(SCREEN_W / 2.0 - 150, 56)
+	var tut := _btn("TUTORIAL  -  learn the basics", func(): start_level(101), 300, 34)
+	tut.position = Vector2(SCREEN_W / 2.0 - 150, 74)   # onder de rang-regel, die staat op y=40
 	tut.add_theme_font_size_override("font_size", 13)
 	root.add_child(tut)
 
 	# Carrière in blokken van vijf (GDD §8): junior / medior / senior.
-	var block_titles := ["JUNIOR  ·  levels 1-5", "MEDIOR  ·  levels 6-10", "SENIOR  ·  levels 11-15"]
+	var block_titles := ["JUNIOR  -  levels 1-5", "MEDIOR  -  levels 6-10", "SENIOR  -  levels 11-15"]
 	var vb := VBoxContainer.new()
-	vb.position = Vector2(44, 100)
+	vb.position = Vector2(44, 116)
 	vb.add_theme_constant_override("separation", 8)
 	root.add_child(vb)
 	var block_count: int = int(ceil(GameState.LEVEL_COUNT / 5.0))
@@ -556,7 +556,8 @@ func show_level_select() -> void:
 				# Sterren als eigen tekening bovenop de knop: als tekst werden het blokjes.
 				var sr = StarsScript.new()
 				sr.setup(s, 3, 6.0)
-				sr.position = Vector2(168.0 / 2.0 - 33.0, 60.0)
+				# Zelf uitrekenen i.p.v. een vaste offset: de rij is 3 * (2*6+4) = 48 breed.
+				sr.position = Vector2((168.0 - sr.size.x) / 2.0, 58.0)
 				sr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 				b.add_child(sr)
 				var lid := i
@@ -747,7 +748,7 @@ func show_shop() -> void:
 	root.add_child(rec)
 
 	var tt := Label.new()
-	tt.text = "Tech Tree — permanent upgrades"
+	tt.text = "Tech Tree - permanent upgrades"
 	tt.add_theme_font_size_override("font_size", 16)
 	tt.position = Vector2(44, 90)
 	root.add_child(tt)
@@ -757,7 +758,7 @@ func show_shop() -> void:
 	tvb.add_child(_shop_upgrade_row(root, "bulk_discount", "Bulk Discount", "All towers cost 10% less", 55))
 
 	var ct := Label.new()
-	ct.text = "Consumables — one-shot, taken into a level"
+	ct.text = "Consumables - one-shot, taken into a level"
 	ct.add_theme_font_size_override("font_size", 16)
 	ct.position = Vector2(44, 280)
 	root.add_child(ct)
@@ -777,7 +778,7 @@ func _shop_upgrade_row(root: Control, id: String, title: String, desc: String, c
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	var l := Label.new()
-	l.text = "%s — %s" % [title, desc]
+	l.text = "%s - %s" % [title, desc]
 	l.custom_minimum_size = Vector2(480, 0)
 	l.add_theme_font_size_override("font_size", 14)
 	row.add_child(l)
@@ -801,7 +802,7 @@ func _shop_consumable_row(root: Control, id: String, title: String, desc: String
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	var l := Label.new()
-	l.text = "%s (x%d) — %s" % [title, int(GameState.consumables.get(id, 0)), desc]
+	l.text = "%s (x%d) - %s" % [title, int(GameState.consumables.get(id, 0)), desc]
 	l.custom_minimum_size = Vector2(480, 0)
 	l.add_theme_font_size_override("font_size", 14)
 	row.add_child(l)
@@ -811,7 +812,7 @@ func _shop_consumable_row(root: Control, id: String, title: String, desc: String
 	b.text = "Buy (%d R)" % cost
 	b.pressed.connect(func():
 		if GameState.buy_consumable(id, cost):
-			l.text = "%s (x%d) — %s" % [title, int(GameState.consumables.get(id, 0)), desc]
+			l.text = "%s (x%d) - %s" % [title, int(GameState.consumables.get(id, 0)), desc]
 			_refresh_shop_labels(root))
 	row.add_child(b)
 	return row

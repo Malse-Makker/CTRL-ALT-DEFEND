@@ -254,7 +254,7 @@ func _build_towers(y0: float) -> float:
 func _build_enemies(y0: float) -> float:
 	var ids: Array = EnemyScript.defs().keys()
 	var y := _section(y0, "ENEMIES (%d)" % ids.size(),
-		"Each one walks its own loop — that is the walk animation.")
+		"Each one walks its own loop - that is the walk animation.")
 	# 6 kolommen: bij 15 was een cel 64px breed en overlapten de namen elkaar; 6 geeft 160px,
 	# genoeg voor vrijwel elke naam zonder afkappen.
 	var cols: int = 6

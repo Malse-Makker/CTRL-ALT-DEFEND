@@ -120,7 +120,7 @@ static func defs() -> Dictionary:
 		},
 		"ceo": {
 			"name": "Office Artillery", "role": "damage", "color": Color(0.85, 0.35, 0.35),
-			"desc": "Slow, huge single-target hit. Staples one distraction shut.", "default_target": "most_hp",
+			"desc": "Slow, huge single-target hit. Staples one distraction shut.",
 			"levels": [
 				{"name": "Rubber Band", "flavour": "Ow. That actually stung.", "cost": 25, "range": 220.0, "rate": 2.6, "damage": 15.0},
 				{"name": "Stapler", "flavour": "It\'s a Swingline.", "cost": 28, "range": 228.0, "rate": 2.5, "damage": 35.0},
@@ -129,7 +129,7 @@ static func defs() -> Dictionary:
 		},
 		"phones": {
 			"name": "Headphones", "role": "stun", "color": Color(0.6, 0.75, 0.4),
-			"desc": "Slows one target; the top tier stops it dead.", "default_target": "most_hp",
+			"desc": "Slows one target; the top tier stops it dead.",
 			"levels": [
 				# Ladder: eerst dempen, dan sterker dempen, dan helemaal afsnijden. Alleen
 				# lvl 3 stunt echt — en dat is ook de enige die de Kletskous stilkrijgt.
@@ -275,7 +275,10 @@ func configure(id: String, lvl: int) -> void:
 	# Alleen zetten zolang de speler niet zelf gekozen heeft — configure() draait ook
 	# bij elke upgrade en mag die keuze niet overschrijven.
 	if not target_mode_chosen:
-		target_mode = String(d.get("default_target", "closest"))
+		# Standaard "first" (verst op het pad): dat is wat spelers verwachten en wat je
+		# meestal wilt. Was "closest", waardoor torens op de achterste vijand bleven hangen
+		# terwijl de voorste doorliep (tester-feedback v0.71).
+		target_mode = String(d.get("default_target", "first"))
 	sees_hidden = bool(d.get("sees_hidden", false))
 	if not sees_hidden:
 		prefer_hidden = false

@@ -227,6 +227,38 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.72.0)
+
+**Font-sweep, winscherm en Recognition-economie (v0.72.0).**
+- **Alle niet-ASCII uit de UI-strings.** De tester zag overal blokjes, ook op de START- (`>`)
+  en pauzeknop (`||`). Vervangen: `— · > < | -> x - ! X`. **Regel: UI-tekst is ASCII.** Wil je
+  een symbool, teken het (zie `stars.gd`, `hud_icon.gd`). Er staat een controle-script-idee in
+  de commit: `grep` op `ord(ch) > 127` binnen string-literals vindt nieuwe overtredingen.
+- **Winscherm:** knoppen **Retry / Next Level / Level Select** (Next alleen bij een gewonnen,
+  niet-speciaal level dat al ontgrendeld is). Detailtekst op eigen regels, want als lange zin
+  liep hij over de knoppen.
+- **Recognition volledig herzien** (`game_state.gd`). Was: basis + sterren + level + score +
+  eenmalige bonussen -- dat gaf bergen Recognition voor herhaald spelen. Nu: **vast potje van
+  `RECOGNITION_PER_LEVEL` (12) per level, alleen via sterren**: 3 sterren = alles, 2 = 2/3,
+  1 = 1/3, en bij terugkomen wordt **alleen het verschil** uitbetaald (`recognition_for_stars`).
+  Score telt niet meer mee. **`BONUS_FLAWLESS` (8)** voor een ronde zonder Focus-verlies,
+  eenmalig per level, bijgehouden in `flawless_levels` (staat in de save).
+  `complete_level(level_id, stars, flawless)` -- de oude `base_reward`-parameter is weg.
+- **Verborgen grote ster** op het winscherm bij flawless, naast de drie gewone.
+- **Standaard targeting is nu `first`** voor élke toren (was `closest`, en `most_hp` voor
+  Artillery/Headphones).
+
+**NOG OPEN uit deze feedbackronde (bewust niet in v0.72.0):**
+- **Toren-detailpaneel**: klikken op een toren voor kills, schade, kills/Coffee en schade/Coffee.
+  De tellers bestaan al per toren (`_run_summary` gebruikt ze), dus dit is vooral UI-werk.
+- **Tutorial-overhaul**: je loopt er altijd schade op; Headphones counteren de Nudge niet
+  overtuigend; er komen te veel tanks vóór Office Artillery beschikbaar is. Plus gevraagd:
+  pijltjes die aanwijzen waar je moet klikken, en lessen voor start/pauze, snelheid en targeting.
+  Dit is een ontwerpronde, geen losse fix.
+- **Feedback naar pastebin** met een deelbare link. Kan met een dienst die anoniem POST
+  accepteert; **let op:** de feedback wordt daarmee publiek benaderbaar via die URL (speler-id +
+  vrije tekst). Eerst met de gebruiker afstemmen welke dienst en of dat acceptabel is.
+
 ## Stand van zaken (v0.71.0)
 
 **Mini-games uitgewerkt + de blokjes-bug (v0.71.0), allemaal uit tester-feedback.**

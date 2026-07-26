@@ -179,7 +179,7 @@ func _build_popup() -> Control:
 	var m := _label(p, "How should the display show up?", Vector2(14, 32), Vector2(w - 28, 18), 12, Color(0.1, 0.1, 0.12))
 	m.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	# twee opties — de 2e is de juiste (naar de projector)
-	var opt1 := _btn("Show desktop only on this laptop", func(): message.emit("That keeps it on your laptop — try the other one."), w - 36, 26)
+	var opt1 := _btn("Show desktop only on this laptop", func(): message.emit("That keeps it on your laptop - try the other one."), w - 36, 26)
 	opt1.position = Vector2(18, 62)
 	opt1.add_theme_font_size_override("font_size", 10)
 	p.add_child(opt1)

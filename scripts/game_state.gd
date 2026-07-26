@@ -10,6 +10,8 @@ const DISPLAY_MODES := ["Windowed", "Borderless windowed", "Fullscreen"]
 # Progressie
 var highest_unlocked: int = 1
 var stars: Dictionary = {}            # str(level_id) -> int
+# Per level onthouden of de flawless-bonus al is uitgekeerd; die is eenmalig.
+var flawless_levels: Dictionary = {}
 var recognition: int = 0
 
 # Meta-aankopen
@@ -184,11 +186,11 @@ func _special_level(level_id: int) -> Dictionary:
 		# Tutorial: 5 lessen. Per les één les-vijand + beperkte torens; level.gd reset ertussen.
 		var straight := PackedVector2Array([Vector2(-60,260),Vector2(780,260)])
 		var lessons := [
-			{"towers":["coffee","auto"],          "spec":"noti:8@0.80",              "text":"LESSON 1/5 — Notifications. Place an Auto-Reply beside the path; a Coffee Machine funds your defence."},
-			{"towers":["coffee","auto"],          "spec":"noti:6@0.85 + hulp:2@1.30", "text":"LESSON 2/5 — Economy. Coffee Machines deal no damage but pay for everything. Build one first, then towers."},
-			{"towers":["coffee","filter"],        "spec":"thread:18@0.15",            "text":"LESSON 3/5 — The Thread is a paper pile. The Shredder eats paper — drop one ON the path."},
-			{"towers":["coffee","phones","auto"], "spec":"nudge:20@0.16",             "text":"LESSON 4/5 — Nudges are a fast swarm. Headphones slow and stun them."},
-			{"towers":["coffee","ceo","auto"],    "spec":"tank:3@1.80",               "text":"LESSON 5/5 — The Old Guard has a shield. Office Artillery hits hard enough to break it."},
+			{"towers":["coffee","auto"],          "spec":"noti:8@0.80",              "text":"LESSON 1/5 - Notifications. Place an Auto-Reply beside the path; a Coffee Machine funds your defence."},
+			{"towers":["coffee","auto"],          "spec":"noti:6@0.85 + hulp:2@1.30", "text":"LESSON 2/5 - Economy. Coffee Machines deal no damage but pay for everything. Build one first, then towers."},
+			{"towers":["coffee","filter"],        "spec":"thread:18@0.15",            "text":"LESSON 3/5 - The Thread is a paper pile. The Shredder eats paper - drop one ON the path."},
+			{"towers":["coffee","phones","auto"], "spec":"nudge:20@0.16",             "text":"LESSON 4/5 - Nudges are a fast swarm. Headphones slow and stun them."},
+			{"towers":["coffee","ceo","auto"],    "spec":"tank:3@1.80",               "text":"LESSON 5/5 - The Old Guard has a shield. Office Artillery hits hard enough to break it."},
 		]
 		var tw := []
 		for l in lessons:
@@ -609,18 +611,35 @@ func is_unlocked(level_id: int) -> bool:
 func get_stars(level_id: int) -> int:
 	return int(stars.get(str(level_id), 0))
 
-const BONUS_FIRST_CLEAR := 15
-const BONUS_FIRST_PERFECT := 20
 
-func complete_level(level_id: int, earned_stars: int, base_reward: int) -> Dictionary:
-	# Eenmalige bonussen belonen vooruitgang in plaats van herhaling: zonder deze
-	# was elke shop-upgrade goed voor 2-3 runs grinden op maar 5 levels.
+# Recognition per level is een VAST potje dat je met sterren openmaakt, niet iets dat met je
+# score meeschaalt. Reden (tester-feedback v0.71): op score meeliften leverde bergen Recognition
+# op voor hetzelfde level nog een keer spelen. Nu: 3 sterren = het hele potje, 2 sterren = 2/3,
+# 1 ster = 1/3. Kom je later terug en doe je het beter, dan krijg je alléén het verschil
+# bijbetaald -- nooit twee keer voor dezelfde ster.
+const RECOGNITION_PER_LEVEL := 12
+# Zonder ook maar één Focus te verliezen: een verborgen extra bovenop de drie sterren.
+const BONUS_FLAWLESS := 8
+
+
+func recognition_for_stars(st: int) -> int:
+	return int(round(float(RECOGNITION_PER_LEVEL) * float(clampi(st, 0, 3)) / 3.0))
+
+
+func complete_level(level_id: int, earned_stars: int, flawless: bool = false) -> Dictionary:
 	var key := str(level_id)
 	var had: int = get_stars(level_id)
-	var first_clear: int = BONUS_FIRST_CLEAR if had == 0 else 0
-	var first_perfect: int = BONUS_FIRST_PERFECT if (earned_stars >= 3 and had < 3) else 0
-	var total: int = base_reward + first_clear + first_perfect
-	stars[key] = maxi(had, earned_stars)
+	var best: int = maxi(had, earned_stars)
+	# Alleen het verschil met wat je eerder al verdiende voor dit level.
+	var already: int = recognition_for_stars(had)
+	var stars_pay: int = maxi(0, recognition_for_stars(best) - already)
+	# De flawless-bonus is eenmalig per level.
+	var flawless_pay: int = 0
+	if flawless and not flawless_levels.has(key):
+		flawless_pay = BONUS_FLAWLESS
+		flawless_levels[key] = true
+	var total: int = stars_pay + flawless_pay
+	stars[key] = best
 	var promotion := ""
 	if level_id == highest_unlocked and level_id < LEVEL_COUNT:
 		highest_unlocked = level_id + 1
@@ -628,11 +647,12 @@ func complete_level(level_id: int, earned_stars: int, base_reward: int) -> Dicti
 		if level_id == 5: promotion = "medior"
 		elif level_id == 10: promotion = "senior"
 	elif level_id == 15 and had == 0:
-		promotion = "specialist"   # laatste level voor het eerst uitgespeeld → top van de carrière
+		promotion = "specialist"   # laatste level voor het eerst uitgespeeld -> top van de carriere
 	recognition += total
 	save_game()
-	return {"base": base_reward, "first_clear": first_clear,
-		"first_perfect": first_perfect, "total": total, "promotion": promotion}
+	return {"stars_pay": stars_pay, "flawless_pay": flawless_pay, "total": total,
+		"promotion": promotion, "had": had, "best": best,
+		"max_for_level": RECOGNITION_PER_LEVEL}
 
 # ---------- Rang / carrière ----------
 
@@ -764,6 +784,7 @@ func save_game() -> void:
 	var data := {
 		"highest_unlocked": highest_unlocked,
 		"stars": stars,
+		"flawless_levels": flawless_levels,
 		"recognition": recognition,
 		"upgrades": upgrades,
 		"consumables": consumables,
@@ -797,6 +818,7 @@ func load_game() -> void:
 		return
 	highest_unlocked = int(data.get("highest_unlocked", 1))
 	stars = data.get("stars", {})
+	flawless_levels = data.get("flawless_levels", {})
 	recognition = int(data.get("recognition", 0))
 	upgrades = data.get("upgrades", {})
 	consumables = data.get("consumables", {})

@@ -298,7 +298,7 @@ func _ready() -> void:
 	if tutorial and not tutorial_lessons.is_empty():
 		_flash_msg(String(tutorial_lessons[0]["text"]))
 	else:
-		_flash_msg("PLAN PHASE — place towers, then press Start.")
+		_flash_msg("PLAN PHASE - place towers, then press Start.")
 	queue_redraw()
 
 func _exit_tree() -> void:
@@ -332,7 +332,7 @@ func _process(delta: float) -> void:
 			_zone_active = not _zone_active
 			_zone_timer = 3.0 if _zone_active else 9.0
 			if _zone_active:
-				_flash_msg("Restructuring — a build zone is off-limits for a moment.")
+				_flash_msg("Restructuring - a build zone is off-limits for a moment.")
 		if hazard_type == "":
 			building_blocked = _zone_active
 	_apply_buffs_and_disrupt()
@@ -601,7 +601,7 @@ func _tower_summary(id: String, lvl: int) -> String:
 		"economy":
 			var per: float = float(s["coffee_amount"]) / float(s["coffee_interval"])
 			var cost: float = float(s["cost"])
-			return "\n%.1f Coffee/s — pays for itself in %ds" % [per, int(cost / maxf(per, 0.01))]
+			return "\n%.1f Coffee/s - pays for itself in %ds" % [per, int(cost / maxf(per, 0.01))]
 		"stun":
 			if float(s.get("stun", 0.0)) > 0.0:
 				return "\nStuns %.1fs every %.1fs" % [float(s.get("stun", 0.0)), float(s.get("rate", 1.0))]
@@ -616,7 +616,7 @@ func _tower_summary(id: String, lvl: int) -> String:
 			return "\n%.0f dmg to %d targets at once, every %.1fs" % [
 				float(s.get("damage", 0.0)), int(s.get("shots", 1)), float(s.get("rate", 1.0))]
 		"chain":
-			return "\n%.0f dmg, jumps to %d more (×%.0f%% each), every %.1fs" % [
+			return "\n%.0f dmg, jumps to %d more (x%.0f%% each), every %.1fs" % [
 				float(s.get("damage", 0.0)), int(s.get("jumps", 0)),
 				float(s.get("falloff", 0.75)) * 100.0, float(s.get("rate", 1.0))]
 		"trap":
@@ -674,7 +674,7 @@ func _try_place(p: Vector2) -> void:
 		return
 	# few_spots-modifier (Boardroom-finales, Server Room): beperkt aantal bouwplekken.
 	if modifiers.has("few_spots") and towers.size() >= FEW_SPOTS_CAP:
-		_flash_msg("No room to build — this floor only fits %d towers." % FEW_SPOTS_CAP)
+		_flash_msg("No room to build - this floor only fits %d towers." % FEW_SPOTS_CAP)
 		return
 	var cost: int = _tower_cost(selected_def_id, 1)
 	if coffee < cost:
@@ -717,7 +717,7 @@ func _upgrade_delta_text(t: Node2D) -> String:
 	var lv: Array = TowerScript.defs()[t.def_id]["levels"]
 	var cur: Dictionary = lv[t.level - 1]
 	var nxt: Dictionary = lv[t.level]
-	var lines: Array = ["%s — \"%s\"" % [String(nxt.get("name", "")), String(nxt.get("flavour", ""))], ""]
+	var lines: Array = ["%s - \"%s\"" % [String(nxt.get("name", "")), String(nxt.get("flavour", ""))], ""]
 	var rows := [
 		["damage", "Damage", 1.0, false],
 		["dot", "Damage/sec", 1.0, false],
@@ -742,12 +742,12 @@ func _upgrade_delta_text(t: Node2D) -> String:
 			continue
 		var diff: float = b - a
 		var better: bool = (diff < 0.0) if bool(r[3]) else (diff > 0.0)
-		lines.append("%s %s → %s  (%s%s)" % [
+		lines.append("%s %s -> %s  (%s%s)" % [
 			String(r[1]), _num(a), _num(b), "+" if diff > 0.0 else "", _num(diff)])
 		if not better:
-			lines[lines.size() - 1] += " ⚠"
+			lines[lines.size() - 1] += " !"
 	if float(cur.get("buff_dmg", 0.0)) != float(nxt.get("buff_dmg", 0.0)):
-		lines.append("Buff %d%% → %d%%  (+%d%%)" % [
+		lines.append("Buff %d%% -> %d%%  (+%d%%)" % [
 			int((float(cur["buff_dmg"]) - 1.0) * 100.0),
 			int((float(nxt["buff_dmg"]) - 1.0) * 100.0),
 			int((float(nxt["buff_dmg"]) - float(cur["buff_dmg"])) * 100.0)])
@@ -785,12 +785,12 @@ func _open_upgrade(t: Node2D) -> void:
 		trap_selecting = null
 	var max_lvl: int = TowerScript.defs()[t.def_id]["levels"].size()
 	if t.is_special:
-		upg_upgrade.text = "Special — no upgrades"
+		upg_upgrade.text = "Special - no upgrades"
 		upg_upgrade.disabled = true
 	elif t.level < max_lvl:
 		var next_cost: int = _tower_cost(t.def_id, t.level + 1)
 		var next_name: String = String(TowerScript.defs()[t.def_id]["levels"][t.level].get("name", ""))
-		upg_upgrade.text = "→ %s  (%d C)" % [next_name, next_cost]
+		upg_upgrade.text = "-> %s  (%d C)" % [next_name, next_cost]
 		upg_upgrade.disabled = false
 	else:
 		upg_upgrade.text = "Max level"
@@ -860,19 +860,19 @@ func _tower_stats_text(t: Node2D) -> String:
 			return "%.0f dmg to %d targets, every %.2fs\nRange %d%s" % [
 				t.damage, int(t.multi_shots), t.fire_rate, int(t.range_radius), invested]
 		"chain":
-			return "%.0f dmg, jumps to %d more (×%d%% each)\nRange %d%s" % [
+			return "%.0f dmg, jumps to %d more (x%d%% each)\nRange %d%s" % [
 				t.damage, int(t.chain_jumps), int(t.chain_falloff * 100.0),
 				int(t.range_radius), invested]
 		"trap":
 			var spot: String = "\nClick the path to aim the throws" if t.pick_spot else "\nThrows land randomly on the path"
-			return "%.0f dmg per tack, one every %.1fs\nEach tack lasts %.1fs · Range %d%s%s" % [
+			return "%.0f dmg per tack, one every %.1fs\nEach tack lasts %.1fs - Range %d%s%s" % [
 				t.damage, t.throw_interval, t.tack_lifetime, int(t.range_radius), spot, invested]
 		"smash":
-			return "%.0f AoE damage, blocks path %.1fs\nEvery %.0fs · Radius %d%s" % [
+			return "%.0f AoE damage, blocks path %.1fs\nEvery %.0fs - Radius %d%s" % [
 				t.smash_damage, t.barrier_duration, t.smash_cooldown, int(t.range_radius), invested]
 		_:
 			var dps: float = float(t.damage) / maxf(t.fire_rate, 0.01)
-			return "%.1f damage/s  (%d per shot, every %.2fs)\nRange %d  ·  %.3f DPS per Coffee%s" % [
+			return "%.1f damage/s  (%d per shot, every %.2fs)\nRange %d  -  %.3f DPS per Coffee%s" % [
 				dps, int(t.damage), t.fire_rate, int(t.range_radius),
 				dps / maxf(float(t.invested), 1.0), invested]
 
@@ -962,7 +962,7 @@ func _start_next_wave() -> void:
 		if not r["done"] and wave_index >= int(r["trigger_wave"]):
 			r["done"] = true
 			paths_all = paths_all + [r["path"]]
-			_flash_msg("A new lane opens up — and new ground to build on!")
+			_flash_msg("A new lane opens up - and new ground to build on!")
 			queue_redraw()
 	# Multi-path: elke wave komt uit een andere ingang.
 	if paths_all.size() > 1:
@@ -996,22 +996,22 @@ func _spawn_enemy_at(type: String, pos: Vector2, idx: int, at_start: bool) -> vo
 		e.phase_changed.connect(_on_boss_phase)
 		if e.cameo:
 			e.on_spawn_cameo = func(p, i, bt): _spawn_cameo(p, i, bt)
-			_flash_msg("360-degree feedback — past managers return as peer reviewers. Do you feel stressed?")
+			_flash_msg("360-degree feedback - past managers return as peer reviewers. Do you feel stressed?")
 		_big_msg(String(bdef["name"]).to_upper(), Color(1.0, 0.5, 0.5))
 		_play("alarm")
 		match e.boss_kind:
 			"outoforder": _flash_msg("Out of Order! No Coffee income until you defeat it.")
-			"beamer": _flash_msg("Break the 'loading' shield first — burst it down.")
-			"reorg": _flash_msg("It restructures — burst it before it splits too often.")
+			"beamer": _flash_msg("Break the 'loading' shield first - burst it down.")
+			"reorg": _flash_msg("It restructures - burst it before it splits too often.")
 			"allhands": _flash_msg("It keeps calling everyone in. Clear the crowd.")
 			"cleaner": _flash_msg("The Cleaner! It speeds up the crowd and wipes your zones and traps.")
-			"smoking": _flash_msg("The Smoking Colleague — the haze keeps your towers' range short.")
+			"smoking": _flash_msg("The Smoking Colleague - the haze keeps your towers' range short.")
 			"baby": _flash_msg("The Baby! Towers nearby get distracted and fire slower.")
 			"floater": _flash_msg("The Floater keeps pulling in a crowd. Cover every lane.")
-			"hrmanager": _flash_msg("The HR Manager is auditing — one of your tower types keeps getting shut down.")
+			"hrmanager": _flash_msg("The HR Manager is auditing - one of your tower types keeps getting shut down.")
 			"legacy": _flash_msg("The Legacy System won't die and keeps spewing errors. Grind it down.")
 			"consultant": _flash_msg("The Consultant buffs everything. Kill it to weaken the wave.")
-			"deadline": _flash_msg("The Deadline! Everything speeds up the longer it lives — burst it NOW.")
+			"deadline": _flash_msg("The Deadline! Everything speeds up the longer it lives - burst it NOW.")
 	elif e.spawn_interval > 0.0:
 		var st: String = e.spawn_type
 		e.on_spawn_adds = func(p, i, c): _spawn_adds(p, i, c, st)
@@ -1097,7 +1097,7 @@ func _on_enemy_reached_end(e) -> void:
 	# zonder te begrijpen waardoor. Eén keer per ronde uitleggen wat er gebeurde.
 	if e.invisible and not e.revealed and not _warned_stealth:
 		_warned_stealth = true
-		_flash_msg("Something slipped past unseen — a Shredder zone reveals hidden enemies.")
+		_flash_msg("Something slipped past unseen - a Shredder zone reveals hidden enemies.")
 	focus -= e.focus_damage
 	_play("leak")
 	_flash_focus()
@@ -1130,7 +1130,7 @@ func _tutorial_advance() -> void:
 	Engine.time_scale = 0.0
 	next_wave_timer = WAVE_INTERVAL
 	if action_button != null:
-		action_button.text = "▶  START"
+		action_button.text = ">  START"
 		action_button.disabled = false
 	_flash_msg(String(tutorial_lessons[_lesson]["text"]))
 	_update_labels()
@@ -1164,7 +1164,7 @@ func _rebuild_shop() -> void:
 	shop_open = was_open
 	shop_panel.visible = shop_open
 	if not shop_open and shop_toggle != null:
-		shop_toggle.text = "◀"
+		shop_toggle.text = "<"
 		shop_toggle.position.x = SCREEN_W - 18
 	_update_bar()
 
@@ -1307,7 +1307,7 @@ func _update_hazard(delta: float) -> void:
 		if not hazard_active:
 			if _hazard_timer <= 3.0 and not _hazard_warned:
 				_hazard_warned = true
-				_flash_msg("Someone's lighting up outside — haze incoming.")
+				_flash_msg("Someone's lighting up outside - haze incoming.")
 			if _hazard_timer <= 0.0:
 				hazard_active = true
 				_hazard_timer = 6.0
@@ -1339,11 +1339,11 @@ func _update_hazard(delta: float) -> void:
 		if not hazard_active:
 			if _hazard_timer <= 3.0 and not _hazard_warned:
 				_hazard_warned = true
-				_flash_msg("Lunch break approaching — build now!")
+				_flash_msg("Lunch break approaching - build now!")
 			if _hazard_timer <= 0.0:
 				hazard_active = true
 				_hazard_timer = 7.0
-				_flash_msg("LUNCH BREAK! Everyone heads out at once — no building.")
+				_flash_msg("LUNCH BREAK! Everyone heads out at once - no building.")
 				_big_msg("LUNCH BREAK", Color(1.0, 0.85, 0.45))
 				_screen_flash(Color(1.0, 0.8, 0.35), 7.0)
 				_play("lunch")
@@ -1410,7 +1410,7 @@ func _update_hazard(delta: float) -> void:
 	if pizza_active:
 		pizza_qte.set_timer_text("Auto-skips in %ds" % int(ceil(maxf(_hazard_timer, 0.0))))
 	if dino_active:
-		dino_qte.set_timer_text("Back online in %ds  ·  dodge to speed it up" % int(ceil(maxf(_hazard_timer, 0.0))))
+		dino_qte.set_timer_text("Back online in %ds  -  dodge to speed it up" % int(ceil(maxf(_hazard_timer, 0.0))))
 	if click_active:
 		click_qte.set_timer_text("Auto-dismiss in %ds" % int(ceil(maxf(_hazard_timer, 0.0))))
 	if hazard_label != null:
@@ -1454,7 +1454,7 @@ func _toggle_pause() -> void:
 		return
 	paused = not paused
 	Engine.time_scale = 0.0 if paused else current_speed
-	pause_button.text = "▶" if paused else "❚❚"
+	pause_button.text = ">" if paused else "||"
 	if pause_menu != null:
 		pause_menu.visible = paused
 
@@ -1483,7 +1483,7 @@ func _build_pause_menu(canvas: CanvasLayer) -> void:
 	vb.add_child(_button("Restart level", func(): retry.emit(level_id), 180, 34))
 	vb.add_child(_button("Quit run", _request_menu, 180, 34))
 	var hint := Label.new()
-	hint.text = "P or Esc to resume  ·  1-6 towers  ·  Space starts a wave"
+	hint.text = "P or Esc to resume  -  1-6 towers  -  Space starts a wave"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.position = Vector2(SCREEN_W / 2.0 - 220, 370)
 	hint.size = Vector2(440, 20)
@@ -1544,7 +1544,7 @@ func _finish_pizza(eaten: bool) -> void:
 		_play("upgrade")
 		_flash_msg("Pizza demolished. Back to the release.")
 	else:
-		_flash_msg("The pizza went cold — back to work.")
+		_flash_msg("The pizza went cold - back to work.")
 
 func _show_dino() -> void:
 	dino_active = true
@@ -1648,16 +1648,16 @@ func _update_labels() -> void:
 func _update_flow() -> void:
 	if phase == "plan":
 		wave_label.text = "Plan Phase"
-		action_button.text = "▶  START"
+		action_button.text = ">  START"
 		action_button.disabled = false
 	else:
 		var shown: int = min(wave_index, total_waves)
 		if wave_index < total_waves:
-			wave_label.text = "Wave %d/%d  •  next %ds" % [shown, total_waves, int(ceil(max(0.0, next_wave_timer)))]
+			wave_label.text = "Wave %d/%d  -  next %ds" % [shown, total_waves, int(ceil(max(0.0, next_wave_timer)))]
 			action_button.text = "CALL WAVE\n+points"
 			action_button.disabled = false
 		else:
-			wave_label.text = "Wave %d/%d  •  final" % [shown, total_waves]
+			wave_label.text = "Wave %d/%d  -  final" % [shown, total_waves]
 			action_button.text = "All waves out"
 			action_button.disabled = true
 
@@ -1670,7 +1670,7 @@ func _update_bar() -> void:
 		var afford: bool = coffee >= cost
 		# De prijs loopt op met het aantal dat je al hebt, dus die moet live meelopen --
 		# anders staat er een bedrag op de knop dat niet klopt met wat er afgeschreven wordt.
-		b.text = "%d · %dC" % [order.find(String(id)) + 1, cost]
+		b.text = "%d - %dC" % [order.find(String(id)) + 1, cost]
 		b.modulate = Color(1.0, 0.9, 0.4) if sel else (Color(1, 1, 1) if afford else Color(0.55, 0.55, 0.55))
 
 func _flash_msg(text: String) -> void:
@@ -1733,7 +1733,7 @@ func _update_boss_bar() -> void:
 		boss_shield_bar.size.x = w * clampf(boss.shield / boss.max_shield, 0.0, 1.0)
 	else:
 		boss_shield_bar.visible = false
-	boss_label.text = "%s — %s" % [EnemyScript.defs()[boss.type_id]["name"], _boss_phase_name(boss)]
+	boss_label.text = "%s - %s" % [EnemyScript.defs()[boss.type_id]["name"], _boss_phase_name(boss)]
 
 func _boss_phase_name(boss: Node2D) -> String:
 	if boss.boss_kind == "review":
@@ -1749,7 +1749,7 @@ func _on_boss_phase(e, p: int) -> void:
 			match p:
 				2:
 					_big_msg("PHASE 2\nPEER FEEDBACK", Color(1.0, 0.75, 0.4))
-					_flash_msg("The boss stops to gather feedback — adds incoming.")
+					_flash_msg("The boss stops to gather feedback - adds incoming.")
 				3:
 					_big_msg("PHASE 3\nIMPROVEMENT PLAN", Color(1.0, 0.45, 0.4))
 					_flash_msg("It speeds up and slows your towers. Last stand.")
@@ -1758,7 +1758,7 @@ func _on_boss_phase(e, p: int) -> void:
 			# Elke fase splitst hij een Manager af (twee Change-splitters die naar je bureau rennen).
 			if p >= 2:
 				_big_msg("RESTRUCTURING", Color(0.8, 0.85, 0.6))
-				_flash_msg("It splits off a Manager — burst it down.")
+				_flash_msg("It splits off a Manager - burst it down.")
 				_spawn_adds(e.position, e.target_index, 2, "change")
 		"beamer":
 			if p >= 2:
@@ -1830,25 +1830,26 @@ func _win() -> void:
 			t = "TUTORIAL COMPLETE"
 		elif level_id == 102:
 			t = "BOSS RUSH CLEARED!"
-		_show_overlay(t, Color(0.2, 0.7, 0.35), true, "Nice work — score %d." % run_score)
+		_show_overlay(t, Color(0.2, 0.7, 0.35), true, "Nice work - score %d." % run_score)
 		return
 	var s: int = _stars()
-	# Score telt mee maar is afgetopt, zodat wave-spammen niet de hoofdbron van
-	# Recognition is. De eenmalige bonussen komen uit GameState.complete_level().
-	var c_stars: int = s * 4
-	var c_level: int = (level_id - 1) * 2
-	var c_score: int = mini(int(run_score / 100.0), 15)
-	var base: int = 5 + c_stars + c_level + c_score
-	var r: Dictionary = GameState.complete_level(level_id, s, base)
+	var flawless: bool = (focus >= start_focus)
+	var r: Dictionary = GameState.complete_level(level_id, s, flawless)
 	_last_recognition = int(r["total"])
-	# Opbouw tonen in plaats van één getal: dan zie je waar het loont om beter te spelen.
-	var detail: String = "Recognition:  base +5   stars +%d   level +%d   score %d +%d" % [
-		c_stars, c_level, run_score, c_score]
-	if int(r["first_clear"]) > 0:
-		detail += "   first clear +%d" % int(r["first_clear"])
-	if int(r["first_perfect"]) > 0:
-		detail += "   first 3 stars +%d" % int(r["first_perfect"])
-	detail += "\nTotal:  +%d Recognition" % int(r["total"])
+	# Opbouw op eigen regels: als een lange zin stond dit over de knoppen heen te lopen.
+	var lines: Array = []
+	lines.append("Score %d   -   Focus left %d/%d" % [run_score, focus, start_focus])
+	if int(r["stars_pay"]) > 0:
+		lines.append("Recognition for %d/3 stars:  +%d" % [int(r["best"]), int(r["stars_pay"])])
+	elif int(r["best"]) > 0:
+		lines.append("You already earned the Recognition for %d/3 stars here." % int(r["best"]))
+	if int(r["flawless_pay"]) > 0:
+		lines.append("FLAWLESS - not a single Focus lost:  +%d" % int(r["flawless_pay"]))
+	if int(r["best"]) < 3:
+		lines.append("Come back with 3 stars to collect the rest (%d of %d so far)." % [
+			GameState.recognition_for_stars(int(r["best"])), int(r["max_for_level"])])
+	lines.append("Total this run:  +%d Recognition" % int(r["total"]))
+	var detail: String = "\n".join(lines)
 	var title: String = "LEVEL COMPLETE"
 	var promo: String = String(r.get("promotion", ""))
 	if promo != "":
@@ -1858,14 +1859,23 @@ func _win() -> void:
 	if overlay != null:
 		var sr = StarsScript.new()
 		sr.setup(s, 3, 14.0)
-		sr.position = Vector2(SCREEN_W / 2.0 - sr.size.x / 2.0, SCREEN_H / 2.0 - 96.0)
+		# Vaste plek tussen de titel en de opsomming; op halve schermhoogte liepen ze
+		# dwars door de Recognition-regels heen.
+		sr.position = Vector2(SCREEN_W / 2.0 - sr.size.x / 2.0, 74.0)
 		sr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		overlay.add_child(sr)
+		if flawless:
+			# De verborgen "geen Focus verloren"-ster: groter en apart, naast de drie.
+			var big = StarsScript.new()
+			big.setup(1, 1, 20.0)
+			big.position = Vector2(SCREEN_W / 2.0 + sr.size.x / 2.0 + 18.0, 68.0)
+			big.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			overlay.add_child(big)
 
 func _lose() -> void:
 	game_over = true
 	Engine.time_scale = 0.0
-	_show_overlay("BURN-OUT\nOut of Focus  ·  wave %d/%d  ·  score %d" % [
+	_show_overlay("BURN-OUT\nOut of Focus  -  wave %d/%d  -  score %d" % [
 		wave_index, total_waves, run_score], Color(0.75, 0.25, 0.3), false)
 
 func _show_overlay(text: String, tint: Color, _won: bool, detail: String = "") -> void:
@@ -1880,8 +1890,13 @@ func _show_overlay(text: String, tint: Color, _won: bool, detail: String = "") -
 	overlay_stats.text = _run_summary() + ("\n" + detail if detail != "" else "")
 	for c in overlay_buttons.get_children():
 		c.queue_free()
-	if not _won:
-		overlay_buttons.add_child(_button("Retry", func(): retry.emit(level_id), 110, 36))
+	# Na een gewonnen ronde wil je meestal dóór of het nog eens beter doen; alleen "Level
+	# Select" aanbieden kostte twee extra klikken (tester-feedback v0.71).
+	overlay_buttons.add_child(_button("Retry", func(): retry.emit(level_id), 110, 36))
+	if _won and not special_mode and level_id < GameState.LEVEL_COUNT \
+			and GameState.is_unlocked(level_id + 1):
+		var nxt: int = level_id + 1
+		overlay_buttons.add_child(_button("Next Level", func(): retry.emit(nxt), 120, 36))
 	overlay_buttons.add_child(_button("Level Select", func(): finished.emit(), 130, 36))
 	if Playtest.ENABLED:
 		_build_feedback(_won)
@@ -1911,7 +1926,7 @@ func _run_summary() -> String:
 			what = "no damage dealt"
 		# Middenstip in plaats van spatie-padding: het font is proportioneel, dus
 		# uitlijnen met spaties levert een scheve kolom op.
-		lines.append("%s x%d%s  ·  %s" % [String(tdefs[sid]["name"]), n,
+		lines.append("%s x%d%s  -  %s" % [String(tdefs[sid]["name"]), n,
 			(" (+%d upgraded)" % up) if up > 0 else "", what])
 	if lines.is_empty():
 		lines.append("No towers built.")
@@ -1941,7 +1956,7 @@ func _build_feedback(won: bool) -> void:
 	overlay.add_child(box)
 
 	var q := Label.new()
-	q.text = "How much FUN was this level?   0 = no fun, barely playable   ·   10 = loved it"
+	q.text = "How much FUN was this level?   0 = no fun, barely playable   -   10 = loved it"
 	q.add_theme_font_size_override("font_size", 12)
 	q.add_theme_color_override("font_color", Color(0.85, 0.88, 0.95))
 	q.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2254,7 +2269,7 @@ func _draw() -> void:
 		var mouse: Vector2 = get_global_mouse_position()
 		for t in towers:
 			if mouse.distance_to(t.position) <= 22.0:
-				var tip: String = "Lv %d  ·  sell +%d C" % [t.level, int(t.invested * 0.6)]
+				var tip: String = "Lv %d  -  sell +%d C" % [t.level, int(t.invested * 0.6)]
 				draw_string(ThemeDB.fallback_font, t.position + Vector2(-30, -26), tip,
 					HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.95, 0.9, 0.65))
 				break
@@ -2436,7 +2451,7 @@ func _build_shop(canvas: CanvasLayer) -> void:
 	for id in _special_order():
 		spec_grid.add_child(_shop_cell(String(id), order))
 
-	shop_toggle = _button("▶", _toggle_shop, 18, 44)
+	shop_toggle = _button(">", _toggle_shop, 18, 44)
 	shop_toggle.position = Vector2(SCREEN_W - SHOP_W - 18, TOP_H + 6)
 	canvas.add_child(shop_toggle)
 
@@ -2481,7 +2496,7 @@ func _shop_button(sid: String, order: Array) -> Button:
 		b.icon = icon
 	var nm: String = String(d["levels"][0].get("name", d["name"]))
 	if available:
-		b.text = "%d · %dC" % [order.find(sid) + 1, _tower_cost(sid, 1)]
+		b.text = "%d - %dC" % [order.find(sid) + 1, _tower_cost(sid, 1)]
 		b.tooltip_text = "%d  %s  [%s]\n%s%s" % [order.find(sid) + 1, nm,
 			_role_tag(String(d["role"])), String(d.get("desc", "")), _tower_summary(sid, 1)]
 		b.pressed.connect(func(): _select_def(sid))
@@ -2489,7 +2504,7 @@ func _shop_button(sid: String, order: Array) -> Button:
 		b.mouse_exited.connect(func(): hover_shop_id = ""; queue_redraw())
 		bar_buttons[sid] = b
 	elif banned_towers.has(sid):
-		b.text = "✕"
+		b.text = "X"
 		b.tooltip_text = "%s\n\nNot allowed on this level." % nm
 		b.disabled = true
 	else:
@@ -2501,7 +2516,7 @@ func _shop_button(sid: String, order: Array) -> Button:
 func _toggle_shop() -> void:
 	shop_open = not shop_open
 	shop_panel.visible = shop_open
-	shop_toggle.text = "▶" if shop_open else "◀"
+	shop_toggle.text = ">" if shop_open else "<"
 	shop_toggle.position.x = (SCREEN_W - SHOP_W - 18) if shop_open else (SCREEN_W - 18)
 
 func _build_controls(canvas: CanvasLayer) -> void:
@@ -2511,7 +2526,7 @@ func _build_controls(canvas: CanvasLayer) -> void:
 	bg.size = Vector2(SHOP_W, CTRL_H)
 	canvas.add_child(bg)
 
-	action_button = _button("▶  START", _on_action, SHOP_W - 12, 44)
+	action_button = _button(">  START", _on_action, SHOP_W - 12, 44)
 	action_button.position = Vector2(SCREEN_W - SHOP_W + 6, SCREEN_H - CTRL_H + 6)
 	action_button.add_theme_font_size_override("font_size", 13)
 	canvas.add_child(action_button)
@@ -2520,7 +2535,7 @@ func _build_controls(canvas: CanvasLayer) -> void:
 	hb.position = Vector2(SCREEN_W - SHOP_W + 6, SCREEN_H - 42)
 	hb.add_theme_constant_override("separation", 2)
 	canvas.add_child(hb)
-	pause_button = _button("❚❚", _toggle_pause, 28, 26)
+	pause_button = _button("||", _toggle_pause, 28, 26)
 	hb.add_child(pause_button)
 	for spd in SPEEDS:
 		var sp: float = spd
@@ -2599,7 +2614,7 @@ func _build_left_panel(canvas: CanvasLayer) -> void:
 		vb.add_child(row)
 		enemy_rows[sid] = {"root": row, "count": cnt, "new": badge}
 
-	left_toggle = _button("◀" if left_open else "▶", func(): _toggle_left(true), 18, 44)
+	left_toggle = _button("<" if left_open else ">", func(): _toggle_left(true), 18, 44)
 	left_toggle.position = Vector2((LEFT_W + 2) if left_open else 2, TOP_H + 6)
 	canvas.add_child(left_toggle)
 
@@ -2610,7 +2625,7 @@ func _toggle_left(by_player: bool = false) -> void:
 	elif left_open:
 		_left_user_closed = false
 	left_panel.visible = left_open
-	left_toggle.text = "◀" if left_open else "▶"
+	left_toggle.text = "<" if left_open else ">"
 	left_toggle.position.x = (LEFT_W + 2) if left_open else 2
 	GameState.enemy_panel_open = left_open   # keuze onthouden voor het volgende level
 
