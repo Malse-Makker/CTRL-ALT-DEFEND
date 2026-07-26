@@ -1,18 +1,13 @@
 {
-  "version": "0.72.0",
+  "version": "0.73.0",
   "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.72.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.73.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "47a783b77f74d63acecf7333810616c5c02e42fadcbbf52a6a072fc47fb2cd33",
-  "size": 110061216,
+  "sha256": "b6b346685bb0ee446d9f9c6679a0465c1de90b142d05e9b671a201c786cd6707",
+  "size": 110065864,
   "changes": [
-    "Fixed the empty boxes for good: every symbol in the interface is now plain text or drawn. The START and pause buttons were the worst offenders.",
-    "After finishing a level you can go straight to Retry or Next Level, not just back to the level select.",
-    "The score summary no longer runs into the buttons, and the stars sit above it instead of through it.",
-    "Recognition is now a fixed amount per level, unlocked by stars only: 3 stars pays the whole thing, 2 stars pays two thirds, and coming back later to improve pays only the difference. It no longer scales with score, which was handing out far too much.",
-    "New hidden reward: finish a level without losing a single Focus and you get a big extra star and a Recognition bonus.",
-    "Every tower now starts on First targeting, which is what you usually want.",
-    "Level select: the stars sit centred under each level, and the Tutorial button no longer overlaps your rank."
+    "Feedback now has a SEND button: one click and it arrives with me, no copying, no files, no chasing.",
+    "Copy and email still work exactly as before, in case sending fails or you would rather not."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }
