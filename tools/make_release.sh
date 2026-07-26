@@ -48,6 +48,15 @@ LATEST_EXE="https://github.com/${REPO}/releases/latest/download/${EXE_NAME}"
 # schrijven, want die moet in de export zitten.
 python3 tools/gen_release_files.py --version "$VERSION" --check-only
 
+# De feedback-bestemming staat bewust niet in de repo (zie .gitignore). Ontbreekt hij, dan
+# gaat de build eruit zonder SEND-knop -- dat wil je weten vóór je 'm rondstuurt.
+if [[ ! -s feedback_target.json ]] || ! grep -q '"discord_webhook": *"https' feedback_target.json; then
+	echo "!! LET OP: feedback_target.json heeft geen webhook-URL."
+	echo "   Deze build krijgt GEEN SEND-knop; testers kunnen alleen kopieren/mailen."
+	echo "   Doorgaan? (ctrl-c om te stoppen)"
+	sleep 4
+fi
+
 echo "==> CTRL-ALT-DEFEND ${TAG}"
 
 # 1. Schoon opstarten? Zo niet, dan heeft exporteren geen zin.

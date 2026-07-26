@@ -227,6 +227,29 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.73.0)
+
+**Feedback met een SEND-knop via een Discord-webhook (v0.73.0).**
+- `scripts/feedback_send.gd`: POST de feedback als **tekstbijlage** naar een Discord-webhook
+  (multipart/form-data). Als bijlage en niet als berichttekst, want een Discord-bericht mag
+  2000 tekens en de feedback is er ruim 7000.
+- **De webhook-URL staat NIET in de repo.** Hij komt uit `res://feedback_target.json`, dat in
+  `.gitignore` staat en alleen mee de build in gaat (`include_filter` in `export_presets.cfg`).
+  **Dit is de kern:** deze repo is openbaar, dus een URL in de code zou betekenen dat iedereen
+  die GitHub bekijkt het kanaal kan volspammen zónder de game te downloaden.
+- **Waarom Discord en geen eigen endpoint:** alles in de .exe is eruit te halen, dus de vraag is
+  wat iemand ermee kan. Bij een webhook is dat "rommel in één kanaal" -- weggooien, nieuwe maken,
+  nieuwe versie uitbrengen. Een endpoint op de eigen OVH-server zou een blijvend aanvalsoppervlak
+  zijn naast tien andere diensten (en dat was ook het bezwaar van de gebruiker).
+- **Degradeert netjes:** geen URL in de build -> `send_available()` is false -> geen knop, en
+  kopiëren/mailen blijven de route. `tools/make_release.sh` waarschuwt vóór de build als de
+  bestemming ontbreekt, zodat je niet per ongeluk een build zonder SEND rondstuurt.
+- Getest: zonder URL geen knop, met URL wel, en de POST bereikt Discord echt (404 op een nep-token
+  bewijst dat de multipart-body klopt); foutmeldingen per statuscode, inclusief 429.
+- **Afgewezen alternatieven:** pastebin (feedback wordt publiek benaderbaar via de link, inclusief
+  speler-id) en GitHub Issues vanuit de game (vraagt een token met schrijfrechten op de repo in
+  de .exe -- veel grotere blast radius dan een kanaal vol spam).
+
 ## Stand van zaken (v0.72.0)
 
 **Font-sweep, winscherm en Recognition-economie (v0.72.0).**

@@ -12,3 +12,8 @@ feedback/
 
 # macOS
 .DS_Store
+
+# Feedback-bestemming: bevat de Discord-webhook-URL. Deze repo is openbaar, dus die URL mag
+# hier NOOIT in -- dan kan iedereen die GitHub bekijkt het kanaal volspammen zonder ook maar
+# de game te downloaden. Het bestand wordt lokaal aangemaakt en gaat alleen mee de build in.
+feedback_target.json

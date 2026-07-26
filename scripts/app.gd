@@ -13,6 +13,7 @@ const UpdaterScript = preload("res://scripts/updater.gd")
 const ChangelogScript = preload("res://scripts/changelog.gd")
 const BuildInfoScript = preload("res://scripts/build_info.gd")
 const StarsScript = preload("res://scripts/stars.gd")
+const FeedbackSendScript = preload("res://scripts/feedback_send.gd")
 
 const FEEDBACK_EMAIL := "games@makkers.net"
 
@@ -228,9 +229,14 @@ func show_feedback() -> void:
 	result.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
 	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	result.custom_minimum_size = Vector2(860, 0)
-	_fb_note(vb, "Any of these is fine -- pick whatever is easiest for you. Copy works for Discord, a text file or pastebin.com.")
 	var btns := HBoxContainer.new()
 	btns.add_theme_constant_override("separation", 10)
+	# Eén klik als de build een bestemming heeft; anders vallen we terug op kopiëren/mailen.
+	if FeedbackSendScript.send_available():
+		_fb_note(vb, "One click is enough -- SEND delivers it straight to me. Copy and email still work if you prefer.")
+		btns.add_child(_btn("SEND IT TO ME", func(): _send_feedback(result), 220, 36))
+	else:
+		_fb_note(vb, "Any of these is fine -- pick whatever is easiest for you. Copy works for Discord, a text file or pastebin.com.")
 	btns.add_child(_btn("COPY ALL TO CLIPBOARD", func(): _copy_feedback(result), 280, 36))
 	btns.add_child(_btn("Email it to " + FEEDBACK_EMAIL, func(): _email_feedback(result), 300, 36))
 	vb.add_child(btns)
@@ -461,6 +467,19 @@ func _copy_feedback(result: Label) -> void:
 	DisplayServer.clipboard_set(_fb_all_text())
 	result.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
 	result.text = "Copied! Paste it wherever suits you: a Discord message, an email, a text file or pastebin.com."
+
+func _send_feedback(result: Label) -> void:
+	result.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
+	result.text = "Sending..."
+	var sender = FeedbackSendScript.new()
+	add_child(sender)
+	sender.done.connect(func(ok: bool, msg: String):
+		if is_instance_valid(result):
+			result.add_theme_color_override("font_color",
+				Color(0.55, 0.9, 0.6) if ok else Color(1.0, 0.7, 0.4))
+			result.text = msg
+		sender.queue_free())
+	sender.send(_fb_all_text(), PlaytestScript.player_id(), PlaytestScript.version())
 
 func _email_feedback(result: Label) -> void:
 	# Een mailto-link kan de volle feedback niet dragen (URL-lengtelimieten in mailclients, en

@@ -13,6 +13,10 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.73.0 — 2026-07-25
+- Feedback now has a SEND button: one click and it arrives with me, no copying, no files, no chasing.
+- Copy and email still work exactly as before, in case sending fails or you would rather not.
+
 ## v0.72.0 — 2026-07-25
 - Fixed the empty boxes for good: every symbol in the interface is now plain text or drawn. The START and pause buttons were the worst offenders.
 - After finishing a level you can go straight to Retry or Next Level, not just back to the level select.
