@@ -117,7 +117,14 @@ func _process(delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if not _active:
 		return
+	# Muisklik doet hetzelfde als spatie: een tester verwachtte te kunnen klikken en zat
+	# vast omdat alleen het toetsenbord werkte.
+	var bite: bool = false
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE:
+		bite = true
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		bite = true
+	if bite:
 		# Altijd de spatie opeten (anders start hij een wave); happen alleen als de cooldown klaar is.
 		get_viewport().set_input_as_handled()
 		if _cooldown <= 0.0:

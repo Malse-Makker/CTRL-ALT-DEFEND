@@ -96,7 +96,8 @@ func _build_qte() -> void:
 		_big_msg("PIZZA GONE", Color(0.6, 1.0, 0.7)))
 	layer.add_child(pizza_qte)
 	dino_qte = QteDino.new()
-	dino_qte.dodged.connect(func(): _big_msg("DODGED", Color(0.6, 1.0, 0.7)))
+	# Dodgen haalt hier ook echt tijd weg, net als in het level.
+	dino_qte.dodged.connect(func(): _qte_time = maxf(0.0, _qte_time - 1.5))
 	layer.add_child(dino_qte)
 	click_qte = QteClick.new()
 	click_qte.finished.connect(func():
@@ -324,6 +325,7 @@ func _process(delta: float) -> void:
 			pizza_qte.hide_event()
 	elif dino_qte != null and dino_qte.visible:
 		_qte_time -= delta
+		dino_qte.set_progress(1.0 - _qte_time / 14.0)
 		if _qte_time <= 0.0:
 			dino_qte.hide_event()
 	elif click_qte != null and click_qte.visible:

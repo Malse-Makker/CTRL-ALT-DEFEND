@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "0.71.0",
+      "date": "2026-07-25",
+      "items": [
+        "Stars and the feedback vote arrows showed up as empty boxes on Linux/Proton. They are drawn now, so they look the same everywhere.",
+        "Eat the Pizza: you can bite with a mouse click as well as the space bar.",
+        "No Internet: there is now a reconnection bar that visibly jumps forward every time you dodge, so you can see that playing well actually shortens it. And the runner is a proper dinosaur.",
+        "The phone call is now an actual phone that slides up and buzzes, with a red hang-up and a green answer button. Answering does not help.",
+        "Sign here is now a five-page compliance document -- GDPR, acceptable use, security, health & safety, tone of voice -- with signature lines to click on every page."
+      ]
+    },
+    {
       "version": "0.70.0",
       "date": "2026-07-25",
       "items": [

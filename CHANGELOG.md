@@ -13,6 +13,13 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.71.0 — 2026-07-25
+- Stars and the feedback vote arrows showed up as empty boxes on Linux/Proton. They are drawn now, so they look the same everywhere.
+- Eat the Pizza: you can bite with a mouse click as well as the space bar.
+- No Internet: there is now a reconnection bar that visibly jumps forward every time you dodge, so you can see that playing well actually shortens it. And the runner is a proper dinosaur.
+- The phone call is now an actual phone that slides up and buzzes, with a red hang-up and a green answer button. Answering does not help.
+- Sign here is now a five-page compliance document -- GDPR, acceptable use, security, health & safety, tone of voice -- with signature lines to click on every page.
+
 ## v0.70.0 — 2026-07-25
 - The Art Room is readable again: it scrolls, everything has room, and nothing overlaps.
 - It now shows all 14 towers (Pomodoro, Reply All and Ctrl+Alt+Del were missing) and lets you try all five mini-games, not just the projector.

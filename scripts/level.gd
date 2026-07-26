@@ -14,6 +14,7 @@ const SHOP_W := 154.0
 const LEFT_W := 174.0   # icoon + naam + aantal + NEW-badge moeten er samen in passen
 const CTRL_H := 96.0
 const HudIconScript = preload("res://scripts/hud_icon.gd")
+const StarsScript = preload("res://scripts/stars.gd")
 
 const GRID := 40.0
 const PATH_WIDTH := 40.0
@@ -149,6 +150,7 @@ var pizza_active: bool = false
 var pizza_qte: Control               # de Eat the Pizza-mini-game (Release Night)
 var dino_active: bool = false
 var dino_qte: Control                # de No Internet-mini-game (Work From Home)
+var _dino_total: float = 10.0        # startduur, om de voortgangsbalk te kunnen vullen
 var click_active: bool = false
 var click_qte: Control               # lichte klik-events: telefoon (Town Hall) / formulier (HR Room)
 const QteClick = preload("res://scripts/qte_click.gd")
@@ -1384,9 +1386,15 @@ func _update_hazard(delta: float) -> void:
 			if _hazard_timer <= 0.0:
 				hazard_active = true
 				_hazard_timer = 10.0     # tijd tot de verbinding terug is (dodgen versnelt dit)
+				_dino_total = 10.0
 				_show_dino()
-		elif _hazard_timer <= 0.0:
-			_finish_dino()               # verbinding terug (vanzelf of sneller door te dodgen)
+		else:
+			# Voortgang doorgeven zodat de balk in de mini-game meeloopt -- en zichtbaar
+			# vooruitspringt zodra je een obstakel ontwijkt.
+			if dino_qte != null:
+				dino_qte.set_progress(1.0 - _hazard_timer / maxf(_dino_total, 0.001))
+			if _hazard_timer <= 0.0:
+				_finish_dino()           # verbinding terug (vanzelf of sneller door te dodgen)
 	elif hazard_type == "phone" or hazard_type == "form":
 		if not click_active:
 			if _hazard_timer <= 0.0:
@@ -1833,7 +1841,6 @@ func _win() -> void:
 	var base: int = 5 + c_stars + c_level + c_score
 	var r: Dictionary = GameState.complete_level(level_id, s, base)
 	_last_recognition = int(r["total"])
-	var stars_txt: String = "★".repeat(s) + "☆".repeat(3 - s)
 	# Opbouw tonen in plaats van één getal: dan zie je waar het loont om beter te spelen.
 	var detail: String = "Recognition:  base +5   stars +%d   level +%d   score %d +%d" % [
 		c_stars, c_level, run_score, c_score]
@@ -1842,11 +1849,18 @@ func _win() -> void:
 	if int(r["first_perfect"]) > 0:
 		detail += "   first 3 stars +%d" % int(r["first_perfect"])
 	detail += "\nTotal:  +%d Recognition" % int(r["total"])
-	var title: String = "LEVEL COMPLETE\n%s" % stars_txt
+	var title: String = "LEVEL COMPLETE"
 	var promo: String = String(r.get("promotion", ""))
 	if promo != "":
-		title = "PROMOTED!\nYou are now a %s\n%s" % [promo, stars_txt]
+		title = "PROMOTED!\nYou are now a %s" % promo
 	_show_overlay(title, Color(0.2, 0.7, 0.35), true, detail)
+	# Sterren als tekening op het winscherm; als tekst werden het blokjes onder Proton.
+	if overlay != null:
+		var sr = StarsScript.new()
+		sr.setup(s, 3, 14.0)
+		sr.position = Vector2(SCREEN_W / 2.0 - sr.size.x / 2.0, SCREEN_H / 2.0 - 96.0)
+		sr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		overlay.add_child(sr)
 
 func _lose() -> void:
 	game_over = true

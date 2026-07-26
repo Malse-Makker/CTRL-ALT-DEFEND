@@ -12,6 +12,7 @@ const PlaytestScript = preload("res://scripts/playtest.gd")
 const UpdaterScript = preload("res://scripts/updater.gd")
 const ChangelogScript = preload("res://scripts/changelog.gd")
 const BuildInfoScript = preload("res://scripts/build_info.gd")
+const StarsScript = preload("res://scripts/stars.gd")
 
 const FEEDBACK_EMAIL := "games@makkers.net"
 
@@ -201,7 +202,7 @@ func show_feedback() -> void:
 			_fb_note(vb, "  - " + _fb_run_line(runs[i]))
 
 	# --- Stem-items ---
-	_fb_section(vb, "PLANS & IDEAS   (▲ = yes please, ▼ = rather not, click again to clear)")
+	_fb_section(vb, "PLANS & IDEAS   (up = yes please, down = rather not, click again to clear)")
 	_fb_items = _fb_plan_list()
 	_fb_votes = []
 	_fb_comment_edits = []
@@ -280,12 +281,14 @@ func _fb_note(vb: VBoxContainer, text: String) -> void:
 func _fb_vote_row(vb: VBoxContainer, idx: int, text: String) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
+	# Driehoekjes getekend in plaats van ▲/▼ als tekst: dat font heeft die glyphs niet en
+	# onder Proton werden het lege blokjes (tester-melding v0.70).
 	var up := Button.new()
-	up.text = "▲"
 	up.custom_minimum_size = Vector2(36, 30)
+	_add_arrow(up, true)
 	var dn := Button.new()
-	dn.text = "▼"
 	dn.custom_minimum_size = Vector2(36, 30)
+	_add_arrow(dn, false)
 	var lbl := Label.new()
 	lbl.text = text
 	lbl.add_theme_font_size_override("font_size", 12)
@@ -305,6 +308,18 @@ func _fb_vote_row(vb: VBoxContainer, idx: int, text: String) -> void:
 	row.add_child(lbl)
 	row.add_child(comment)
 	vb.add_child(row)
+
+func _add_arrow(b: Button, up: bool) -> void:
+	var a := Control.new()
+	a.custom_minimum_size = Vector2(14, 12)
+	a.size = Vector2(14, 12)
+	a.position = Vector2(11, 9)
+	a.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	a.draw.connect(func():
+		var pts := PackedVector2Array([Vector2(7, 0), Vector2(14, 12), Vector2(0, 12)] if up
+			else [Vector2(0, 0), Vector2(14, 0), Vector2(7, 12)])
+		a.draw_colored_polygon(pts, Color(0.85, 0.87, 0.92)))
+	b.add_child(a)
 
 func _fb_set_vote(idx: int, v: String, up: Button, dn: Button) -> void:
 	if _fb_votes[idx] == v:
@@ -533,12 +548,17 @@ func show_level_select() -> void:
 			var data: Dictionary = GameState.get_level(i)
 			var unlocked: bool = GameState.is_unlocked(i)
 			var s: int = GameState.get_stars(i)
-			var stars_txt: String = "★".repeat(s) + "☆".repeat(3 - s)
 			var b := Button.new()
 			b.custom_minimum_size = Vector2(168, 82)
 			b.add_theme_font_size_override("font_size", 12)
 			if unlocked:
-				b.text = "%d\n%s\n%s" % [i, String(data["name"]), stars_txt]
+				b.text = "%d\n%s" % [i, String(data["name"])]
+				# Sterren als eigen tekening bovenop de knop: als tekst werden het blokjes.
+				var sr = StarsScript.new()
+				sr.setup(s, 3, 6.0)
+				sr.position = Vector2(168.0 / 2.0 - 33.0, 60.0)
+				sr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				b.add_child(sr)
 				var lid := i
 				b.pressed.connect(func(): start_level(lid))
 			else:

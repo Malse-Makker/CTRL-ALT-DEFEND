@@ -227,6 +227,31 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.71.0)
+
+**Mini-games uitgewerkt + de blokjes-bug (v0.71.0), allemaal uit tester-feedback.**
+- **★☆ en ▲▼ werden lege blokjes onder Proton.** Het standaardfont heeft die glyphs niet; op
+  Windows viel het nog mee, via Proton niet. **Regel: geen geometrische Unicode-tekens in de UI**
+  (dezelfde reden als "geen emoji"). Nieuw: `scripts/stars.gd` (getekende sterrenrij, gebruikt in
+  de level-select en op het winscherm) en `_add_arrow()` in `app.gd` voor de stemknoppen.
+  *Nog niet omgezet, wel risico:* `▶ ◀ ❚❚ ✕` in de HUD — nog niet gemeld, maar als een tester
+  daar blokjes ziet, is dit de oorzaak.
+- **Pizza:** muisklik doet nu hetzelfde als spatie.
+- **No Internet:** de mini-game kreeg een **voortgangsbalk** ("Reconnecting...") die de aanroeper
+  elke frame vult via `set_progress()`; `level.gd` bewaart daarvoor `_dino_total`. Ontwijken duwt
+  de balk zichtbaar vooruit + "back online sooner!" + een teller. Vóór deze versie verrekende het
+  level de dodge wél, maar zag je het nergens, dus leek het eindeloos. De renner is nu een
+  **getekende dino** (blokken, kijkt naar rechts) in plaats van `mg_runner.png`.
+- **Telefoon:** `qte_click.gd` herschreven — een telefoon die van onderen inschuift en trilt, met
+  een rode ophang- en een groene opneemknop. Opnemen helpt niet ("Hi, do you have a minute?"),
+  je moet alsnog rood. Alles getekend.
+- **Formulier:** nu een **document van 5 pagina's** (GDPR, acceptable use, security, health &
+  safety, tone of voice) met per pagina twee handtekeningregels die je aanklikt; getekend als
+  papier met schaduw, paginateller en voortgangsblokjes. Eigen mini-woordafbreker
+  (`_draw_wrapped`), want `draw_string` wrapt niet.
+- **Valkuil:** `qte_dino` had titel en uitleg als Labels én opnieuw in `_draw` — die stonden
+  dubbel over elkaar. Labels verwijderd, tekenen is nu de enige bron.
+
 ## Stand van zaken (v0.70.0)
 
 **Art Room opgeknapt (v0.70.0).** Was onleesbaar: alles geperst in 540px, met overlappende

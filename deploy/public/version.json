@@ -1,13 +1,16 @@
 {
-  "version": "0.70.0",
-  "date": "2026-07-25",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.70.0/CTRL-ALT-DEFEND.exe",
+  "version": "0.71.0",
+  "date": "2026-07-26",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.71.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "400ccf0c1be7ad0f1b7fd98737bd445b5e4f48b220f98b4e87fdbf5e2b166e47",
-  "size": 110048296,
+  "sha256": "2258a76158095f42bb5690158c07fc6ae29fb3b302650ae5712e9d5fd3f9b6de",
+  "size": 110058928,
   "changes": [
-    "The Art Room is readable again: it scrolls, everything has room, and nothing overlaps.",
-    "It now shows all 14 towers (Pomodoro, Reply All and Ctrl+Alt+Del were missing) and lets you try all five mini-games, not just the projector."
+    "Stars and the feedback vote arrows showed up as empty boxes on Linux/Proton. They are drawn now, so they look the same everywhere.",
+    "Eat the Pizza: you can bite with a mouse click as well as the space bar.",
+    "No Internet: there is now a reconnection bar that visibly jumps forward every time you dodge, so you can see that playing well actually shortens it. And the runner is a proper dinosaur.",
+    "The phone call is now an actual phone that slides up and buzzes, with a red hang-up and a green answer button. Answering does not help.",
+    "Sign here is now a five-page compliance document -- GDPR, acceptable use, security, health & safety, tone of voice -- with signature lines to click on every page."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }
