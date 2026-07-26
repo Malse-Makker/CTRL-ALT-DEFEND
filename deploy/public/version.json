@@ -1,16 +1,12 @@
 {
-  "version": "0.74.0",
+  "version": "0.75.0",
   "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.74.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.75.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "d4babd888f0c6f8253a22d6a8003dc491c09fd51fac68e4c0e4699cfa7057ead",
-  "size": 110067688,
+  "sha256": "6a08117d3120c578ac7ac94cd2d0dac3483e977aa9bc0fd29852c03684e1ffe5",
+  "size": 110068936,
   "changes": [
-    "The tutorial is meant to be beatable without losing any Focus now: smaller groups, more starting Coffee, and a fresh purse for every lesson.",
-    "A pulsing arrow points at whatever the lesson is talking about -- the shop, the path, the speed buttons or a tower you placed.",
-    "Fixed the Headphones lesson: it used to throw twenty Nudges at a tower that can only slow one thing at a time. It is six now, and the lesson says to pair it with Auto-Reply.",
-    "The Old Guard lesson sends one tank instead of three, so you can actually watch the Artillery break the shield.",
-    "Two new lessons: one for START, pause and the 1x-8x speeds, and one for opening a tower to upgrade it and set its targeting."
+    "Click any tower you have placed and it now tells you what that particular tower has actually done: total damage dealt, and how much damage it earned per Coffee you put into it. Coffee Machines show what they have made."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

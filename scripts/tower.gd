@@ -9,6 +9,10 @@ var level_name: String = ""
 var level_flavour: String = ""
 var role: String = "damage"
 var invested: int = 0
+# Wat DEZE toren heeft gedaan (niet dit toren-TYPE): voedt het detailpaneel als je 'm aanklikt,
+# zodat je kunt zien of een plek zijn Coffee waard is.
+var stat_damage: float = 0.0
+var stat_time: float = 0.0
 
 var range_radius: float = 135.0
 var fire_rate: float = 0.45

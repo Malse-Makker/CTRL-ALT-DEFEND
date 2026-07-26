@@ -698,6 +698,7 @@ func _try_place(p: Vector2) -> void:
 		_add_coffee(a)
 	t.on_damage = func(id, amt):
 		_stats["damage"][id] = float(_stats["damage"].get(id, 0.0)) + amt
+		t.stat_damage += amt
 	t.on_fire = func(from, to, id, role): _play_shot(id); _fx_shot(from, to, id, role)
 	t.trap_path = path        # dichtstbijzijnde pad-punt (lvl-3 default)
 	t.trap_paths = paths_all  # trap strooit over ÁLLE lanes (multi-path)
@@ -760,11 +761,23 @@ func _upgrade_delta_text(t: Node2D) -> String:
 func _num(v: float) -> String:
 	return str(int(v)) if is_equal_approx(v, round(v)) else ("%.2f" % v)
 
+func _tower_performance(t: Node2D) -> String:
+	# Wat heeft juist DEZE toren opgeleverd voor de Coffee die erin zit? Zonder dit moest je
+	# op gevoel bepalen of een plek goed was (tester-feedback v0.72).
+	var inv: float = maxf(float(t.invested), 1.0)
+	if t.role == "economy":
+		var made: float = float(_stats["made"].get(t.def_id, 0.0))
+		return "\n\nThis machine's type has made %d Coffee this run." % int(made)
+	var dmg: float = float(t.stat_damage)
+	if dmg <= 0.0:
+		return "\n\nNo damage yet - it may be out of range of the path."
+	return "\n\nDamage dealt: %d   (%.1f per Coffee invested)" % [int(dmg), dmg / inv]
+
 func _open_upgrade(t: Node2D) -> void:
 	selected_tower = t
 	var d: Dictionary = TowerScript.defs()[t.def_id]
 	upg_name.text = "%s  (Lv %d)" % [t.level_name, t.level]
-	upg_stats.text = "\"%s\"\n%s" % [t.level_flavour, _tower_stats_text(t)]
+	upg_stats.text = "\"%s\"\n%s%s" % [t.level_flavour, _tower_stats_text(t), _tower_performance(t)]
 	if t.role == "damage" or t.role == "stun" or t.role == "multi" or t.role == "chain":
 		upg_target.visible = true
 		upg_target.selected = TARGET_MODES.find(t.target_mode)

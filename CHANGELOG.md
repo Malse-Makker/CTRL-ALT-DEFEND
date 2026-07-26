@@ -13,6 +13,9 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.75.0 — 2026-07-25
+- Click any tower you have placed and it now tells you what that particular tower has actually done: total damage dealt, and how much damage it earned per Coffee you put into it. Coffee Machines show what they have made.
+
 ## v0.74.0 — 2026-07-25
 - The tutorial is meant to be beatable without losing any Focus now: smaller groups, more starting Coffee, and a fresh purse for every lesson.
 - A pulsing arrow points at whatever the lesson is talking about -- the shop, the path, the speed buttons or a tower you placed.

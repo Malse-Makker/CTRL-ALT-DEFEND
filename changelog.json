@@ -1,6 +1,13 @@
 {
   "entries": [
     {
+      "version": "0.75.0",
+      "date": "2026-07-25",
+      "items": [
+        "Click any tower you have placed and it now tells you what that particular tower has actually done: total damage dealt, and how much damage it earned per Coffee you put into it. Coffee Machines show what they have made."
+      ]
+    },
+    {
       "version": "0.74.0",
       "date": "2026-07-25",
       "items": [

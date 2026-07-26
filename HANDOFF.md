@@ -227,6 +227,20 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.75.0)
+
+**Toren-detailpaneel (v0.75.0)** -- het laatste openstaande punt uit de feedbackronde van v0.72.
+- `tower.gd` heeft nu `stat_damage` **per exemplaar**; de schade werd alleen per toren-TYPE
+  bijgehouden (`_stats["damage"][def_id]`), en daar kun je niet mee zien of een specifieke plek
+  zijn Coffee waard was. De teller loopt mee in de bestaande `on_damage`-callback.
+- `_tower_performance()` hangt onder de bestaande upgrade-tekst: totale schade + **schade per
+  geïnvesteerde Coffee**. Coffee Machines tonen wat ze hebben opgebracht. Staat er nog niets,
+  dan zegt hij dat de toren misschien buiten bereik van het pad staat -- vaak de echte oorzaak.
+- **Kills per toren zit er NIET in.** Dat vraagt toewijzing van de dodelijke klap, en
+  `take_damage` weet niet wie hem uitdeelde; dat is een grotere ingreep door alle schade-paden
+  van `tower.gd` heen. Schade per Coffee beantwoordt dezelfde vraag ("is deze plek het waard")
+  zonder die verbouwing.
+
 ## Stand van zaken (v0.74.0)
 
 **Tutorial herzien (v0.74.0)** -- het "je pakt altijd schade"-punt uit de tester-feedback.
