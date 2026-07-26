@@ -227,6 +227,22 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.77.0)
+
+**Wave-spam was een symptoom, geen oorzaak -- en een gat in de uitgangen (v0.77.0).**
+- In v0.76.0 las ik hoge `early_calls` in de verliesrondes als "hij spamt zichzelf dood".
+  De gebruiker wees erop dat het andersom is: **je spamt omdat je al verloren hebt** en de
+  ronde wilt afraffelen. De cijfers geven hem gelijk: in die twee rondes was `coffee_earned`
+  **1 en 14** -- er ging vrijwel niets dood, dus het was al voorbij vóór het spammen begon.
+- **De echte fout zat in het spel:** doodgaan was de énige route naar het eindscherm met je
+  cijfers en het feedbackformulier. "Quit run" gooide je zonder iets terug naar het menu. Wie
+  klaar was met een verloren ronde kón dus alleen maar waves spammen. Nu heeft de
+  bevestigingsdialoog **Give up** (`_surrender()` -> `_lose()`), naast Quit run en Keep playing.
+- **Waarschuwing bij vroeg oproepen alleen nog boven de helft van je Focus.** Iemand die al
+  verliest hoeft geen belerende melding.
+- **Les voor de volgende data-analyse:** `early_calls` is besmet als signaal. Kijk naar
+  `coffee_earned` en `kills` om te zien of iemand écht speelde of alleen nog afraffelde.
+
 ## Stand van zaken (v0.76.0)
 
 **Playtest-data van v0.71.0 verwerkt (v0.76.0).** 7 runs; Coffee Corner 3x verloren, fun 2/10.

@@ -13,6 +13,10 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.77.0 — 2026-07-26
+- New "Give up" button when you leave a run: it takes you to the results screen with your stats instead of dropping you back at the menu with nothing. If a run is already lost you no longer have to rush waves just to reach the end.
+- The early-wave warning now only appears when you are still doing well. Nobody needs a lecture while they are already losing.
+
 ## v0.76.0 — 2026-07-26
 - You now start every level with 45 Coffee instead of 30. Thirty was exactly one Shredder and nothing else, so picking it meant losing before you began.
 - Coffee Corner had 312 Nudges in it, up to 50 in a single wave, and the first swarm arrived on wave 2 while you still had one tower. That is 167 now, spread out, and the first swarm comes later.

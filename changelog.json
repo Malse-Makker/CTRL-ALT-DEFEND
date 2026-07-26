@@ -1,6 +1,14 @@
 {
   "entries": [
     {
+      "version": "0.77.0",
+      "date": "2026-07-26",
+      "items": [
+        "New \"Give up\" button when you leave a run: it takes you to the results screen with your stats instead of dropping you back at the menu with nothing. If a run is already lost you no longer have to rush waves just to reach the end.",
+        "The early-wave warning now only appears when you are still doing well. Nobody needs a lecture while they are already losing."
+      ]
+    },
+    {
       "version": "0.76.0",
       "date": "2026-07-26",
       "items": [

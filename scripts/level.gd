@@ -953,7 +953,7 @@ func _call_next_wave() -> void:
 	# Vroeg oproepen geeft punten, maar waves stapelen op. In de playtest riep een tester
 	# 21 van de 22 waves vroeg op en werd bedolven -- het spel juichte alleen maar mee.
 	# Nu waarschuwt hij zodra het bord al vol staat.
-	if enemies.size() >= 25:
+	if enemies.size() >= 25 and focus > start_focus / 2:
 		_flash_msg("+%d points -- but %d are still on the board. Waves stack up." % [bonus, enemies.size()])
 	else:
 		_flash_msg("Wave called early! +%d points." % bonus)
@@ -1624,6 +1624,11 @@ func _request_menu() -> void:
 		confirm.visible = true
 	else:
 		_leave_to_menu()
+
+func _surrender() -> void:
+	confirm.visible = false
+	Engine.time_scale = 1.0
+	_lose()
 
 func _cancel_menu() -> void:
 	confirm.visible = false
@@ -2797,7 +2802,7 @@ func _build_confirm(canvas: CanvasLayer) -> void:
 	bg.color = Color(0, 0, 0, 0.55)
 	confirm.add_child(bg)
 	var lbl := Label.new()
-	lbl.text = "Leaving now ends your current run.\nAre you sure?"
+	lbl.text = "End this run?\nGive up shows your results; quitting drops them."
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.position = Vector2(SCREEN_W / 2.0 - 180, SCREEN_H / 2.0 - 60)
 	lbl.custom_minimum_size = Vector2(360, 50)
@@ -2807,5 +2812,10 @@ func _build_confirm(canvas: CanvasLayer) -> void:
 	hb.add_theme_constant_override("separation", 16)
 	hb.position = Vector2(SCREEN_W / 2.0 - 125, SCREEN_H / 2.0 + 10)
 	confirm.add_child(hb)
+	# "Give up" gaat naar het eindscherm mét cijfers en feedbackformulier. Zonder die route
+	# was doodgaan de enige manier om je resultaten te zien, en dus spamden testers waves om
+	# een verloren ronde af te raffelen (playtest v0.71: 21 van de 22 waves vroeg opgeroepen,
+	# ronde in 61 seconden uit). Dat is geen fout van de speler maar een gat in de uitgangen.
+	hb.add_child(_button("Give up", _surrender, 110, 32))
 	hb.add_child(_button("Quit run", _leave_to_menu, 110, 32))
 	hb.add_child(_button("Keep playing", _cancel_menu, 130, 32))

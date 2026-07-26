@@ -1,14 +1,13 @@
 {
-  "version": "0.76.0",
+  "version": "0.77.0",
   "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.76.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.77.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "dcfa89eb0d6f364d5c2d8aa12261231924c674543526d4931a98f0373fe66891",
-  "size": 110069160,
+  "sha256": "f832074d85c2666dcb7e9376b02e9749b058e0aede3c7fcaf30c718c956a61b9",
+  "size": 110070056,
   "changes": [
-    "You now start every level with 45 Coffee instead of 30. Thirty was exactly one Shredder and nothing else, so picking it meant losing before you began.",
-    "Coffee Corner had 312 Nudges in it, up to 50 in a single wave, and the first swarm arrived on wave 2 while you still had one tower. That is 167 now, spread out, and the first swarm comes later.",
-    "Calling a wave early now warns you when the board is already full. It still pays points, but waves stack, and it was cheerfully saying \"nice\" while burying you."
+    "New \"Give up\" button when you leave a run: it takes you to the results screen with your stats instead of dropping you back at the menu with nothing. If a run is already lost you no longer have to rush waves just to reach the end.",
+    "The early-wave warning now only appears when you are still doing well. Nobody needs a lecture while they are already losing."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }
