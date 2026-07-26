@@ -13,6 +13,13 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.74.0 — 2026-07-25
+- The tutorial is meant to be beatable without losing any Focus now: smaller groups, more starting Coffee, and a fresh purse for every lesson.
+- A pulsing arrow points at whatever the lesson is talking about -- the shop, the path, the speed buttons or a tower you placed.
+- Fixed the Headphones lesson: it used to throw twenty Nudges at a tower that can only slow one thing at a time. It is six now, and the lesson says to pair it with Auto-Reply.
+- The Old Guard lesson sends one tank instead of three, so you can actually watch the Artillery break the shield.
+- Two new lessons: one for START, pause and the 1x-8x speeds, and one for opening a tower to upgrade it and set its targeting.
+
 ## v0.73.0 — 2026-07-25
 - Feedback now has a SEND button: one click and it arrives with me, no copying, no files, no chasing.
 - Copy and email still work exactly as before, in case sending fails or you would rather not.

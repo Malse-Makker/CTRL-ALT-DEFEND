@@ -227,6 +227,23 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.74.0)
+
+**Tutorial herzien (v0.74.0)** -- het "je pakt altijd schade"-punt uit de tester-feedback.
+- **Waarom je schade opliep:** de groepen waren te groot voor de beperkte toolkit per les
+  (noti:8, thread:18, nudge:20, tank:3) en er was maar 40 Coffee. Nu kleinere groepen, 70 Coffee,
+  en `_tutorial_reset` zet de beurs terug op `_start_coffee` in plaats van een hardgecodeerde 40.
+- **Les 4 was fundamenteel fout:** Headphones is single-target crowd control en kreeg een zwerm
+  van 20 Nudges. Dat kan die toren per definitie niet. Nu 6 Nudges, en de lestekst zegt expliciet
+  dat je 'm mét Auto-Reply gebruikt -- afremmen, de ander maakt af.
+- **Les 5:** 1 tank in plaats van 3, zodat je de Artillery het schild ziet breken.
+- **Twee lessen erbij (nu 7):** START/pauze/snelheid, en een toren openklikken voor upgraden +
+  targeting.
+- **Hint-pijl** (`_draw_tutorial_hint`): elke les heeft een `hint` (`shop` / `path` / `speed` /
+  `tower`) en er wijst een pulserende pijl naar dat deel van het scherm. *Valkuil:* pulseren op
+  `Time.get_ticks_msec()` en niet op delta -- in de plan-fase staat `time_scale` op 0.
+- **Nog open uit die feedbackronde:** het toren-detailpaneel (kills/schade per Coffee).
+
 ## Stand van zaken (v0.73.0)
 
 **Feedback met een SEND-knop via een Discord-webhook (v0.73.0).**

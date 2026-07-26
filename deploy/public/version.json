@@ -1,13 +1,16 @@
 {
-  "version": "0.73.0",
+  "version": "0.74.0",
   "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.73.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.74.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "b6b346685bb0ee446d9f9c6679a0465c1de90b142d05e9b671a201c786cd6707",
-  "size": 110065864,
+  "sha256": "d4babd888f0c6f8253a22d6a8003dc491c09fd51fac68e4c0e4699cfa7057ead",
+  "size": 110067688,
   "changes": [
-    "Feedback now has a SEND button: one click and it arrives with me, no copying, no files, no chasing.",
-    "Copy and email still work exactly as before, in case sending fails or you would rather not."
+    "The tutorial is meant to be beatable without losing any Focus now: smaller groups, more starting Coffee, and a fresh purse for every lesson.",
+    "A pulsing arrow points at whatever the lesson is talking about -- the shop, the path, the speed buttons or a tower you placed.",
+    "Fixed the Headphones lesson: it used to throw twenty Nudges at a tower that can only slow one thing at a time. It is six now, and the lesson says to pair it with Auto-Reply.",
+    "The Old Guard lesson sends one tank instead of three, so you can actually watch the Artillery break the shield.",
+    "Two new lessons: one for START, pause and the 1x-8x speeds, and one for opening a tower to upgrade it and set its targeting."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

@@ -185,17 +185,31 @@ func _special_level(level_id: int) -> Dictionary:
 	if level_id == 101:
 		# Tutorial: 5 lessen. Per les één les-vijand + beperkte torens; level.gd reset ertussen.
 		var straight := PackedVector2Array([Vector2(-60,260),Vector2(780,260)])
+		# Lessen zijn HAALBAAR bedoeld: met de aangeboden torens moet je nul Focus verliezen.
+		# Tester-feedback v0.72: je liep altijd schade op. Oorzaken waren te grote groepen voor
+		# de beperkte toolkit, en les 4 leerde Headphones (single-target) tegen een zwerm van 20
+		# -- dat kan die toren per definitie niet. Aantallen omlaag, koffie omhoog, en de
+		# Headphones-les gaat nu over EEN doelwit afremmen zodat je schade-toren het afmaakt.
 		var lessons := [
-			{"towers":["coffee","auto"],          "spec":"noti:8@0.80",              "text":"LESSON 1/5 - Notifications. Place an Auto-Reply beside the path; a Coffee Machine funds your defence."},
-			{"towers":["coffee","auto"],          "spec":"noti:6@0.85 + hulp:2@1.30", "text":"LESSON 2/5 - Economy. Coffee Machines deal no damage but pay for everything. Build one first, then towers."},
-			{"towers":["coffee","filter"],        "spec":"thread:18@0.15",            "text":"LESSON 3/5 - The Thread is a paper pile. The Shredder eats paper - drop one ON the path."},
-			{"towers":["coffee","phones","auto"], "spec":"nudge:20@0.16",             "text":"LESSON 4/5 - Nudges are a fast swarm. Headphones slow and stun them."},
-			{"towers":["coffee","ceo","auto"],    "spec":"tank:3@1.80",               "text":"LESSON 5/5 - The Old Guard has a shield. Office Artillery hits hard enough to break it."},
+			{"towers":["coffee","auto"],          "spec":"noti:5@1.10",              "hint":"shop",
+				"text":"LESSON 1/7 - Pick Auto-Reply in the shop on the right, then click beside the path to place it."},
+			{"towers":["coffee","auto"],          "spec":"noti:5@1.10 + hulp:2@1.60", "hint":"shop",
+				"text":"LESSON 2/7 - Build a Coffee Machine first: it deals no damage but pays for everything else."},
+			{"towers":["coffee","filter"],        "spec":"thread:12@0.22",            "hint":"path",
+				"text":"LESSON 3/7 - The Thread is a paper pile. Drop a Shredder ON the path: it slows everything in the zone so the pile bunches up."},
+			{"towers":["coffee","phones","auto"], "spec":"nudge:6@0.55",              "hint":"path",
+				"text":"LESSON 4/7 - Nudges are fast. Headphones slow ONE of them right down; your Auto-Reply finishes it. Use both."},
+			{"towers":["coffee","ceo","auto"],    "spec":"tank:1@2.00",               "hint":"shop",
+				"text":"LESSON 5/7 - The Old Guard has a shield. Only Office Artillery hits hard enough to break through."},
+			{"towers":["coffee","auto","ceo"],    "spec":"noti:8@0.70 + hulp:3@1.20", "hint":"speed",
+				"text":"LESSON 6/7 - Bottom right: START begins a wave, || pauses, and 1x-8x sets the speed. Try 4x - you can always pause to think."},
+			{"towers":["coffee","auto","phones"], "spec":"noti:4@1.00 + nudge:4@0.70","hint":"tower",
+				"text":"LESSON 7/7 - Click a tower you placed to open it. There you upgrade it and set targeting: First aims at whoever is furthest along."},
 		]
 		var tw := []
 		for l in lessons:
 			tw.append(_parse_wave(String(l["spec"])))
-		return _special_base(101, "Tutorial", straight, full, 100, 40, tw, {"tutorial": true, "tutorial_lessons": lessons, "towers": lessons[0]["towers"]})
+		return _special_base(101, "Tutorial", straight, full, 100, 70, tw, {"tutorial": true, "tutorial_lessons": lessons, "towers": lessons[0]["towers"]})
 	elif level_id == 102:
 		# Boss Rush: alle 15 per-level bosses in volgorde, elk met een kleine escorte.
 		var p := PackedVector2Array([Vector2(-60,120),Vector2(620,120),Vector2(620,420),Vector2(180,420),Vector2(180,260),Vector2(780,260)])

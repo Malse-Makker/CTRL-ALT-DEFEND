@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "0.74.0",
+      "date": "2026-07-25",
+      "items": [
+        "The tutorial is meant to be beatable without losing any Focus now: smaller groups, more starting Coffee, and a fresh purse for every lesson.",
+        "A pulsing arrow points at whatever the lesson is talking about -- the shop, the path, the speed buttons or a tower you placed.",
+        "Fixed the Headphones lesson: it used to throw twenty Nudges at a tower that can only slow one thing at a time. It is six now, and the lesson says to pair it with Auto-Reply.",
+        "The Old Guard lesson sends one tank instead of three, so you can actually watch the Artillery break the shield.",
+        "Two new lessons: one for START, pause and the 1x-8x speeds, and one for opening a tower to upgrade it and set its targeting."
+      ]
+    },
+    {
       "version": "0.73.0",
       "date": "2026-07-25",
       "items": [

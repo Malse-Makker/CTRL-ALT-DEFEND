@@ -104,6 +104,8 @@ var tutorial: bool = false
 var endless: bool = false
 var tutorial_lessons: Array = []
 var _lesson: int = 0               # huidige tutorial-les
+var _lesson_hint: String = ""      # waar de tutorial-pijl naar wijst
+var _start_coffee: float = 40.0    # beginbedrag, om per tutorial-les te herstellen
 var banned_towers: Array = []      # dit level expliciet verboden (bv. HR Room)
 
 var focus: int = 100
@@ -248,6 +250,7 @@ func _ready() -> void:
 	start_focus = int(data["start_focus"])
 	focus = start_focus
 	coffee = float(data["start_coffee"])
+	_start_coffee = coffee
 	waves = data["waves"]
 	total_waves = waves.size()
 	# Speciale modi: Tutorial (per-les reset + beperkte torens), Endless (genereert waves), Boss Rush.
@@ -297,6 +300,7 @@ func _ready() -> void:
 	_update_flow()
 	if tutorial and not tutorial_lessons.is_empty():
 		_flash_msg(String(tutorial_lessons[0]["text"]))
+		_lesson_hint = String(tutorial_lessons[0].get("hint", ""))
 	else:
 		_flash_msg("PLAN PHASE - place towers, then press Start.")
 	queue_redraw()
@@ -1133,6 +1137,7 @@ func _tutorial_advance() -> void:
 		action_button.text = ">  START"
 		action_button.disabled = false
 	_flash_msg(String(tutorial_lessons[_lesson]["text"]))
+	_lesson_hint = String(tutorial_lessons[_lesson].get("hint", ""))
 	_update_labels()
 
 func _tutorial_reset() -> void:
@@ -1146,7 +1151,7 @@ func _tutorial_reset() -> void:
 		if is_instance_valid(e):
 			e.queue_free()
 	enemies.clear()
-	coffee = 40.0
+	coffee = _start_coffee   # elke les met een schone, toereikende beurs beginnen
 	focus = start_focus
 	queue_redraw()
 
@@ -2105,6 +2110,49 @@ func _play_shot(id: String) -> void:
 func _play_buy() -> void:
 	_play("buy")
 
+func _draw_tutorial_hint() -> void:
+	# Een pulserende pijl die aanwijst waar je moet klikken. Zonder dit moest een tester
+	# zelf raden welk deel van het scherm bij de lestekst hoorde (feedback v0.72).
+	if _lesson_hint == "" or game_over:
+		return
+	var target := Vector2.ZERO
+	var from_left := true          # pijl komt van links en wijst naar rechts
+	match _lesson_hint:
+		"shop":
+			target = Vector2(SCREEN_W - SHOP_W - 6.0, TOP_H + 70.0)
+		"start":
+			target = Vector2(SCREEN_W - SHOP_W - 6.0, SCREEN_H - CTRL_H + 28.0)
+		"speed":
+			target = Vector2(SCREEN_W - SHOP_W - 6.0, SCREEN_H - 30.0)
+		"path":
+			# Wijs naar een plek NAAST het pad, halverwege: daar hoort de toren te komen.
+			if not path.is_empty():
+				var mid: Vector2 = path[path.size() / 2]
+				target = mid + Vector2(0, -58.0)
+				from_left = false
+		"tower":
+			if towers.is_empty():
+				target = Vector2(SCREEN_W - SHOP_W - 6.0, TOP_H + 70.0)
+			else:
+				target = towers[0].position + Vector2(0, -44.0)
+				from_left = false
+		_:
+			return
+	if target == Vector2.ZERO:
+		return
+	# Pulseren op de wandklok: in de plan-fase staat time_scale op 0, dus delta is daar 0.
+	var t: float = float(Time.get_ticks_msec()) * 0.004
+	var puls: float = 8.0 + sin(t) * 5.0
+	var col := Color(1.0, 0.85, 0.35)
+	if from_left:
+		var tip := target - Vector2(puls, 0)
+		draw_colored_polygon(PackedVector2Array([tip, tip - Vector2(18, -9), tip - Vector2(18, 9)]), col)
+		draw_line(tip - Vector2(18, 0), tip - Vector2(46, 0), col, 4.0)
+	else:
+		var tip2 := target - Vector2(0, -puls)
+		draw_colored_polygon(PackedVector2Array([tip2, tip2 - Vector2(-9, 18), tip2 - Vector2(9, 18)]), col)
+		draw_line(tip2 - Vector2(0, 18), tip2 - Vector2(0, 46), col, 4.0)
+
 func _draw_path_arrows() -> void:
 	# Zachte, vooruit stromende groene chevrons langs elke ingang → tonen welke kant de
 	# vijanden op lopen. Puur cosmetisch. Wandkloktijd, want time_scale is 0 in de plan-fase.
@@ -2192,6 +2240,8 @@ func _draw() -> void:
 	draw_rect(Rect2(desk - Vector2(14, 24), Vector2(28, 48)), Color(0.7, 0.35, 0.35))
 	if (phase == "plan" or selected_def_id != "") and not game_over and not paused:
 		_draw_path_arrows()
+	if tutorial:
+		_draw_tutorial_hint()
 	if selected_def_id != "" and not game_over and not paused:
 		var top: float = 40.0
 		var bot: float = SCREEN_H
