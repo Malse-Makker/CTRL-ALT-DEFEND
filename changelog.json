@@ -1,6 +1,14 @@
 {
   "entries": [
     {
+      "version": "0.78.0",
+      "date": "2026-07-26",
+      "items": [
+        "When a run ends you now get a WHAT HURT YOU list: which enemies got through, how much Focus each of them actually cost you, and what to build against them next time.",
+        "It is sorted by Focus lost rather than by headcount, so three Old Guards rank above twenty Notifications -- which is usually the thing you needed to know."
+      ]
+    },
+    {
       "version": "0.77.0",
       "date": "2026-07-26",
       "items": [

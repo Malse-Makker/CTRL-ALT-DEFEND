@@ -13,6 +13,10 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.78.0 — 2026-07-26
+- When a run ends you now get a WHAT HURT YOU list: which enemies got through, how much Focus each of them actually cost you, and what to build against them next time.
+- It is sorted by Focus lost rather than by headcount, so three Old Guards rank above twenty Notifications -- which is usually the thing you needed to know.
+
 ## v0.77.0 — 2026-07-26
 - New "Give up" button when you leave a run: it takes you to the results screen with your stats instead of dropping you back at the menu with nothing. If a run is already lost you no longer have to rush waves just to reach the end.
 - The early-wave warning now only appears when you are still doing well. Nobody needs a lecture while they are already losing.

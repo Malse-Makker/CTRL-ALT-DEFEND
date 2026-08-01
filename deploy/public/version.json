@@ -1,13 +1,13 @@
 {
-  "version": "0.77.0",
-  "date": "2026-07-26",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.77.0/CTRL-ALT-DEFEND.exe",
+  "version": "0.78.0",
+  "date": "2026-08-01",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.78.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "f832074d85c2666dcb7e9376b02e9749b058e0aede3c7fcaf30c718c956a61b9",
-  "size": 110070056,
+  "sha256": "abbe04a747f84ecc5f0c85a5f801db4d5cff1c99a1c0ec436578e45c549fe8e9",
+  "size": 110071288,
   "changes": [
-    "New \"Give up\" button when you leave a run: it takes you to the results screen with your stats instead of dropping you back at the menu with nothing. If a run is already lost you no longer have to rush waves just to reach the end.",
-    "The early-wave warning now only appears when you are still doing well. Nobody needs a lecture while they are already losing."
+    "When a run ends you now get a WHAT HURT YOU list: which enemies got through, how much Focus each of them actually cost you, and what to build against them next time.",
+    "It is sorted by Focus lost rather than by headcount, so three Old Guards rank above twenty Notifications -- which is usually the thing you needed to know."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

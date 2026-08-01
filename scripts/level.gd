@@ -1927,6 +1927,10 @@ func _show_overlay(text: String, tint: Color, _won: bool, detail: String = "") -
 		var nxt: int = level_id + 1
 		overlay_buttons.add_child(_button("Next Level", func(): retry.emit(nxt), 120, 36))
 	overlay_buttons.add_child(_button("Level Select", func(): finished.emit(), 130, 36))
+	# Knoppen onder de tekst schuiven: het "wat deed je pijn"-overzicht is langer dan de oude
+	# vaste plek toeliet, en dan stonden Retry/Level Select dwars over de adviezen heen.
+	var lines_n: int = overlay_stats.text.count("\n") + 1
+	overlay_buttons.position.y = 118.0 + float(lines_n) * 20.0 + 16.0
 	if Playtest.ENABLED:
 		_build_feedback(_won)
 
@@ -1959,18 +1963,27 @@ func _run_summary() -> String:
 			(" (+%d upgraded)" % up) if up > 0 else "", what])
 	if lines.is_empty():
 		lines.append("No towers built.")
-	# Wat kwam er door? Dat wijst aan waar je verdediging lek was.
+	# Wat heeft je pijn gedaan, en wat doe je daaraan? Op FOCUS-schade sorteren en niet op
+	# aantal: drie Old Guards kosten je meer dan twintig Notifications, en juist die volgorde
+	# vertelt je waar je verdediging het echt liet afweten.
 	var leaks: Array = []
 	var edefs: Dictionary = EnemyScript.defs()
 	for k in _stats["leaks"].keys():
-		leaks.append([int(_stats["leaks"][k]), String(edefs[k]["name"])])
+		var id: String = String(k)
+		var n: int = int(_stats["leaks"][k])
+		if n <= 0 or not edefs.has(id):
+			continue
+		var per: int = int(edefs[id].get("damage", 1))
+		leaks.append([n * per, n, String(edefs[id]["name"]), String(edefs[id].get("counter", ""))])
 	leaks.sort_custom(func(a, b): return a[0] > b[0])
 	if not leaks.is_empty():
-		var parts: Array = []
-		for i in mini(3, leaks.size()):
-			parts.append("%dx %s" % [leaks[i][0], leaks[i][1]])
 		lines.append("")
-		lines.append("Got through:  " + ", ".join(parts))
+		lines.append("WHAT HURT YOU  (Focus lost, worst first)")
+		for i in mini(3, leaks.size()):
+			var l: Array = leaks[i]
+			lines.append("  -%d Focus   %dx %s" % [int(l[0]), int(l[1]), String(l[2])])
+			if String(l[3]) != "":
+				lines.append("      Fix: %s" % String(l[3]))
 	return "\n".join(lines)
 
 # ---------- Playtest-feedback ----------
@@ -1979,7 +1992,10 @@ func _build_feedback(won: bool) -> void:
 	# Verschijnt na elke ronde in playtest-builds. Overslaan mag: liever een ronde
 	# zonder oordeel dan een tester die afhaakt op een verplicht formulier.
 	var box := VBoxContainer.new()
-	box.position = Vector2(SCREEN_W / 2.0 - 210, SCREEN_H / 2.0 + 84)
+	# Onder de knoppen beginnen, niet op een vaste hoogte: bij een lang "wat deed je pijn"-
+	# overzicht schuiven die knoppen naar beneden en stond het formulier er anders dwars doorheen.
+	box.position = Vector2(SCREEN_W / 2.0 - 210,
+		maxf(SCREEN_H / 2.0 + 84, overlay_buttons.position.y + 46.0))
 	box.custom_minimum_size = Vector2(420, 0)
 	box.add_theme_constant_override("separation", 4)
 	overlay.add_child(box)

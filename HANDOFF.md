@@ -253,6 +253,20 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.78.0)
+
+**"WHAT HURT YOU"-overzicht op het eindscherm (v0.78.0).**
+- Elke vijand-def in `enemy.gd` heeft nu een **`counter`**-veld: één zin met wat je ertegen
+  bouwt. 18 stuks ingevuld. Die tekst verschijnt onder de vijand in het eindoverzicht.
+- `_run_summary()` sorteert de doorbraken op **Focus-schade** (`aantal x damage`), niet op
+  aantal. Dat is de hele truc: 3 Old Guards (24 Focus) horen bóven 22 Notifications (22 Focus),
+  want dát is waar je verdediging het liet afweten.
+- **Layout-valkuil:** het overzicht is langer dan de oude vaste posities toelieten, waardoor
+  Retry/Level Select over de adviezen vielen en daarna over het feedbackformulier. Nu berekent
+  `_show_overlay` de knoppositie uit het aantal regels, en het feedbackformulier begint onder
+  de knoppen (`maxf(vaste plek, knoppen + 46)`). Lijst afgetopt op 3 vijanden zodat het binnen
+  540px blijft -- komt er iets bij, dan moet dit opnieuw gemeten worden.
+
 ## Stand van zaken (v0.77.0)
 
 **Wave-spam was een symptoom, geen oorzaak -- en een gat in de uitgangen (v0.77.0).**
