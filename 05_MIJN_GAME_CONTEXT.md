@@ -104,7 +104,7 @@ senior 11-15), plus drie extra modi: Tutorial, Boss Rush en Endless. 15 is het e
 of eerder als je hem oproept (bonuspunten, gecapt op 40 per wave). Een rustig gespeeld level duurt
 zo'n 5-7 minuten.
 
-**Wat ik expliciet NIET wil:** geen multiplayer, geen microtransacties, geen procedurele maps
+**Wat ik expliciet NIET wil:**  geen microtransacties, geen procedurele maps
 (elk van de 15 levels heeft een handgemaakte layout met eigen mechanieken), geen 3D. Meta-progressie
 tussen levels (Recognition, sterren, perks) wil ik juist wél — dat is de carrièrelaag.
 
@@ -217,7 +217,7 @@ geks doet, eerst kijken welke uitgangen het spel hem gaf.
 **Games die ik als voorbeeld gebruik:** Bloons TD 6 (systeemdiepte, de shop-UI, upgradeladders),
 Kingdom Rush (leesbaarheid van een druk scherm), en qua humor Papers Please en Not For Broadcast —
 alledaagse bureaucratie die je serieus moet nemen. De mini-games zijn geïnspireerd op de taakjes
-uit Among Us en de Chrome-offline-dino.
+uit Among Us en de Chrome-offline-dino. Verder wil ik referenties uit tv series en films zo als it crowd en officepace
 
 **Games waar ik juist NIET op wil lijken:** de mobiele free-to-play tower defense met
 wachttimers, gacha en energie. Ook geen generieke fantasy-TD met torentjes en goblins — dat is
@@ -228,5 +228,5 @@ heeft in plaats van een sterker getal; de spanning tussen investeren in economie
 verdediging; upgraden dat altijd beter moet zijn dan nóg een kopie neerzetten (die regel staat in
 mijn GDD en heb ik met een prijsopslag op duplicaten afgedwongen).
 
-**Wat ik uit Bloons TD 6 niet wil:** de enorme hoeveelheid content en de eindeloze meta-grind, de
+**Wat ik uit Bloons TD 6 niet wil:**  de
 monetisatie, en de cartoon-art style. Mijn art is pixel-art in een kantoorpalet.
