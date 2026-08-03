@@ -17,3 +17,6 @@ feedback/
 # hier NOOIT in -- dan kan iedereen die GitHub bekijkt het kanaal volspammen zonder ook maar
 # de game te downloaden. Het bestand wordt lokaal aangemaakt en gaat alleen mee de build in.
 feedback_target.json
+
+# Gegenereerde meetdata van tools/wave_metrics.py
+tools/wave_metrics.json
