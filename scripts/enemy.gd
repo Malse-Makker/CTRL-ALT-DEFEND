@@ -35,7 +35,18 @@ var is_boss: bool = false
 var invisible: bool = false          # niet targetbaar tot onthuld
 var revealed: bool = false
 var zone_mult: float = 1.0           # gevoeligheid voor area-zones (papier 1.6, archief 0.0)
-var immune_to: String = ""           # def_id van tower waar 'ie immuun voor is
+# Immuniteit op SCHADESOORT, niet op een specifieke toren. Stond op een tower-def_id, en dan
+# is een immuniteit een slot met een sleutel: wie toevallig die ene toren niet kocht merkte er
+# niets van, dus mono-bouwen werd nergens gestraft. Nu straft elke immuniteit een hele
+# bouwstijl. Zie 06_SYSTEEM_AUDIT.md §4.2 (B3).
+#   written   = je schrijft terug: Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation
+#   in_person = het werkt alleen als hij er echt is: Office Artillery, Thumbtacks, The Shredder,
+#               Keyboard Smash, Pomodoro Timer (een focusblok houdt alleen mensen tegen die
+#               naast je bureau staan)
+# Bewust TWEE klassen van elk vijf torens en niet drie: Headphones en Motivational Poster doen
+# nul schade, dus die kunnen er geen zitten. Een derde klasse zou er een van één toren zijn
+# geworden, en dan bouw je opnieuw een slot met precies één sleutel.
+var immune_class: String = ""
 var sprite: Sprite2D = null
 var use_sprite: bool = false
 
@@ -93,7 +104,7 @@ static func defs() -> Dictionary:
 			"hp": 12.0, "speed": 80.0, "reward": 1.44, "damage": 2, "radius": 15.0, "color": Color(0.85, 0.4, 0.5)},
 		"story": {"name": "User Story", "ability": "Heavy basic enemy.", "counter": "Sustained damage. Upgraded Auto-Reply or Quick Reply.",
 			"hp": 26.0, "speed": 70.0, "reward": 3.12, "damage": 4, "radius": 18.0, "color": Color(0.8, 0.45, 0.7)},
-		"tank":  {"name": "The Old Guard", "ability": "Shielded: anything under 10 damage per hit bounces straight off. That archive is legally required to be kept, so the shredder won't touch it either.", "counter": "Office Artillery, an upgraded Pomodoro Timer or Keyboard Smash. Light, fast towers cannot dent the shield no matter how many you build.",
+		"tank":  {"name": "The Old Guard", "ability": "Shielded: anything under 10 damage per hit bounces straight off. That archive is legally required to be kept, so the shredder won't touch it either.", "counter": "Office Artillery, an upgraded Pomodoro or Keyboard Smash. Light hits bounce off.",
 			"hp": 46.0, "speed": 50.0, "reward": 11.4, "damage": 8, "radius": 19.0, "color": Color(0.55, 0.55, 0.6), "shield": 30.0, "shield_min_hit": 10.0, "zone_mult": 0.0},
 		"nudge": {"name": "The Nudge", "ability": "Very fast swarm. Needs area damage or slows.", "counter": "Area damage. A Shredder on the path slows the swarm so your towers can hit it.",
 			"hp": 3.0, "speed": 190.0, "reward": 0.27, "damage": 1, "radius": 8.0, "color": Color(0.95, 0.85, 0.3)},
@@ -120,10 +131,10 @@ static func defs() -> Dictionary:
 			"hp": 5.0, "speed": 118.0, "reward": 0.45, "damage": 1, "radius": 9.0, "color": Color(0.85, 0.75, 0.35)},
 		"phish": {"name": "Suspicious Link", "ability": "Invisible until a Shredder zone reveals it.", "counter": "A Shredder zone reveals it. Nothing else can even see it.",
 			"hp": 10.0, "speed": 100.0, "reward": 1.5, "damage": 3, "radius": 12.0, "color": Color(0.5, 0.85, 0.7), "invisible": true},
-		"board": {"name": "The Board Member", "ability": "Immune to Office Artillery. Grind it down.", "counter": "Auto-Reply. Artillery does nothing - it is never physically there.",
-			"hp": 40.0, "speed": 60.0, "reward": 6.0, "damage": 8, "radius": 18.0, "color": Color(0.4, 0.45, 0.55), "immune_to": "ceo"},
-		"cold":  {"name": "The Cold Caller", "ability": "Immune to Auto-Reply. Needs burst.", "counter": "Office Artillery. Auto-Reply chip damage bounces off.",
-			"hp": 24.0, "speed": 92.0, "reward": 3.6, "damage": 4, "radius": 15.0, "color": Color(0.7, 0.5, 0.35), "immune_to": "auto"},
+		"board": {"name": "The Board Member", "ability": "Never actually in the building. Nothing in-person touches him.", "counter": "Write to him. In-person towers do nothing at all - not one of them.",
+			"hp": 40.0, "speed": 60.0, "reward": 6.0, "damage": 8, "radius": 18.0, "color": Color(0.4, 0.45, 0.55), "immune_class": "in_person"},
+		"cold":  {"name": "The Cold Caller", "ability": "He does not read email. He calls. Writing back does nothing.", "counter": "Handle him in person: Artillery, Shredder, Thumbtacks or a Pomodoro.",
+			"hp": 24.0, "speed": 92.0, "reward": 3.6, "damage": 4, "radius": 15.0, "color": Color(0.7, 0.5, 0.35), "immune_class": "written"},
 		"caller": {"name": "The Phone Caller", "ability": "On a loud call. Single-target towers fire at him FIRST - and he can take it, so the rest slips by.", "counter": "Ignore the taunt: use area damage, or place single-target towers out of its reach.",
 			"hp": 34.0, "speed": 86.0, "reward": 5.1, "damage": 5, "radius": 16.0, "color": Color(0.45, 0.7, 0.85), "aggro": true},
 		"update": {"name": "System Update", "ability": "Installing... briefly invulnerable while it updates, then keeps coming. Burst it between updates.", "counter": "Burst it between updates - it is invulnerable while installing.",
@@ -202,7 +213,7 @@ func configure(id: String) -> void:
 	# Eerste lading pas na een hele cyclus, zodat hij niet meteen bij het spawnpunt begint.
 	_spawn_timer = spawn_interval
 	_stun_falloff = 1.0
-	immune_to = String(d.get("immune_to", ""))
+	immune_class = String(d.get("immune_class", ""))
 	_apply_art()
 
 func _apply_art() -> void:
@@ -404,8 +415,14 @@ func _boss_spawn(n: int) -> void:
 	if on_spawn_adds.is_valid():
 		on_spawn_adds.call(position, target_index, n)
 
-func take_damage(amount: float) -> void:
+func take_damage(amount: float, dmg_class: String = "") -> void:
 	if _dead:
+		return
+	# Eén controlepunt voor immuniteit, aan de ONTVANGENDE kant: elke schadebron (schot, zone,
+	# burst, splash, punaise, klap) komt hier langs, dus geen enkel pad kan het overslaan.
+	if immune_class != "" and dmg_class == immune_class:
+		_deflect = 0.30
+		queue_redraw()
 		return
 	if installing:
 		queue_redraw()   # System Update: onkwetsbaar zolang hij 'updatet'
@@ -457,6 +474,11 @@ func _draw() -> void:
 			var d: Vector2 = Vector2(cos(ang), sin(ang))
 			draw_line(d * (radius + 2.0), d * (radius + 2.0 + heat * 6.0),
 				Color(1.0, 0.4, 0.25, heat * 0.9), 2.0)
+	if _deflect > 0.0 and shield <= 0.0:
+		# Geen schild om op te flitsen: dan een witte ring om de vijand zelf, zodat
+		# "mijn toren schiet maar er gebeurt niets" leesbaar wordt als "verkeerd wapen".
+		draw_arc(Vector2.ZERO, radius + 5.0, 0.0, TAU, 26,
+			Color(1, 1, 1, clampf(_deflect / 0.30, 0.0, 1.0) * 0.9), 2.5)
 	if invisible and not revealed:
 		draw_arc(Vector2.ZERO, radius + 4.0, 0.0, TAU, 20, Color(0.6, 1.0, 0.85, 0.5), 1.0)
 	if aggro:
@@ -470,7 +492,7 @@ func _draw() -> void:
 		# in plaats van een volle ring, zodat je ziet dat het een laag ervoor is.
 		draw_arc(Vector2.ZERO, radius + 4.0, PI * 0.15, PI * 0.85, 20, Color(0.55, 0.72, 1.0, 0.95), 3.5)
 		if _deflect > 0.0:
-			# Te lichte klap: de boog licht wit op. Zonder dit ziet de speler alleen dat
+			# Te lichte klap of verkeerde schadesoort: de boog licht wit op. Zonder dit ziet de speler alleen dat
 			# zijn toren staat te schieten zonder dat er iets gebeurt, en dat leest als
 			# een bug in plaats van als "dit wapen is te licht".
 			var f: float = clampf(_deflect / 0.30, 0.0, 1.0)

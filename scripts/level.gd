@@ -597,6 +597,14 @@ func _role_tag(role: String) -> String:
 		"chain": return "CHAIN"
 		_: return "DMG"
 
+# Welke aanpak deze toren gebruikt. Bepaalt tegen wie hij niets uitricht, dus dat moet
+# zichtbaar zijn vóór je koopt en niet pas als je staat te schieten zonder effect.
+func _class_tag(cls: String) -> String:
+	match cls:
+		"written": return "  [WRITTEN]"
+		"in_person": return "  [IN PERSON]"
+		_: return ""
+
 func _tower_summary(id: String, lvl: int) -> String:
 	# Eén regel met het kerngetal per rol, voor in de shop-tooltip.
 	var d: Dictionary = TowerScript.defs()[id]
@@ -798,7 +806,9 @@ func _open_upgrade(t: Node2D) -> void:
 	selected_tower = t
 	var d: Dictionary = TowerScript.defs()[t.def_id]
 	upg_name.text = "%s  (Lv %d)" % [t.level_name, t.level]
-	upg_stats.text = "\"%s\"\n%s%s" % [t.level_flavour, _tower_stats_text(t), _tower_performance(t)]
+	var cls: String = _class_tag(t.damage_class).strip_edges()
+	upg_stats.text = "\"%s\"%s\n%s%s" % [t.level_flavour,
+		("   " + cls) if cls != "" else "", _tower_stats_text(t), _tower_performance(t)]
 	if t.role == "damage" or t.role == "stun" or t.role == "multi" or t.role == "chain":
 		upg_target.visible = true
 		upg_target.selected = TARGET_MODES.find(t.target_mode)
@@ -1983,6 +1993,20 @@ func _lose() -> void:
 	_show_overlay("BURN-OUT\nOut of Focus  -  wave %d/%d  -  score %d" % [
 		wave_index, total_waves, run_score], Color(0.75, 0.25, 0.3), false)
 
+func _wrap_words(text: String, max_chars: int) -> Array:
+	var out: Array = []
+	var line: String = ""
+	for w in text.split(" ", false):
+		var cand: String = w if line == "" else line + " " + w
+		if cand.length() > max_chars and line != "":
+			out.append(line)
+			line = w
+		else:
+			line = cand
+	if line != "":
+		out.append(line)
+	return out
+
 func _show_overlay(text: String, tint: Color, _won: bool, detail: String = "") -> void:
 	# Ronde voorbij: de types die langskwamen zijn nu bekend, dus geen NEW-badge meer.
 	if not _new_types_this_run.is_empty():
@@ -2059,7 +2083,13 @@ func _run_summary() -> String:
 			var l: Array = leaks[i]
 			lines.append("  -%d Focus   %dx %s" % [int(l[0]), int(l[1]), String(l[2])])
 			if String(l[3]) != "":
-				lines.append("      Fix: %s" % String(l[3]))
+				# Afbreken op woordgrens. overlay_stats is een gecentreerde Label ZONDER
+				# woordafbreking, dus een lange zin liep gewoon het scherm uit (de counter van
+				# The Old Guard was 146 tekens en werd rechts afgekapt). Echte regeleindes en
+				# geen autowrap, want de knoppen worden onder de tekst gezet op basis van het
+				# aantal "\n" -- wrapt de Label zelf, dan schuiven de knoppen niet mee.
+				for w in _wrap_words("Fix: " + String(l[3]), 76):
+					lines.append("      " + w)
 	return "\n".join(lines)
 
 # ---------- Playtest-feedback ----------
@@ -2664,8 +2694,9 @@ func _shop_button(sid: String, order: Array) -> Button:
 	var nm: String = String(d["levels"][0].get("name", d["name"]))
 	if available:
 		b.text = "%d - %dC" % [order.find(sid) + 1, _tower_cost(sid, 1)]
-		b.tooltip_text = "%d  %s  [%s]\n%s%s" % [order.find(sid) + 1, nm,
-			_role_tag(String(d["role"])), String(d.get("desc", "")), _tower_summary(sid, 1)]
+		b.tooltip_text = "%d  %s  [%s]%s\n%s%s" % [order.find(sid) + 1, nm,
+			_role_tag(String(d["role"])), _class_tag(String(d.get("class", ""))),
+			String(d.get("desc", "")), _tower_summary(sid, 1)]
 		b.pressed.connect(func(): _select_def(sid))
 		b.mouse_entered.connect(func(): hover_shop_id = sid; queue_redraw())
 		b.mouse_exited.connect(func(): hover_shop_id = ""; queue_redraw())

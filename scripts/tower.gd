@@ -8,6 +8,11 @@ var level: int = 1
 var level_name: String = ""
 var level_flavour: String = ""
 var role: String = "damage"
+# Schadesoort. Bepaalt tegen welke vijanden deze toren niets uitricht (zie immune_class in
+# enemy.gd). Elke toren die schade doet hoort er een te hebben; Coffee Machine niet (doet geen
+# schade) en Ctrl+Alt+Del bewust niet: die force-quit het proces en kiest zelf zijn doel, dus
+# een immuniteit zou hem een eenmalige misser opleveren zonder dat de speler dat kan sturen.
+var damage_class: String = ""
 var invested: int = 0
 # Wat DEZE toren heeft gedaan (niet dit toren-TYPE): voedt het detailpaneel als je 'm aanklikt,
 # zodat je kunt zien of een plek zijn Coffee waard is.
@@ -111,7 +116,7 @@ static func defs() -> Dictionary:
 	# zodat een tweede toren nodig blijft om een tweede stuk map te dekken.
 	return {
 		"auto": {
-			"name": "Auto-Reply", "role": "damage", "color": Color(0.25, 0.55, 0.9),
+			"name": "Auto-Reply", "role": "damage", "class": "written", "color": Color(0.25, 0.55, 0.9),
 			"desc": "Fast, low damage. Reliable workhorse.",
 			"levels": [
 				# 10 was te goedkoop: de op één na goedkoopste schadetoren kostte 18, dus met je
@@ -134,7 +139,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"ceo": {
-			"name": "Office Artillery", "role": "damage", "color": Color(0.85, 0.35, 0.35),
+			"name": "Office Artillery", "role": "damage", "class": "in_person", "color": Color(0.85, 0.35, 0.35),
 			"desc": "Slow, huge single-target hit. Staples one distraction shut.",
 			"levels": [
 				{"name": "Rubber Band", "flavour": "Ow. That actually stung.", "cost": 25, "range": 220.0, "rate": 2.6, "damage": 15.0},
@@ -157,7 +162,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"filter": {
-			"name": "The Shredder", "role": "area", "color": Color(0.35, 0.7, 0.7),
+			"name": "The Shredder", "role": "area", "class": "in_person", "color": Color(0.35, 0.7, 0.7),
 			"desc": "Zone that slows everything inside it. Its damage is shared out over everyone in the zone, so it holds swarms up rather than deleting them.",
 			"levels": [
 				{"name": "Wastebasket", "flavour": "Round filing.", "cost": 30, "range": 95.0, "dot": 2.0, "slow": 0.6},
@@ -166,7 +171,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"trap": {
-			"name": "Thumbtacks", "role": "trap", "color": Color(0.8, 0.7, 0.35),
+			"name": "Thumbtacks", "role": "trap", "class": "in_person", "color": Color(0.8, 0.7, 0.35),
 			"desc": "Lays a tack trap on the path. Spikes enemies that step on it.",
 			"levels": [
 				# Strooit punaises op de baan: elke throw_interval gooit hij er één (projectiel)
@@ -190,7 +195,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"chain": {
-			"name": "Delegation", "role": "chain", "color": Color(0.95, 0.85, 0.30),
+			"name": "Delegation", "role": "chain", "class": "written", "color": Color(0.95, 0.85, 0.30),
 			"desc": "Passes the problem along, and every hop hits HARDER than the last - it keeps going further up the chain. Nearly useless on a lone target, brutal in a tight crowd.",
 			"levels": [
 				# damage = eerste treffer; elke sprong daarna is damage × falloff. jumps = extra
@@ -208,7 +213,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"machinegun": {
-			"name": "Quick Reply", "role": "damage", "color": Color(0.55, 0.60, 0.68),
+			"name": "Quick Reply", "role": "damage", "class": "written", "color": Color(0.55, 0.60, 0.68),
 			"desc": "Fast, tiny replies. Shorter and faster each level. Chews through weak swarms, but the hits are far too light to dent a shield.",
 			"levels": [
 				{"name": "\"Got it\"", "flavour": "Two words. Efficient.", "cost": 16, "range": 115.0, "rate": 0.13, "damage": 0.5},
@@ -217,7 +222,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"multishot": {
-			"name": "Self-Service", "role": "multi", "color": Color(0.90, 0.55, 0.25),
+			"name": "Self-Service", "role": "multi", "class": "written", "color": Color(0.90, 0.55, 0.25),
 			"desc": "Deflects several distractions at once. Great vs crowds.",
 			"levels": [
 				# shots = aantal doelen per salvo (2 → 5 → 8). Slecht tegen één sterk doel.
@@ -227,7 +232,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"pomodoro": {
-			"name": "Pomodoro Timer", "role": "burst", "color": Color(0.9, 0.35, 0.3),
+			"name": "Pomodoro Timer", "role": "burst", "class": "in_person", "color": Color(0.9, 0.35, 0.3),
 			"desc": "Charges up, then unleashes one big AoE burst on everything in range.",
 			"levels": [
 				# rate = laadtijd (sec); damage = burst-klap op iedereen in bereik. Loont een druk pad.
@@ -237,7 +242,7 @@ static func defs() -> Dictionary:
 			],
 		},
 		"splash": {
-			"name": "Reply All", "role": "splash", "color": Color(0.3, 0.7, 0.55),
+			"name": "Reply All", "role": "splash", "class": "written", "color": Color(0.3, 0.7, 0.55),
 			"desc": "Hits one target and splashes everyone around it. The splash moves with the target.",
 			"levels": [
 				{"name": "Reply All", "flavour": "You didn\'t need to reply all.", "cost": 26, "range": 135.0, "rate": 1.1, "damage": 2.0, "splash_radius": 45.0, "splash_falloff": 0.60},
@@ -247,7 +252,7 @@ static func defs() -> Dictionary:
 		},
 		# --- Specials: gedeelde regels — max 1 per level, geen upgrade-levels, één sterk effect.
 		"keyboard": {
-			"name": "Keyboard Smash", "role": "smash", "color": Color(0.4, 0.42, 0.5),
+			"name": "Keyboard Smash", "role": "smash", "class": "in_person", "color": Color(0.4, 0.42, 0.5),
 			"desc": "SPECIAL: slams the path for big AoE, then blocks it like a barrier. Max 1.",
 			"special": true, "on_path": true,
 			"levels": [
@@ -273,6 +278,7 @@ func configure(id: String, lvl: int) -> void:
 	# Clamp naar het aantal levels: specials (bv. Keyboard Smash) hebben er maar één.
 	level = clampi(lvl, 1, d["levels"].size())
 	role = String(d["role"])
+	damage_class = String(d.get("class", ""))
 	var s: Dictionary = d["levels"][level - 1]
 	range_radius = float(s.get("range", 130.0))
 	fire_rate = float(s.get("rate", 1.0))
@@ -450,7 +456,7 @@ func _process(delta: float) -> void:
 						if not is_instance_valid(e):
 							continue
 						if position.distance_to(e.position) <= range_radius:
-							e.call("take_damage", smash_damage * buff_dmg_mult)
+							e.call("take_damage", smash_damage * buff_dmg_mult, damage_class)
 							if on_damage.is_valid():
 								on_damage.call(def_id, smash_damage * buff_dmg_mult)
 							hit_any = true
@@ -483,7 +489,7 @@ func _process(delta: float) -> void:
 					var hit := false
 					for e in enemies:
 						if is_instance_valid(e) and e.hp > 0.0 and Vector2(tk["pos"]).distance_to(e.position) <= trap_radius:
-							e.call("take_damage", damage * buff_dmg_mult)
+							e.call("take_damage", damage * buff_dmg_mult, damage_class)
 							if on_damage.is_valid():
 								on_damage.call(def_id, damage * buff_dmg_mult)
 							hit = true
@@ -515,7 +521,7 @@ func _process(delta: float) -> void:
 					# zone_mult: papier gaat er extra hard doorheen (1.6), een archief met
 					# bewaarplicht helemaal niet (0.0).
 					var amt: float = area_dot * share * buff_dmg_mult * e.zone_mult * delta
-					e.call("take_damage", amt)
+					e.call("take_damage", amt, damage_class)
 					if on_damage.is_valid():
 						on_damage.call(def_id, amt)
 		"stun":
@@ -539,7 +545,7 @@ func _process(delta: float) -> void:
 					var targets: Array = _find_targets(multi_shots)
 					if not targets.is_empty():
 						for e in targets:
-							e.call("take_damage", damage * buff_dmg_mult)
+							e.call("take_damage", damage * buff_dmg_mult, damage_class)
 							if on_damage.is_valid():
 								on_damage.call(def_id, damage * buff_dmg_mult)
 							if on_fire.is_valid():
@@ -566,7 +572,7 @@ func _process(delta: float) -> void:
 							if not is_instance_valid(e):
 								continue
 							if position.distance_to(e.position) <= r and _los_clear(e.position):
-								e.call("take_damage", damage * buff_dmg_mult)
+								e.call("take_damage", damage * buff_dmg_mult, damage_class)
 								if on_damage.is_valid():
 									on_damage.call(def_id, damage * buff_dmg_mult)
 								if first == null:
@@ -592,7 +598,7 @@ func _process(delta: float) -> void:
 									continue
 								if center.distance_to(e.position) <= splash_radius:
 									var amt: float = damage * buff_dmg_mult * (1.0 if e == t else splash_falloff)
-									e.call("take_damage", amt)
+									e.call("take_damage", amt, damage_class)
 									if on_damage.is_valid():
 										on_damage.call(def_id, amt)
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
@@ -612,7 +618,7 @@ func _process(delta: float) -> void:
 								best_hp = e.hp
 								best = e
 					if best != null:
-						best.call("take_damage", 99999.0)
+						best.call("take_damage", 99999.0, damage_class)
 						if on_damage.is_valid():
 							on_damage.call(def_id, 99999.0)
 						_spent = true
@@ -625,7 +631,7 @@ func _process(delta: float) -> void:
 				if _cooldown <= 0.0:
 					var t := _find_target()
 					if t != null:
-						t.call("take_damage", damage * buff_dmg_mult)
+						t.call("take_damage", damage * buff_dmg_mult, damage_class)
 						if on_damage.is_valid():
 							on_damage.call(def_id, damage * buff_dmg_mult)
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
@@ -648,7 +654,7 @@ func _find_target() -> Node2D:
 	for e in get_enemies.call():
 		if not is_instance_valid(e):
 			continue
-		if e.immune_to == def_id:
+		if damage_class != "" and e.immune_class == damage_class:
 			continue
 		# Een stun-tower die te laag is voor dit doelwit mikt liever op iets anders dan
 		# zijn schoten te verspillen aan iemand die er niets van merkt.
@@ -694,7 +700,7 @@ func _valid_targets() -> Array:
 	for e in get_enemies.call():
 		if not is_instance_valid(e):
 			continue
-		if e.immune_to == def_id:
+		if damage_class != "" and e.immune_class == damage_class:
 			continue
 		if e.invisible and not e.revealed and not sees_hidden:
 			continue
@@ -741,7 +747,7 @@ func _nearest_unhit(from: Node2D, hit: Array) -> Node2D:
 	for e in get_enemies.call():
 		if not is_instance_valid(e) or hit.has(e):
 			continue
-		if e.immune_to == def_id:
+		if damage_class != "" and e.immune_class == damage_class:
 			continue
 		if e.invisible and not e.revealed and not sees_hidden:
 			continue
@@ -759,7 +765,7 @@ func _chain_fire() -> bool:
 		return false
 	var hit: Array = [first]
 	var dmg: float = damage * buff_dmg_mult
-	first.call("take_damage", dmg)
+	first.call("take_damage", dmg, damage_class)
 	if on_damage.is_valid():
 		on_damage.call(def_id, dmg)
 	_flash(first)
@@ -769,7 +775,7 @@ func _chain_fire() -> bool:
 		if nxt == null:
 			break
 		dmg *= chain_falloff
-		nxt.call("take_damage", dmg)
+		nxt.call("take_damage", dmg, damage_class)
 		if on_damage.is_valid():
 			on_damage.call(def_id, dmg)
 		if on_fire.is_valid():

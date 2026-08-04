@@ -13,6 +13,13 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.84.0 — 2026-08-04
+- Towers now have an approach: WRITTEN (Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation) or IN PERSON (Office Artillery, The Shredder, Thumbtacks, Pomodoro Timer, Keyboard Smash). It is shown in the shop and on the tower panel.
+- Immunities target the approach instead of one specific tower. The Board Member is never actually in the building, so nothing in-person touches him at all; The Cold Caller does not read email, so nothing written does. Both used to shrug off exactly one tower, which you could ignore by owning almost any other.
+- That also closes some holes: Shredder zones, Pomodoro bursts and Keyboard Smash never checked immunity at all, so they quietly hit enemies that were supposed to be immune.
+- Hits that bounce off now flash white on the enemy, so "my tower is firing and nothing is happening" reads as the wrong weapon rather than a bug.
+- Fixed: advice on the results screen ran off the right-hand edge of the screen if it was long. It now wraps.
+
 ## v0.83.0 — 2026-08-04
 - Coffee rewards now scale with how much enemy you actually had to kill. They used to vary wildly: a Notification paid over three times more per point of health than an Old Guard, so which enemies a level happened to contain mattered more than how well you played. Swarms pay a little less per point, anything that demands a specific tool (shields, immunities, invisibility) pays a little more.
 - The Old Guard is the big winner: 11 Coffee instead of 4.5, which finally matches what it costs you to bring the right tower.
