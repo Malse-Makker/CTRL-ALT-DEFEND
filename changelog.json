@@ -1,6 +1,15 @@
 {
   "entries": [
     {
+      "version": "0.81.0",
+      "date": "2026-08-04",
+      "items": [
+        "The Old Guard's shield now works the way the game always claimed it did: hits under 10 damage bounce straight off it. Auto-Reply, Quick Reply, Self-Service, Reply All and Delegation cannot dent it no matter how many you build. Office Artillery, an upgraded Pomodoro Timer and Keyboard Smash can. Deflected hits flash white on the shield so you can see what is happening.",
+        "Until now that shield was simply 30 extra hit points, so the tutorial was teaching you a rule the game did not actually have.",
+        "The Motivational Poster now buffs the nearest towers automatically the moment you place it. It used to buff only towers you had clicked on afterwards, which was never explained anywhere, so buying one and doing nothing else did literally nothing. You can still click towers to choose your own; the panel shows whether it is on auto."
+      ]
+    },
+    {
       "version": "0.80.0",
       "date": "2026-08-04",
       "items": [

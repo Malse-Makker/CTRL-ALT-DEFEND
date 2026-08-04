@@ -33,6 +33,7 @@ niet uit de pas lopen met de code.
 | 2026-08-04 | **Uitgebracht in v0.79.0:** D1 (start_coffee schalen) en D2 (demping + oplopend salaris) |
 | 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
 | 2026-08-04 | **Uitgebracht in v0.81.0:** B1 (`shield_min_hit`, Old Guard op 10) en A7 (Poster bufft automatisch) |
+| 2026-08-04 | **Uitgebracht in v0.82.0:** A3 (Delegation escaleert) en A8 (prijsladder: auto 14/dmg 1,4, Quick Reply 16) |
 
 ---
 
@@ -554,10 +555,10 @@ progressie en instellingen, geen torens of levelstaat.
 - [x] **Z1** ontgrendelcurve uitsmeren over L4 tot L10  *(v0.80.0)*
 - [x] **D2** demping plus oplopend wave-salaris  *(v0.79.0)*
 - [x] **B1** `shield_min_hit`  *(v0.81.0)*
-- [ ] **A8** prijsladder onderkant
+- [x] **A8** prijsladder onderkant  *(v0.82.0)*
 - [x] **A7** Poster bufft automatisch  *(v0.81.0)*
 - [ ] **D3** reward normaliseren
-- [ ] **A3** Delegation omdraaien
+- [x] **A3** Delegation omdraaien  *(v0.82.0)*
 - [ ] **C5** L14-sterren, **D5** SELL_RATIO, **Z2** modifiers opschonen
 
 ### DAARNA (hoge impact, hoog werk, of afhankelijk van NU)

@@ -114,8 +114,13 @@ static func defs() -> Dictionary:
 			"name": "Auto-Reply", "role": "damage", "color": Color(0.25, 0.55, 0.9),
 			"desc": "Fast, low damage. Reliable workhorse.",
 			"levels": [
-				{"name": "Auto-Reply", "flavour": "I\'ll get back to you.", "cost": 10, "range": 135.0, "rate": 0.45, "damage": 1.0},
-				{"name": "Out of Office", "flavour": "Currently unavailable. Forever.", "cost": 12, "range": 142.0, "rate": 0.40, "damage": 2.0},
+				# 10 was te goedkoop: de op één na goedkoopste schadetoren kostte 18, dus met je
+				# startkoffie kocht je drie Auto-Replies of één van iets anders. Vroeg in een level
+				# wint dekking van DPS, dus die keuze had altijd hetzelfde antwoord en de rest van
+				# de toolkit deed niet mee. Nu 14, met Quick Reply op 16 ernaast als echte rivaal
+				# met een ander profiel. Zie 06_SYSTEEM_AUDIT.md §4.1 (A8).
+				{"name": "Auto-Reply", "flavour": "I\'ll get back to you.", "cost": 14, "range": 135.0, "rate": 0.45, "damage": 1.4},
+				{"name": "Out of Office", "flavour": "Currently unavailable. Forever.", "cost": 12, "range": 142.0, "rate": 0.40, "damage": 2.4},
 				{"name": "Inbox Zero", "flavour": "Nothing left to answer.", "cost": 25, "range": 150.0, "rate": 0.32, "damage": 4.0},
 			],
 		},
@@ -186,20 +191,27 @@ static func defs() -> Dictionary:
 		},
 		"chain": {
 			"name": "Delegation", "role": "chain", "color": Color(0.95, 0.85, 0.30),
-			"desc": "Passes a distraction along, jumping to nearby ones. Loves tight groups.",
+			"desc": "Passes the problem along, and every hop hits HARDER than the last - it keeps going further up the chain. Nearly useless on a lone target, brutal in a tight crowd.",
 			"levels": [
 				# damage = eerste treffer; elke sprong daarna is damage × falloff. jumps = extra
 				# sprongen, chain_range = hoe ver hij nog naar de volgende vijand mag springen.
-				{"name": "Delegate", "flavour": "Can you take this one?", "cost": 28, "range": 150.0, "rate": 1.0, "damage": 3.0, "jumps": 1, "chain_range": 90.0, "falloff": 0.70},
-				{"name": "Escalate", "flavour": "I\'m looping in my manager.", "cost": 30, "range": 158.0, "rate": 0.9, "damage": 5.0, "jumps": 2, "chain_range": 95.0, "falloff": 0.75},
-				{"name": "Company Policy", "flavour": "It now applies to everyone.", "cost": 48, "range": 165.0, "rate": 0.8, "damage": 8.0, "jumps": 4, "chain_range": 100.0, "falloff": 0.80},
+				#
+				# falloff staat BOVEN 1.0: elke sprong slaat harder. Stond op 0.70-0.80 (elke
+				# sprong zwakker), en dan was deze toren tegen groepen slechter dan Self-Service
+				# (die kost 8 Coffee minder en deed 26% meer) en tegen één doel slechter dan
+				# Artillery. Hij zat dus nergens in een eigen vak. Nu is de grondschade laag en
+				# telt alleen hoe vol het pad staat, en dat is meteen de betere kantoorgrap:
+				# escaleren maakt het erger, niet minder erg. Zie 06_SYSTEEM_AUDIT.md §4.1.
+				{"name": "Delegate", "flavour": "Can you take this one?", "cost": 28, "range": 150.0, "rate": 1.0, "damage": 2.0, "jumps": 1, "chain_range": 90.0, "falloff": 1.25},
+				{"name": "Escalate", "flavour": "I\'m looping in my manager.", "cost": 30, "range": 158.0, "rate": 0.9, "damage": 2.5, "jumps": 2, "chain_range": 95.0, "falloff": 1.30},
+				{"name": "Company Policy", "flavour": "It now applies to everyone.", "cost": 48, "range": 165.0, "rate": 0.8, "damage": 3.0, "jumps": 4, "chain_range": 100.0, "falloff": 1.35},
 			],
 		},
 		"machinegun": {
 			"name": "Quick Reply", "role": "damage", "color": Color(0.55, 0.60, 0.68),
-			"desc": "Fast, tiny replies. Shorter and faster each level. Chews through weak swarms.",
+			"desc": "Fast, tiny replies. Shorter and faster each level. Chews through weak swarms, but the hits are far too light to dent a shield.",
 			"levels": [
-				{"name": "\"Got it\"", "flavour": "Two words. Efficient.", "cost": 18, "range": 115.0, "rate": 0.13, "damage": 0.5},
+				{"name": "\"Got it\"", "flavour": "Two words. Efficient.", "cost": 16, "range": 115.0, "rate": 0.13, "damage": 0.5},
 				{"name": "\"OK\"", "flavour": "Down to two letters.", "cost": 20, "range": 120.0, "rate": 0.10, "damage": 0.9},
 				{"name": "Thumbs-Up", "flavour": "No words left. Just the emoji.", "cost": 35, "range": 125.0, "rate": 0.075, "damage": 1.6},
 			],

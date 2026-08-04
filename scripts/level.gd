@@ -835,11 +835,19 @@ func _open_upgrade(t: Node2D) -> void:
 		upg_upgrade.disabled = true
 	upg_upgrade.tooltip_text = _upgrade_delta_text(t)
 	upg_sell.text = "Sell (+%d C)" % int(t.invested * 0.6)
-	var pos: Vector2 = t.position + Vector2(24, -20)
-	pos.x = clampf(pos.x, 8.0, SCREEN_W - SHOP_W - 200.0)
-	pos.y = clampf(pos.y, TOP_H + 4.0, SCREEN_H - 180.0)
-	panel.position = pos
 	panel.visible = true
+	# Meten in plaats van gokken. De klem stond op vaste waardes (200 breed, 180 hoog), maar
+	# het paneel groeit mee met zijn inhoud: een uitgebouwde toren mét targeting is ruim 200
+	# hoog, en dan viel de Sell-knop (of "Max level") onder de onderrand voor elke toren in de
+	# onderste helft van de map. reset_size() dwingt de layout af zodat size klopt bij DEZE
+	# toren en niet bij de vorige die je aanklikte.
+	panel.reset_size()
+	var pw: float = maxf(panel.size.x, 200.0)
+	var ph: float = maxf(panel.size.y, 180.0)
+	var pos: Vector2 = t.position + Vector2(24, -20)
+	pos.x = clampf(pos.x, 8.0, SCREEN_W - SHOP_W - pw - 8.0)
+	pos.y = clampf(pos.y, TOP_H + 4.0, SCREEN_H - ph - 8.0)
+	panel.position = pos
 
 func _close_upgrade() -> void:
 	selected_tower = null
