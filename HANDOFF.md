@@ -253,6 +253,61 @@ mislukte pogingen, dus **$14–26**. Saldo nu: **$0,92** (50 credits), dus eerst
 **Eerst één sprite testen:** `rd_pro__*` gaf op dit account eerder HTTP 400 "inference_failed"
 (zie v0.32.0-notitie); de gratis cost-check zegt niets over of genereren zelf lukt.
 
+## Stand van zaken (v0.79.0 t/m v0.86.0) — de systeemaudit
+
+**Er is een volledige systeemaudit gedaan tegen `01_TD_DESIGN_REFERENCE.md`. Alles staat in
+`06_SYSTEEM_AUDIT.md`: meetgetallen, scorecard, gevonden fouten, alle voorstellen met getallen,
+en een afvinkbare prioriteitenlijst.** Lees dat bestand vóór je aan balans werkt; de dure
+meetgetallen hoeven niet opnieuw uitgerekend te worden.
+
+**Nieuw meetgereedschap in `tools/`** (leest rechtstreeks uit de code, kan dus niet uit de pas
+lopen):
+```bash
+python3 tools/wave_metrics.py    # HP-equivalent, Coffee en Focus per level en per wave
+python3 tools/tower_metrics.py   # DPS, doelen per aanval, DPS per Coffee, openingsopties
+python3 tools/economy.py         # inkomen tegenover benodigde verdediging, ROI, deflation
+```
+`wave_metrics.py` eerst draaien: `economy.py` leest de JSON die het wegschrijft.
+**Let op:** `economy.py` bevat kopieën van de formules uit `game_state.gd` en `level.gd`.
+Verander je `start_coffee`, `WAVE_INCOME_BASE` of `KILL_DAMP_*`, werk dat script dan mee bij,
+anders meet je een spel dat niet meer bestaat (dat is één keer misgegaan).
+
+**Wat er in acht releases is veranderd:**
+- **v0.79.0** startkoffie schaalt (40 op L1 tot 110 op L15, was overal 45); kill-inkomen dempt
+  na wave 5 tot een bodem van 40%; wave-salaris loopt op met het wave-nummer.
+- **v0.80.0** één toren per level vrij tot en met L10 (was: alle veertien ineens op L4).
+- **v0.81.0** `shield_min_hit`: klappen onder de drempel ketsen af. Motivational Poster bufft
+  automatisch de dichtstbijzijnde torens.
+- **v0.82.0** Delegation escaleert (elke sprong hárder); Auto-Reply 14 C met 1,4 schade,
+  Quick Reply 16 C.
+- **v0.83.0** kill-reward genormaliseerd op 0,09 / 0,12 / 0,15 per HP-equivalent; sterren
+  vallen terug op absoluut Focus-verlies waar de verhouding onredelijk werd.
+- **v0.84.0** schadeklassen WRITTEN en IN PERSON (elk vijf torens); immuniteit zit nu in
+  `take_damage`, dus élke schadebron komt langs één controlepunt.
+- **v0.85.0** The Steering Committee: klasse-breuk op L6. Schil vraagt burst, inhoud is immuun
+  voor burst.
+- **v0.86.0** zijpaden OVERTIME en ESCALATION op elf torens; één spoor per toren, de andere
+  gaat op slot.
+
+**Valkuilen die deze ronde zijn opgelost en die je NIET opnieuw moet introduceren:**
+- De meldingsregel (`msg_label`) stond achter het vijandpaneel. Hij schuift nu mee via
+  `_place_msg_label()`.
+- Het torenpaneel werd geklemd op een vaste hoogte van 180 px terwijl het meegroeit tot 252.
+  Het meet zichzelf nu met `reset_size()`.
+- Adviesregels op het eindscherm liepen van het scherm af: `overlay_stats` is een gecentreerde
+  Label **zonder** woordafbreking. Er is nu `_wrap_words()`; gebruik dat voor élke lange regel
+  daar, en breek met echte `\n` zodat de knoppen eronder blijven meeschuiven.
+- Vijf commentaarregels in `game_state.gd` beschreven afgeronde features als "stub", en boven
+  L11 stond dat Headphones gebannen is terwijl dat een softlock zou geven.
+
+**Nog open, met de grootste eerst:** D4 (The Expense Claim, de tweede economische filosofie),
+B4 (overerfbare vlaggen, Recurring eerst), N1 (alle vijanden omschrijven naar collega's,
+besloten 2026-08-04), B2 (splitsketen), A2 (Ctrl+Alt+Del als ability), C1/A4 (`ignores_los` en
+Thumbtacks herprofileren). Zie de prioriteitenlijst in `06_SYSTEEM_AUDIT.md`.
+
+**Nog niet gedaan: dit is alle acht releases lang niet door een mens gespeeld.** De balans is
+gemeten, niet gevoeld.
+
 ## Stand van zaken (v0.78.0)
 
 **"WHAT HURT YOU"-overzicht op het eindscherm (v0.78.0).**
