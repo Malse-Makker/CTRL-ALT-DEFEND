@@ -29,6 +29,8 @@ niet uit de pas lopen met de code.
 | 2026-08-03 | **Delegation draait om**: elke sprong slaat harder in plaats van zwakker |
 | 2026-08-03 | **Splitsketen alleen op User Story**, The Question blijft plat (entiteiten-risico) |
 | 2026-08-03 | **Recurring is de eerste vlag**, BCC'd pas nadat er een detectie-toren bestaat |
+| 2026-08-04 | **Alle vijanden worden mensen (collega's).** Namen nog niet bepaald. Zie §4.6 |
+| 2026-08-04 | **Uitgebracht in v0.79.0:** D1 (start_coffee schalen) en D2 (demping + oplopend salaris) |
 
 ---
 
@@ -449,6 +451,51 @@ dus de 70-80% uit de reference is hier niet nodig.
 Dit is wat The Expense Claim gevaarlijk maakt: je hebt 100 Coffee in een pot zitten en de
 wave die erdoorheen breekt kost je precies het geld waarmee je de verdediging had gerepareerd.
 
+### 4.6 Alle vijanden worden collega's (besloten 2026-08-04)
+
+Stond als open ontwerpvraag in `05_MIJN_GAME_CONTEXT.md` §2 en is nu een besluit: elke vijand
+wordt een **mens**, de torens blijven **voorwerpen**. Namen zijn nog niet gekozen.
+
+**Waarom dit de identiteit versterkt:** het geeft een schone scheidslijn die je nu niet hebt.
+Voorwerpen van je bureau verdedigen je, mensen leiden je af. Dat is in één zin uit te leggen
+en het klopt met elke grap in de game.
+
+**De helft is al mens.** Van de 32 defs zijn er 12 al een persoon:
+
+| Al een persoon (12) | Nog om te bouwen (20) |
+|---|---|
+| The Old Guard, The Micro-manager, The Chatterbox, The Board Member, The Cold Caller, The Phone Caller | The Notification, The Question, User Story, The Nudge, The Thread, The Change, Task, Feedback, The Printer, Error Message, Suspicious Link, System Update |
+| The Cleaner, The Smoking Colleague, The Baby, The Floater, The HR Manager, The Consultant | The All-Hands Meeting, The Broken Projector, Out of Order, The Reorganisation, The Legacy System, The Deadline, The Performance Review (x2) |
+
+**De valkuil, en die is echt.** Je noemt de counter-logica zelf de kern van de game
+(`05_MIJN_GAME_CONTEXT.md` §4.1), en een deel daarvan leunt erop dat de vijand een **ding** is:
+
+- The Thread is papier, dus de Shredder eet hem (`zone_mult` 1.6).
+- The Old Guard is een archief met bewaarplicht, dus de Shredder mag er niet aan (`zone_mult` 0.0).
+- The Board Member is nooit fysiek aanwezig, dus Artillery raakt hem niet.
+
+Wordt The Thread een mens, dan slaat "de versnipperaar eet hem" nergens meer op.
+
+**De uitweg: de persoon draagt het ding.** Een collega die met een enorme stapel printjes
+aan komt lopen kan nog steeds door de versnipperaar, want wat de versnipperaar pakt is de
+stapel. Zo blijft elke bestaande counter kloppen én is elke vijand een mens. Dat is de regel
+om aan te houden bij het bedenken van de namen: **de mens is de vijand, het voorwerp dat hij
+bij zich draagt is de counter.**
+
+**Wat het raakt:**
+
+| Wat | Omvang |
+|---|---|
+| `name`, `ability` en `counter` in `enemy.gd` | 20 defs, 60 teksten |
+| Tutorial-lesteksten in `game_state.gd` | 4 van de 7 lessen noemen een vijand |
+| De invullijst `FB_COLLEAGUES` in `app.gd` | bestaat al, is precies hiervoor gemaakt |
+| Sprites in `art/enemies/` | 29 stuks: dit is de art-pass, en die is bewust als laatste gepland |
+| `def_id`'s | **niet aanraken.** `seen_enemies` in de save gebruikt ze als sleutel |
+
+**Volgorde:** eerst de namen en de teksten (dat is een schrijfronde, geen code), daarna pas
+de sprites in de art-pass. De game is dan meteen consistent in taal, ook al ziet een Thread
+er nog uit als een stapel papier.
+
 **De drie sterkste ontbrekende koppelingen, op volgorde:**
 
 1. **Schadeklassen (B3).** Vijf van je zes weerstanden zijn nu te negeren door meer DPS neer
@@ -496,12 +543,14 @@ progressie en instellingen, geen torens of levelstaat.
 | C4 | Geboekte ruimtes | maps | 3 | 3 | - |
 | B7 | The Quick Question (L12) | vijanden | 3 | 1 | B4, A4 |
 | C6 | Drie map-concepten | maps | 3 | 8+ | buiten scope |
+| N1 | Alle vijanden omschrijven naar collega's (namen + teksten) | vijanden | 4 | 3 | - |
+| N2 | Vijand-sprites naar mensen | art | 3 | art-pass | N1 |
 
 ### NU (hoge impact, laag werk, geen afhankelijkheden)
 
-- [ ] **D1** `start_coffee` schalen
+- [x] **D1** `start_coffee` schalen  *(v0.79.0)*
 - [ ] **Z1** ontgrendelcurve uitsmeren over L4 tot L10
-- [ ] **D2** demping plus oplopend wave-salaris
+- [x] **D2** demping plus oplopend wave-salaris  *(v0.79.0)*
 - [ ] **B1** `shield_min_hit`
 - [ ] **A8** prijsladder onderkant
 - [ ] **A7** Poster als straalbuff
@@ -521,6 +570,7 @@ progressie en instellingen, geen torens of levelstaat.
 - [ ] **A2** Ctrl+Alt+Del als ability
 - [ ] **C2** pay_zones uitbreiden
 - [ ] **B2** splitsketen User Story
+- [ ] **N1** alle vijanden omschrijven naar collega's (namen + `ability` + `counter`)
 
 ### LATER (nice to have)
 
@@ -529,6 +579,7 @@ progressie en instellingen, geen torens of levelstaat.
 - [ ] **B7** The Quick Question
 - [ ] **A5** Keyboard Smash, **A6** Reply All, **B5** The Walk-and-Talk
 - [ ] **C6** map-concepten (buiten de huidige scope van 15 levels)
+- [ ] **N2** vijand-sprites naar mensen (hoort bij de art-pass, na N1)
 
 ---
 

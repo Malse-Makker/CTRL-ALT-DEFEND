@@ -1,13 +1,15 @@
 {
-  "version": "0.78.0",
-  "date": "2026-08-01",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.78.0/CTRL-ALT-DEFEND.exe",
+  "version": "0.79.0",
+  "date": "2026-08-04",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.79.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "abbe04a747f84ecc5f0c85a5f801db4d5cff1c99a1c0ec436578e45c549fe8e9",
-  "size": 110071288,
+  "sha256": "83679482102cad2e73f846679430b9c90305e0a94613115adb352399a0ed3303",
+  "size": 110072840,
   "changes": [
-    "When a run ends you now get a WHAT HURT YOU list: which enemies got through, how much Focus each of them actually cost you, and what to build against them next time.",
-    "It is sorted by Focus lost rather than by headcount, so three Old Guards rank above twenty Notifications -- which is usually the thing you needed to know."
+    "Starting Coffee now scales with the level: 40 on the first floor, 110 on the last. It used to be 45 everywhere, which was generous on level 1 and close to unplayable on the later floors, where wave 2 alone is heavier than the finale of level 1.",
+    "Surviving a wave pays more the further you get. Payday used to be a flat 4 Coffee; it now grows with the wave number, so making it through a late wave is worth something on its own.",
+    "Coffee from kills tapers off after wave 5, down to a floor of 40%. Late waves used to hand out far more Coffee than any defence could ever cost, which quietly made the second half of every level a formality.",
+    "Fixed: on-screen messages were hidden behind the enemy panel, so half of every notification was unreadable while that panel was open."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }
