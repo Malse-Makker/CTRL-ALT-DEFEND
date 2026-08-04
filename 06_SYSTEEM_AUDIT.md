@@ -31,6 +31,7 @@ niet uit de pas lopen met de code.
 | 2026-08-03 | **Recurring is de eerste vlag**, BCC'd pas nadat er een detectie-toren bestaat |
 | 2026-08-04 | **Alle vijanden worden mensen (collega's).** Namen nog niet bepaald. Zie §4.6 |
 | 2026-08-04 | **Uitgebracht in v0.79.0:** D1 (start_coffee schalen) en D2 (demping + oplopend salaris) |
+| 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
 
 ---
 
@@ -549,7 +550,7 @@ progressie en instellingen, geen torens of levelstaat.
 ### NU (hoge impact, laag werk, geen afhankelijkheden)
 
 - [x] **D1** `start_coffee` schalen  *(v0.79.0)*
-- [ ] **Z1** ontgrendelcurve uitsmeren over L4 tot L10
+- [x] **Z1** ontgrendelcurve uitsmeren over L4 tot L10  *(v0.80.0)*
 - [x] **D2** demping plus oplopend wave-salaris  *(v0.79.0)*
 - [ ] **B1** `shield_min_hit`
 - [ ] **A8** prijsladder onderkant

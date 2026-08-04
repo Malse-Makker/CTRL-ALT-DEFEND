@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.80.0 — 2026-08-04
+- Towers now unlock one per level up to level 10, instead of two on level 1, three on level 2, one on level 3 and then all eight remaining ones at once on level 4. Every tower gets its own introduction on the floor where it makes the most sense: Quick Reply on the Meeting Room swarms, Thumbtacks in the Canteen where The Cleaner sweeps them away, Delegation in the Parking where the lanes are spread out.
+- Because of that, the shop on level 1 now doubles as a roadmap: every locked tower shows the level it arrives on.
+- No towers were removed and none were added. If you had already reached the later levels, your full toolkit is still there from level 10 onwards.
+
 ## v0.79.0 — 2026-08-04
 - Starting Coffee now scales with the level: 40 on the first floor, 110 on the last. It used to be 45 everywhere, which was generous on level 1 and close to unplayable on the later floors, where wave 2 alone is heavier than the finale of level 1.
 - Surviving a wave pays more the further you get. Payday used to be a flat 4 Coffee; it now grows with the wave number, so making it through a late wave is worth something on its own.

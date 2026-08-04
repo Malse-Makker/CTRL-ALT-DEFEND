@@ -265,26 +265,51 @@ func _endless_spec(n: int) -> String:
 	return " + ".join(parts)
 
 # Welke towers de speler in dit level mag bouwen (lescurve uit GDD §4): elk level
-# introduceert er een paar, zodat het spel zichzelf uitlegt en counters op tijd
-# beschikbaar zijn. Het stealth-trio in level 4 heeft filter, auto en ceo (allen ≤ L2).
+# introduceert er EEN, zodat het spel zichzelf uitlegt en counters op tijd beschikbaar zijn.
+#
+# WAAROM DIT ZO STAAT (playtest v0.71 + audit v0.78): het stond op 2 torens (L1), 5 (L2),
+# 6 (L3) en dan ALLE VEERTIEN op L4, waarna er elf levels lang niets nieuws bijkwam. Dat is
+# de belangrijkste reden dat negen van de veertien torens in de playtest nul keer gekocht
+# werden: acht daarvan waren in de gespeelde levels domweg niet te koop, en op het moment
+# dat je de rest wél krijgt heb je al een werkende gewoonte. Een toren per level geeft elke
+# toren een eigen introductiemoment op het level waar hij het meest voor de hand ligt.
+#
+# De VOLGORDE van deze lijst is ook de volgorde in de shop en dus van de sneltoetsen
+# (_buildable() in level.gd leidt die hieruit af), dus nieuwe torens horen achteraan.
+#
+# Softlock-checks die deze volgorde respecteert (map-review §7):
+#  - Chatterbox debuteert L2 -> phones staat op L2 en is daar naar lvl 3 te brengen.
+#  - Suspicious Link (onzichtbaar) debuteert L4 -> filter staat op L2; de zone is de enige reveal.
+#  - The Cleaner (boss L4) veegt zones en vallen weg -> trap staat op L4, anders is die
+#    boss-mechaniek onzichtbaar voor de speler.
+#  - The Phone Caller (taunt) debuteert L9 -> area damage is de counter; multishot staat op L4.
 const TOWERS_PER_LEVEL := {
 	1: ["coffee", "auto"],
 	2: ["coffee", "auto", "phones", "ceo", "filter"],
-	3: ["coffee", "auto", "phones", "ceo", "filter", "keyboard"],
-	4: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	5: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	# Blok 2 (medior): volledige toolkit beschikbaar.
-	6: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	7: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	8: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	9: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	10: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	# Blok 3 (senior): volledige toolkit (HR Room verbiedt phones+machinegun via 'banned', zie get_level).
-	11: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	12: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	13: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	14: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
-	15: ["coffee", "auto", "filter", "phones", "ceo", "scrum", "trap", "keyboard", "chain", "machinegun", "multishot", "pomodoro", "splash", "ctrlaltdel"],
+	# Meeting Room draait om de Thread-zwerm: een goedkope, snelle vuurmond hoort daar.
+	3: ["coffee", "auto", "phones", "ceo", "filter", "machinegun"],
+	# Canteen: de lunch-swarm vraagt een salvo, en The Cleaner moet iets te vegen hebben.
+	4: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot"],
+	# Boardroom I: eerste boss-arena, dus de eerste special.
+	5: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard"],
+	# Blok 2 (medior): een toren per level, elk op het level waar hij het meest voor de hand ligt.
+	# WFH heeft zicht-muren: splash raakt ook wat je maar half kunt zien.
+	6: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash"],
+	# Parking heeft gespreide banen: chain-sprongen overbruggen die.
+	7: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain"],
+	# Flexplek: vier deuren die samenkomen, dus een AoE-klap op het knooppunt.
+	8: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro"],
+	# Town Hall heeft half_coffee: minder torens moeten harder werken, dus de buff-toren.
+	9: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum"],
+	# Boardroom II: tweede Performance Review, en daarmee de laatste toren. Toolkit compleet.
+	10: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
+	# Blok 3 (senior): volledige toolkit. Nieuwe leerstof komt hier uit de vijanden en de maps,
+	# niet uit nieuwe torens. (HR Room verbiedt auto+machinegun via 'banned', zie get_level.)
+	11: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
+	12: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
+	13: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
+	14: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
+	15: ["coffee", "auto", "phones", "ceo", "filter", "machinegun", "trap", "multishot", "keyboard", "splash", "chain", "pomodoro", "scrum", "ctrlaltdel"],
 }
 
 # Wave-tabellen per level. Notatie: "type:aantal@interval", groepen gescheiden met " + ".
