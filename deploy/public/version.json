@@ -1,16 +1,14 @@
 {
-  "version": "0.84.0",
+  "version": "0.85.0",
   "date": "2026-08-04",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.84.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.85.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "dfe3b4e0aa72da334309c4a1cdde7c994d09dc9855956abca308b4d927782fa9",
-  "size": 110081224,
+  "sha256": "d14b0b816db7f6c51fec97316f93222056e6076a9c6c005e2a76b156fc37293a",
+  "size": 110082344,
   "changes": [
-    "Towers now have an approach: WRITTEN (Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation) or IN PERSON (Office Artillery, The Shredder, Thumbtacks, Pomodoro Timer, Keyboard Smash). It is shown in the shop and on the tower panel.",
-    "Immunities target the approach instead of one specific tower. The Board Member is never actually in the building, so nothing in-person touches him at all; The Cold Caller does not read email, so nothing written does. Both used to shrug off exactly one tower, which you could ignore by owning almost any other.",
-    "That also closes some holes: Shredder zones, Pomodoro bursts and Keyboard Smash never checked immunity at all, so they quietly hit enemies that were supposed to be immune.",
-    "Hits that bounce off now flash white on the enemy, so \"my tower is firing and nothing is happening\" reads as the wrong weapon rather than a bug.",
-    "Fixed: advice on the results screen ran off the right-hand edge of the screen if it was long. It now wraps."
+    "New enemy: The Steering Committee. \"A decision will be made about your decision.\" It arrives on level 6 behind a heavy shield that light hits bounce off, and when you finally crack it open it releases four Board Members - who are immune to every single tower that could crack a shield.",
+    "This is deliberate. Up to now level 14 asked for the same defence as level 3, only more of it. From level 6 onwards you need both approaches standing at the same time.",
+    "It shows up three times on Work From Home and once on the medior finale."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

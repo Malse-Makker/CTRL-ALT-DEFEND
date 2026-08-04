@@ -34,6 +34,7 @@ niet uit de pas lopen met de code.
 | 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
 | 2026-08-04 | **Uitgebracht in v0.81.0:** B1 (`shield_min_hit`, Old Guard op 10) en A7 (Poster bufft automatisch) |
 | 2026-08-04 | **Uitgebracht in v0.82.0:** A3 (Delegation escaleert) en A8 (prijsladder: auto 14/dmg 1,4, Quick Reply 16) |
+| 2026-08-04 | **Uitgebracht in v0.86.0:** A1, zijpaden OVERTIME/ESCALATION op 11 torens |
 | 2026-08-04 | **Uitgebracht in v0.85.0:** B6, The Steering Committee op L6 (waves 5, 10, 13) en L10 (wave 11) |
 | 2026-08-04 | **Uitgebracht in v0.84.0:** B3, maar met TWEE klassen (written / in_person) van elk vijf torens in plaats van drie: Headphones en Motivational Poster doen nul schade, dus een derde klasse zou er een van één toren zijn geworden |
 | 2026-08-04 | **Uitgebracht in v0.83.0:** D3 (reward 0,09/0,12/0,15 per HP), C5 (sterren met absolute bodem), D5 (`SELL_RATIO`), Z2 (verouderd commentaar) |
@@ -573,7 +574,7 @@ progressie en instellingen, geen torens of levelstaat.
 ### DAARNA (hoge impact, hoog werk, of afhankelijk van NU)
 
 - [x] **B3** schadeklassen (written / in_person)  *(v0.84.0)*
-- [ ] **A1** crosspath
+- [x] **A1** crosspath (OVERTIME / ESCALATION)  *(v0.86.0)*
 - [ ] **D4** The Expense Claim
 - [ ] **B4** vlaggen, Recurring eerst
 - [ ] **C1** `ignores_los` → **A4** Thumbtacks

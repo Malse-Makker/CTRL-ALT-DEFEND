@@ -57,6 +57,19 @@ var buff_targets: Array = []          # support: welke torens hij buft
 var buff_chosen: bool = false
 var max_targets: int = 1
 
+# --- Zijpaden (crosspath). De ladder 1-2-3 blijft, maar daarnaast kies je EEN van twee
+# sporen en daar mag je twee stappen in. Koop je de eerste stap van het ene spoor, dan gaat
+# het andere op slot voor deze toren. Zonder dit is elke upgrade alleen een prijskaartje en
+# heeft de speler per toren nooit een beslissing te nemen. Zie 06_SYSTEEM_AUDIT.md §4.1 (A1).
+#   OVERTIME   "Just one more thing before I log off."   sneller, daarna verder
+#   ESCALATION "I'm going to have to loop in a few more people."   meer doelen, daarna harder
+# Overtime is de veilige keuze (rate vermenigvuldigt alles wat de toren al doet), Escalation
+# de situationele: tegen een drom wil je doelen, tegen een tank schade.
+const SIDE_OVERTIME := "overtime"
+const SIDE_ESCALATION := "escalation"
+var side_path: String = ""
+var side_step: int = 0
+
 # multishot: aantal doelen per salvo. chain: schot springt door naar volgende vijanden.
 var multi_shots: int = 1
 var chain_jumps: int = 0               # aantal extra sprongen na het eerste doel
@@ -272,6 +285,21 @@ static func defs() -> Dictionary:
 		},
 	}
 
+static func has_side_paths(id: String) -> bool:
+	# Economie heeft niets om te versnellen of te verbreden, en specials zijn al gecapt op
+	# een per level en hebben geen upgrade-ladder om naast te hangen.
+	var d: Dictionary = defs()[id]
+	return not bool(d.get("special", false)) and String(d["role"]) != "economy"
+
+static func side_cost(id: String, step: int) -> int:
+	# Bewust goedkoop: dit is waar je kleingeld heen gaat als je 14 Coffee over hebt en
+	# niets kunt kopen. Stap 1 is de helft van de instapprijs, stap 2 de hele.
+	var base: float = float(defs()[id]["levels"][0]["cost"])
+	return int(round(base * (0.5 if step <= 1 else 1.0)))
+
+static func side_label(path: String) -> String:
+	return "OVERTIME" if path == SIDE_OVERTIME else "ESCALATION"
+
 func configure(id: String, lvl: int) -> void:
 	def_id = id
 	var d: Dictionary = defs()[id]
@@ -333,6 +361,7 @@ func configure(id: String, lvl: int) -> void:
 		# Alleen zetten zolang de speler niet zelf koos — configure() draait ook bij elke upgrade.
 		if not trap_pos_chosen:
 			trap_pos = _tile(_closest_path_point())
+	_apply_side()
 	level_name = String(s.get("name", String(d["name"])))
 	level_flavour = String(s.get("flavour", ""))
 	_apply_art()
@@ -404,6 +433,64 @@ func clear_tacks_near(p: Vector2, r: float) -> void:
 	if keep.size() != _tacks_list.size():
 		_tacks_list = keep
 		queue_redraw()
+
+func _apply_side() -> void:
+	# Draait aan het eind van configure(), dus altijd op de VERSE basiswaarden van dit level.
+	# Daardoor is hij idempotent: upgraden herberekent alles opnieuw in plaats van te stapelen.
+	if side_path == "" or side_step <= 0:
+		return
+	if side_path == SIDE_OVERTIME:
+		match role:
+			"area":
+				range_radius *= 1.15
+				if side_step >= 2:
+					range_radius *= 1.20
+			"support":
+				range_radius *= 1.20
+				if side_step >= 2:
+					max_targets += 1
+			_:
+				fire_rate *= 0.80
+				throw_interval *= 0.80
+				smash_cooldown *= 0.80
+				if side_step >= 2:
+					range_radius *= 1.20
+	else:
+		match role:
+			"area":
+				area_slow = maxf(0.05, area_slow - 0.05)
+				if side_step >= 2:
+					area_dot *= 1.25
+			"support":
+				buff_dmg += 0.2
+				if side_step >= 2:
+					buff_rate *= 0.92
+			"stun":
+				max_targets += 1
+				if side_step >= 2:
+					stun_dur *= 1.25
+					cc_slow_dur *= 1.25
+			"chain":
+				chain_jumps += 1
+				if side_step >= 2:
+					damage *= 1.25
+			"splash":
+				splash_radius *= 1.30
+				if side_step >= 2:
+					damage *= 1.25
+			"burst":
+				range_radius *= 1.10
+				if side_step >= 2:
+					damage *= 1.25
+			"trap":
+				throw_interval *= 0.75
+				if side_step >= 2:
+					damage *= 1.25
+			_:
+				multi_shots += 1
+				if side_step >= 2:
+					damage *= 1.25
+					smash_damage *= 1.25
 
 func _apply_art() -> void:
 	# Per upgrade-level een eigen sprite: art/towers/<def_id>_<level>.png.
@@ -530,10 +617,22 @@ func _process(delta: float) -> void:
 				if _cooldown <= 0.0:
 					var t := _find_target()
 					if t != null:
-						if stun_dur > 0.0:
-							t.call("apply_stun", stun_dur, level)
-						if cc_slow < 1.0:
-							t.call("apply_slow", cc_slow, cc_slow_dur)
+						# max_targets > 1 komt van het Escalation-zijpad: meerdere tegelijk stil.
+						var picks: Array = [t]
+						if max_targets > 1:
+							for e in _valid_targets():
+								if picks.size() >= max_targets:
+									break
+								if e == t:
+									continue
+								if e.cc_immune_below > 0 and level < e.cc_immune_below:
+									continue
+								picks.append(e)
+						for pk in picks:
+							if stun_dur > 0.0:
+								pk.call("apply_stun", stun_dur, level)
+							if cc_slow < 1.0:
+								pk.call("apply_slow", cc_slow, cc_slow_dur)
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
 						_flash(t)
 		"multi":
@@ -634,6 +733,19 @@ func _process(delta: float) -> void:
 						t.call("take_damage", damage * buff_dmg_mult, damage_class)
 						if on_damage.is_valid():
 							on_damage.call(def_id, damage * buff_dmg_mult)
+						# multi_shots > 1 komt van het Escalation-zijpad: hetzelfde salvo
+						# raakt er nog een paar. Een gewone damage-toren heeft er 1.
+						if multi_shots > 1:
+							var extra: int = 1
+							for e in _valid_targets():
+								if extra >= multi_shots:
+									break
+								if e == t:
+									continue
+								e.call("take_damage", damage * buff_dmg_mult, damage_class)
+								if on_damage.is_valid():
+									on_damage.call(def_id, damage * buff_dmg_mult)
+								extra += 1
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
 						_flash(t)
 	if _shot_time > 0.0:
@@ -786,6 +898,12 @@ func _chain_fire() -> bool:
 
 func _draw() -> void:
 	var col: Color = defs()[def_id]["color"]
+	# Welk zijpad deze toren nam, als een of twee blokjes onder de toren. Zonder markering
+	# zien twee torens van hetzelfde type er identiek uit terwijl ze compleet anders spelen.
+	if side_step > 0:
+		var sc: Color = Color(0.95, 0.70, 0.25) if side_path == SIDE_OVERTIME else Color(0.75, 0.45, 0.95)
+		for i in side_step:
+			draw_rect(Rect2(-7.0 + float(i) * 8.0, 13.0, 5.0, 3.0), sc)
 	if role == "area":
 		draw_circle(Vector2.ZERO, range_radius * buff_range_mult, Color(col.r, col.g, col.b, 0.12))
 		draw_arc(Vector2.ZERO, range_radius * buff_range_mult, 0.0, TAU, 48, Color(col.r, col.g, col.b, 0.5), 1.5)

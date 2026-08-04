@@ -13,6 +13,13 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.86.0 — 2026-08-04
+- Every tower now has two side tracks on top of its normal 1-2-3 upgrades, and you may only go down one of them. OVERTIME ("just one more thing before I log off") makes it fire faster and then reach further. ESCALATION ("I'm going to have to loop in a few more people") makes it hit an extra target and then hit harder.
+- Buying the first step of one track locks the other on that tower forever, so two Auto-Replies on the same floor can now be completely different towers. There is a small coloured marker under each tower showing which way it went.
+- Side steps are cheap on purpose: half the tower's starting price for the first, the full price for the second. Auto-Reply is 7 and 14. This is where your spare change goes when you have 14 Coffee and nothing to buy.
+- To give a sense of it: a maxed Auto-Reply does 12.5 damage per second. With Overtime it does 15.6 and reaches 180 instead of 150. With Escalation it does 15.6 against one target but 31.2 against a crowd. Same price, completely different answer depending on the floor.
+- Coffee Machine, Keyboard Smash and Ctrl+Alt+Del have no side tracks.
+
 ## v0.85.0 — 2026-08-04
 - New enemy: The Steering Committee. "A decision will be made about your decision." It arrives on level 6 behind a heavy shield that light hits bounce off, and when you finally crack it open it releases four Board Members - who are immune to every single tower that could crack a shield.
 - This is deliberate. Up to now level 14 asked for the same defence as level 3, only more of it. From level 6 onwards you need both approaches standing at the same time.

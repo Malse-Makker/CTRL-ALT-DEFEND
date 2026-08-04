@@ -203,6 +203,8 @@ var upg_stats: Label
 var upg_target: OptionButton
 var upg_hidden: CheckBox
 var upg_scrum: Label
+var upg_side_a: Button
+var upg_side_b: Button
 var upg_upgrade: Button
 var upg_sell: Button
 var _sounds: Dictionary = {}
@@ -807,8 +809,11 @@ func _open_upgrade(t: Node2D) -> void:
 	var d: Dictionary = TowerScript.defs()[t.def_id]
 	upg_name.text = "%s  (Lv %d)" % [t.level_name, t.level]
 	var cls: String = _class_tag(t.damage_class).strip_edges()
-	upg_stats.text = "\"%s\"%s\n%s%s" % [t.level_flavour,
-		("   " + cls) if cls != "" else "", _tower_stats_text(t), _tower_performance(t)]
+	var side: String = ""
+	if t.side_step > 0:
+		side = "\n%s %s" % [TowerScript.side_label(t.side_path), "I" if t.side_step == 1 else "II"]
+	upg_stats.text = "\"%s\"%s%s\n%s%s" % [t.level_flavour,
+		("   " + cls) if cls != "" else "", side, _tower_stats_text(t), _tower_performance(t)]
 	if t.role == "damage" or t.role == "stun" or t.role == "multi" or t.role == "chain":
 		upg_target.visible = true
 		upg_target.selected = TARGET_MODES.find(t.target_mode)
@@ -847,6 +852,7 @@ func _open_upgrade(t: Node2D) -> void:
 		upg_upgrade.text = "Max level"
 		upg_upgrade.disabled = true
 	upg_upgrade.tooltip_text = _upgrade_delta_text(t)
+	_refresh_side_buttons(t)
 	upg_sell.text = "Sell (+%d C)" % int(t.invested * SELL_RATIO)
 	panel.visible = true
 	# Meten in plaats van gokken. De klem stond op vaste waardes (200 breed, 180 hoog), maar
@@ -957,6 +963,80 @@ func _tower_stats_text(t: Node2D) -> String:
 			return "%.1f damage/s  (%d per shot, every %.2fs)\nRange %d  -  %.3f DPS per Coffee%s" % [
 				dps, int(t.damage), t.fire_rate, int(t.range_radius),
 				dps / maxf(float(t.invested), 1.0), invested]
+
+func _do_side(path: String) -> void:
+	var t = selected_tower
+	if t == null or not TowerScript.has_side_paths(t.def_id):
+		return
+	if building_blocked:
+		_flash_msg("Can't build during lunch break.")
+		return
+	if t.side_path != "" and t.side_path != path:
+		_flash_msg("This tower already went down %s. One track per tower." % TowerScript.side_label(t.side_path))
+		return
+	if t.side_step >= 2:
+		_flash_msg("%s is fully done on this tower." % TowerScript.side_label(path))
+		return
+	var step: int = t.side_step + 1
+	var cost: int = int(round(float(TowerScript.side_cost(t.def_id, step)) * cost_mult))
+	if coffee < cost:
+		_flash_msg("Not enough Coffee (need %d)." % cost)
+		return
+	coffee -= cost
+	_stats["coffee_spent"] = int(_stats["coffee_spent"]) + cost
+	t.invested += cost
+	t.side_path = path
+	t.side_step = step
+	t.configure(t.def_id, t.level)   # herberekent alles inclusief het zijpad
+	_play("upgrade")
+	_update_labels()
+	_open_upgrade(t)
+	queue_redraw()
+
+# Wat een zijstap concreet doet, per rol. Staat op de knop-tooltip zodat de keuze te maken
+# is vóór je betaalt en niet erna.
+func _side_effect_text(t: Node2D, path: String, step: int) -> String:
+	if path == TowerScript.SIDE_OVERTIME:
+		match t.role:
+			"area": return "+15% zone radius" if step == 1 else "+20% zone radius"
+			"support": return "+20% buff range" if step == 1 else "+1 tower buffed"
+			_: return "Fires 20% faster" if step == 1 else "+20% range"
+	match t.role:
+		"area": return "Slows 5% harder" if step == 1 else "+25% damage over time"
+		"support": return "+0.2 damage buff" if step == 1 else "Buffed towers fire 8% faster"
+		"stun": return "Stops one extra target" if step == 1 else "+25% stun and slow duration"
+		"chain": return "+1 hop" if step == 1 else "+25% damage"
+		"splash": return "+30% splash radius" if step == 1 else "+25% damage"
+		"burst": return "+10% blast radius" if step == 1 else "+25% damage"
+		"trap": return "Throws 25% more often" if step == 1 else "+25% damage"
+		_: return "Hits one extra target" if step == 1 else "+25% damage"
+
+func _refresh_side_buttons(t: Node2D) -> void:
+	if not TowerScript.has_side_paths(t.def_id):
+		upg_side_a.visible = false
+		upg_side_b.visible = false
+		return
+	upg_side_a.visible = true
+	upg_side_b.visible = true
+	for pair in [[upg_side_a, TowerScript.SIDE_OVERTIME], [upg_side_b, TowerScript.SIDE_ESCALATION]]:
+		var b: Button = pair[0]
+		var path: String = String(pair[1])
+		var nm: String = TowerScript.side_label(path)
+		if t.side_path != "" and t.side_path != path:
+			b.text = "%s  (locked)" % nm
+			b.disabled = true
+			b.tooltip_text = "%s is locked: this tower already went down %s." % [nm, TowerScript.side_label(t.side_path)]
+		elif t.side_step >= 2:
+			b.text = "%s  II/II" % nm
+			b.disabled = true
+			b.tooltip_text = "%s is fully done on this tower." % nm
+		else:
+			var step: int = t.side_step + 1
+			var cost: int = int(round(float(TowerScript.side_cost(t.def_id, step)) * cost_mult))
+			b.text = "%s %s  (%d C)" % [nm, "I" if step == 1 else "II", cost]
+			b.disabled = coffee < cost
+			b.tooltip_text = "%s %s\n%s\n\nOne track per tower: buying this locks the other." % [
+				nm, "I" if step == 1 else "II", _side_effect_text(t, path, step)]
 
 func _do_upgrade() -> void:
 	var t = selected_tower
@@ -2882,6 +2962,12 @@ func _build_upgrade_panel(canvas: CanvasLayer) -> void:
 	upg_scrum.add_theme_color_override("font_color", Color(0.82, 0.72, 0.96))
 	upg_scrum.visible = false
 	vb.add_child(upg_scrum)
+	upg_side_a = _button("Overtime", func(): _do_side(TowerScript.SIDE_OVERTIME), 170, 24)
+	upg_side_a.add_theme_font_size_override("font_size", 11)
+	vb.add_child(upg_side_a)
+	upg_side_b = _button("Escalation", func(): _do_side(TowerScript.SIDE_ESCALATION), 170, 24)
+	upg_side_b.add_theme_font_size_override("font_size", 11)
+	vb.add_child(upg_side_b)
 	upg_upgrade = _button("Upgrade", _do_upgrade, 170, 28)
 	upg_upgrade.add_theme_font_size_override("font_size", 12)
 	vb.add_child(upg_upgrade)
