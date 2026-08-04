@@ -34,6 +34,7 @@ niet uit de pas lopen met de code.
 | 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
 | 2026-08-04 | **Uitgebracht in v0.81.0:** B1 (`shield_min_hit`, Old Guard op 10) en A7 (Poster bufft automatisch) |
 | 2026-08-04 | **Uitgebracht in v0.82.0:** A3 (Delegation escaleert) en A8 (prijsladder: auto 14/dmg 1,4, Quick Reply 16) |
+| 2026-08-04 | **Uitgebracht in v0.83.0:** D3 (reward 0,09/0,12/0,15 per HP), C5 (sterren met absolute bodem), D5 (`SELL_RATIO`), Z2 (verouderd commentaar) |
 
 ---
 
@@ -110,7 +111,13 @@ Coffee nodig bij 0,30 DPS per Coffee.
 Op de gewone waves van level 1 zweeft de ratio tussen **3,2x en 8,3x**.
 Op level 15 slaat het om: **wave 2 vraagt 177 Coffee en je hebt er 104.**
 
-### 1.5 Reward per HP verschilt een factor 3,4
+### 1.5 Reward per HP (opgelost in v0.83.0)
+
+> **Sinds v0.83.0 genormaliseerd** op drie banden: 0,09 voor zwermen (makkelijk met AoE te
+> raken), 0,12 standaard, 0,15 voor alles dat specifiek gereedschap vraagt (schild,
+> immuniteit, onzichtbaar, crowd-control-immuun, taunt, rage). Bosses zijn bewust
+> ongewijzigd: hun beloning valt op de laatste wave en beinvloedt de economie nauwelijks.
+> De tabel hieronder is de situatie die dat veroorzaakte.
 
 | Vijand | Reward per HP |
 |---|---|
@@ -557,9 +564,9 @@ progressie en instellingen, geen torens of levelstaat.
 - [x] **B1** `shield_min_hit`  *(v0.81.0)*
 - [x] **A8** prijsladder onderkant  *(v0.82.0)*
 - [x] **A7** Poster bufft automatisch  *(v0.81.0)*
-- [ ] **D3** reward normaliseren
+- [x] **D3** reward normaliseren  *(v0.83.0)*
 - [x] **A3** Delegation omdraaien  *(v0.82.0)*
-- [ ] **C5** L14-sterren, **D5** SELL_RATIO, **Z2** modifiers opschonen
+- [x] **C5** L14-sterren, **D5** SELL_RATIO, **Z2** verouderd commentaar  *(v0.83.0)*
 
 ### DAARNA (hoge impact, hoog werk, of afhankelijk van NU)
 

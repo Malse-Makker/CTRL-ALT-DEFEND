@@ -484,7 +484,7 @@ const WAVES := {
 		"nudge:46@0.10 + micro:6@1.30 + kletskous:4@1.50 + noti:18@0.40",
 		"baby:1@2.00 + change:4@1.30 + phish:3@1.10",
 	],
-	# --- Level 8: The Flexplek. Multi-path (nu stub: één pad). Boss: The Floater.
+	# --- Level 8: The Flexplek. Multi-path: 4 deuren die rouleren (zie 'multi'). Boss: The Floater.
 	8: [
 		"nudge:24@0.14 + noti:14@0.50",
 		"cold:4@1.20 + phish:3@1.10",
@@ -502,7 +502,7 @@ const WAVES := {
 		"tank:5@1.30 + micro:7@1.20 + printer:3@1.50 + noti:20@0.40",
 		"floater:1@2.00 + nudge:24@0.14",
 	],
-	# --- Level 9: Town Hall. Event: telefoon-ophangen (stub) + 50% koffie. Boss: The Reorganisation.
+	# --- Level 9: Town Hall. Event: telefoon wegdrukken + 50% koffie. Boss: The Reorganisation.
 	9: [
 		"nudge:22@0.14 + change:3@1.40",
 		"tank:3@1.60 + cold:4@1.20",
@@ -539,7 +539,9 @@ const WAVES := {
 		"boss:1@1.00 + noti:10@0.45 + hulp:4@1.00 + change:3@1.30",
 	],
 	# ===== BLOK 3 — SENIOR (11-15). Hardst: min. 2 prikkels per level, dichte gemengde golven. =====
-	# --- Level 11: HR Room. Verboden torens (Headphones + Quick Reply) + formulier-event (stub). Boss: HR Manager.
+	# --- Level 11: HR Room. Verboden torens: Auto-Reply + Quick Reply (zie 'banned'; Headphones mag
+	#     NOOIT gebannen worden, dat is de enige Chatterbox-counter -> softlock). Plus het
+	#     formulier-event. Boss: HR Manager.
 	11: [
 		"nudge:26@0.13 + change:4@1.30",
 		"micro:4@1.50 + phish:4@1.10",
@@ -593,7 +595,7 @@ const WAVES := {
 		"board:7@1.30 + tank:6@1.15 + change:10@0.90 + phish:8@0.88",
 		"consultant:1@2.00 + tank:3@1.50 + board:3@1.60",
 	],
-	# --- Level 14: Release Night. Start met 10 Focus + Eat the Pizza (stub). Boss: The Deadline.
+	# --- Level 14: Release Night. Start met 10 Focus + Eat the Pizza. Boss: The Deadline.
 	14: [
 		"nudge:30@0.12 + noti:14@0.45",
 		"cold:6@1.00 + phish:4@1.10",
@@ -611,7 +613,8 @@ const WAVES := {
 		"board:6@1.30 + change:10@0.90 + printer:4@1.40 + cold:8@0.88",
 		"deadline:1@2.00 + nudge:24@0.13 + micro:3@1.50",
 	],
-	# --- Level 15: Boardroom (senior finale). Weinig bouwplekken + 50% koffie. Boss: Performance Review.
+	# --- Level 15: Boardroom (senior finale). Corridor-bouwen is hier de knijp, dus bewust GEEN
+	#     extra economie-modifier (map-review §8). Hazard: projector. Boss: Performance Review 360.
 	15: [
 		"noti:18@0.40 + nudge:26@0.13",
 		"tank:4@1.50 + change:5@1.20",

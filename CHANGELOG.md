@@ -13,6 +13,13 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.83.0 — 2026-08-04
+- Coffee rewards now scale with how much enemy you actually had to kill. They used to vary wildly: a Notification paid over three times more per point of health than an Old Guard, so which enemies a level happened to contain mattered more than how well you played. Swarms pay a little less per point, anything that demands a specific tool (shields, immunities, invisibility) pays a little more.
+- The Old Guard is the big winner: 11 Coffee instead of 4.5, which finally matches what it costs you to bring the right tower.
+- Level 15 is no longer unaffordable at the start. Its second wave used to demand more defence than you could possibly own.
+- Three stars now also works on Release Night. That level starts you on 10 Focus, and three stars needed 90% of it, so losing a single point cost you the star. You can now lose up to 3. Normal levels are completely unchanged.
+- Tidied up: selling always paid 60% but the number lived in three separate places, and five code comments described features as unfinished that have been done since v0.71.
+
 ## v0.82.0 — 2026-08-04
 - Delegation works the other way round now: every hop hits HARDER than the last, because it keeps going further up the chain. Base damage is lower, so it is nearly useless against a lone target and brutal against a tight crowd. Company Policy goes from 4 to 37 damage per second depending purely on how packed the path is.
 - Auto-Reply costs 14 instead of 10, and hits harder to match. Quick Reply costs 16 instead of 18. Auto-Reply used to be the only tower you could afford three of on wave one, which made the opening decision the same every single game.

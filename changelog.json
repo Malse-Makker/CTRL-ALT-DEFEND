@@ -1,6 +1,16 @@
 {
   "entries": [
     {
+      "version": "0.82.0",
+      "date": "2026-08-04",
+      "items": [
+        "Delegation works the other way round now: every hop hits HARDER than the last, because it keeps going further up the chain. Base damage is lower, so it is nearly useless against a lone target and brutal against a tight crowd. Company Policy goes from 4 to 37 damage per second depending purely on how packed the path is.",
+        "Auto-Reply costs 14 instead of 10, and hits harder to match. Quick Reply costs 16 instead of 18. Auto-Reply used to be the only tower you could afford three of on wave one, which made the opening decision the same every single game.",
+        "Quick Reply's description now warns you that its hits are far too light to dent a shield, which since the last version actually matters.",
+        "Fixed: the tower panel was clamped to a fixed height, so on any tower in the lower half of the floor the Sell button fell off the bottom of the screen. It now measures itself."
+      ]
+    },
+    {
       "version": "0.81.0",
       "date": "2026-08-04",
       "items": [

@@ -675,6 +675,9 @@ const FEW_SPOTS_CAP := 8
 # halen" een eigen, groeiende beloning naast "veel doodmaken", en belonen die twee stromen
 # echt twee verschillende dingen. Loopt via _add_coffee en volgt dus half_coffee.
 const WAVE_INCOME_BASE := 4
+# Verkoopwaarde: hoeveel van het geinvesteerde bedrag je terugkrijgt. Stond als los getal
+# 0.6 op drie plekken (knoptekst, uitbetaling, tooltip), dus een wijziging kon uit de pas lopen.
+const SELL_RATIO := 0.6
 
 # Demping op kill-inkomen. Zonder dit groeit je overschot binnen een level van ~3x naar ~8x
 # wat je verdediging kost: de aantallen per wave lopen harder op dan de prijs van torens, dus
@@ -834,7 +837,7 @@ func _open_upgrade(t: Node2D) -> void:
 		upg_upgrade.text = "Max level"
 		upg_upgrade.disabled = true
 	upg_upgrade.tooltip_text = _upgrade_delta_text(t)
-	upg_sell.text = "Sell (+%d C)" % int(t.invested * 0.6)
+	upg_sell.text = "Sell (+%d C)" % int(t.invested * SELL_RATIO)
 	panel.visible = true
 	# Meten in plaats van gokken. De klem stond op vaste waardes (200 breed, 180 hoog), maar
 	# het paneel groeit mee met zijn inhoud: een uitgebouwde toren mét targeting is ruim 200
@@ -973,7 +976,7 @@ func _do_sell() -> void:
 		_flash_msg("Can't sell during lunch break.")
 		return
 	_stats["sold"] = int(_stats["sold"]) + 1
-	_add_coffee(int(t.invested * 0.6))
+	_add_coffee(int(t.invested * SELL_RATIO))
 	towers.erase(t)
 	t.queue_free()
 	_close_upgrade()
@@ -1905,11 +1908,20 @@ func _update_enemy_panel() -> void:
 
 # ---------- Win / lose ----------
 
+# Sterren op verhouding OF op absoluut verlies, wat van de twee gunstiger uitpakt.
+# Alleen op verhouding rekenen brak op de low_focus-levels: level 14 start met 10 Focus, dus
+# 90% over betekende dat je er maximaal EEN mocht verliezen voor drie sterren. Op een gewoon
+# level van 100 Focus is de verhouding juist ruimer (10 verlies toegestaan), dus daar verandert
+# er niets: de absolute grens bijt alleen waar de verhouding onredelijk werd.
+const STAR3_MAX_LOSS := 3
+const STAR2_MAX_LOSS := 6
+
 func _stars() -> int:
 	var ratio: float = float(focus) / float(max(1, start_focus))
-	if ratio >= 0.9:
+	var lost: int = start_focus - focus
+	if ratio >= 0.9 or lost <= STAR3_MAX_LOSS:
 		return 3
-	elif ratio >= 0.5:
+	elif ratio >= 0.5 or lost <= STAR2_MAX_LOSS:
 		return 2
 	return 1
 
@@ -2423,7 +2435,7 @@ func _draw() -> void:
 		var mouse: Vector2 = get_global_mouse_position()
 		for t in towers:
 			if mouse.distance_to(t.position) <= 22.0:
-				var tip: String = "Lv %d  -  sell +%d C" % [t.level, int(t.invested * 0.6)]
+				var tip: String = "Lv %d  -  sell +%d C" % [t.level, int(t.invested * SELL_RATIO)]
 				draw_string(ThemeDB.fallback_font, t.position + Vector2(-30, -26), tip,
 					HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.95, 0.9, 0.65))
 				break

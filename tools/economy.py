@@ -8,8 +8,13 @@ HERE = Path(__file__).parent
 rows = json.loads((HERE / "wave_metrics.json").read_text())
 
 WAVE_INTERVAL = 16.0
-START = 45.0
-WAVE_INCOME = 4.0
+# Deze formules moeten gelijk blijven aan de game: start_coffee in game_state.gd en
+# WAVE_INCOME_BASE / KILL_DAMP_* in level.gd. Lopen ze uiteen, dan meet je iets dat niet bestaat.
+def start_coffee(level):
+    return 40 + 5 * (level - 1)
+WAVE_INCOME_BASE = 4.0
+def damp(w):
+    return max(0.40, 1.0 - 0.04 * max(0, w - 5))
 # DPS per Coffee bij volledig uitgebouwde torens (uit tower_metrics.py):
 #   Auto-Reply 0.266, Quick Reply 0.292, Artillery 0.340. Realistisch mengsel: 0.30.
 DPS_PER_COFFEE = 0.30
@@ -28,7 +33,9 @@ for lv in sorted(rows, key=int):
     peak = max(w[0] for w in pw)
     dps_needed = peak / WAVE_INTERVAL * COVERAGE
     coffee_needed = dps_needed / DPS_PER_COFFEE
-    total_coffee = START + r["coffee"] + WAVE_INCOME * (r["waves"] - 1)
+    kills = sum(w[1] * damp(i + 1) for i, w in enumerate(pw))
+    wage = sum(WAVE_INCOME_BASE + i for i in range(1, r["waves"]))
+    total_coffee = start_coffee(int(lv)) + kills + wage
     print(f"{lv:>3} {peak:>14.0f} {dps_needed:>10.1f} {coffee_needed:>13.0f} "
           f"{total_coffee:>19.0f} {total_coffee/coffee_needed:>9.1f}x")
 
@@ -38,13 +45,13 @@ print("2. WANNEER HEB JE GENOEG? (level 1 en level 15, per wave)")
 print("=" * 96)
 for lv in ["1", "15"]:
     r = rows[lv]
-    cum = START
+    cum = start_coffee(int(lv))
     print(f"\nLevel {lv}:")
     print(f"{'wave':>5}{'HP':>7}{'DPS nodig':>11}{'C nodig':>9}{'C in kas':>10}{'ratio':>8}")
     for i, w in enumerate(r["per_wave"]):
         if i > 0:
-            cum += WAVE_INCOME
-        cum += w[1]
+            cum += WAVE_INCOME_BASE + i
+        cum += w[1] * damp(i + 1)
         need = w[0] / WAVE_INTERVAL * COVERAGE / DPS_PER_COFFEE
         print(f"{i+1:>5}{w[0]:>7.0f}{w[0]/WAVE_INTERVAL*COVERAGE:>11.1f}"
               f"{need:>9.0f}{cum:>10.0f}{cum/need:>7.1f}x")
@@ -57,13 +64,13 @@ print("=" * 96)
 # Beste 45-Coffee build: Auto-Reply lv1+lv2 (22) + Auto-Reply lv1 (12) = 34 -> 5.0+2.2 = 7.2
 for lv in ["1", "5", "15"]:
     r = rows[lv]
-    best_dps = 45 * DPS_PER_COFFEE
+    best_dps = start_coffee(int(lv)) * DPS_PER_COFFEE
     dead = None
     for i, w in enumerate(r["per_wave"]):
         need = w[0] / WAVE_INTERVAL * COVERAGE
         if need > best_dps and dead is None:
             dead = i + 1
-    print(f"Level {lv}: 45 Coffee = {best_dps:.1f} DPS. Eerste wave die dat overschrijdt: "
+    print(f"Level {lv}: {start_coffee(int(lv))} Coffee = {best_dps:.1f} DPS. Eerste wave die dat overschrijdt: "
           f"wave {dead} van {r['waves']}")
 
 print()
@@ -102,10 +109,6 @@ print("6. VOORSTEL: DEMPING OP KILL-INKOMEN + OPLOPEND WAVE-SALARIS")
 print("=" * 96)
 
 
-def damp(w):
-    return max(0.40, 1.0 - 0.04 * max(0, w - 5))
-
-
 print("dempingscurve:", "  ".join(f"w{w}:{damp(w):.2f}" for w in [1, 5, 8, 10, 12, 15, 18, 21]))
 print()
 print(f"{'Lv':>3}{'nu totaal':>11}{'nieuw totaal':>14}{'verschil':>10}"
@@ -113,11 +116,11 @@ print(f"{'Lv':>3}{'nu totaal':>11}{'nieuw totaal':>14}{'verschil':>10}"
 for lv in sorted(rows, key=int):
     r = rows[lv]
     old_kill = r["coffee"]
-    old_wage = WAVE_INCOME * (r["waves"] - 1)
+    old_wage = 4.0 * (r["waves"] - 1)
     new_kill = sum(w[1] * damp(i + 1) for i, w in enumerate(r["per_wave"]))
     new_wage = sum(4 + i for i in range(1, r["waves"]))
-    old_tot = START + old_kill + old_wage
-    new_tot = START + new_kill + new_wage
+    old_tot = 45 + old_kill + old_wage
+    new_tot = start_coffee(int(lv)) + new_kill + new_wage
     print(f"{lv:>3}{old_tot:>11.0f}{new_tot:>14.0f}{new_tot-old_tot:>+10.0f}"
           f"{old_kill:>10.0f}{new_kill:>13.0f}{old_wage:>12.0f}{new_wage:>15.0f}")
 
