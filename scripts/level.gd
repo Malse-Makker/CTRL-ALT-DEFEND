@@ -669,8 +669,21 @@ func _tower_cost(id: String, lvl: int) -> int:
 	return int(round(base))
 
 const FEW_SPOTS_CAP := 8
-# Vast bedrag per overleefde wave; loopt via _add_coffee en volgt dus half_coffee.
-const WAVE_INCOME := 4
+# Salaris per overleefde wave, OPLOPEND met het wave-nummer (uitbetaling = basis + wave).
+# Was een vast bedrag van 4, en dat leverde 9 tot 13% van je inkomen op -- te klein om
+# gedrag te sturen, dus in de praktijk had je maar één inkomstenbron. Nu betaalt "de wave
+# halen" een eigen, groeiende beloning naast "veel doodmaken", en belonen die twee stromen
+# echt twee verschillende dingen. Loopt via _add_coffee en volgt dus half_coffee.
+const WAVE_INCOME_BASE := 4
+
+# Demping op kill-inkomen. Zonder dit groeit je overschot binnen een level van ~3x naar ~8x
+# wat je verdediging kost: de aantallen per wave lopen harder op dan de prijs van torens, dus
+# tegen het eind is Coffee betekenisloos precies wanneer het spannend hoort te zijn.
+# Volle opbrengst tot en met wave 5, daarna -4% per wave, met een bodem zodat late waves
+# niet waardeloos worden. Meting op v0.78.0 staat in 06_SYSTEEM_AUDIT.md §1.4.
+const KILL_DAMP_FROM := 5
+const KILL_DAMP_PER_WAVE := 0.04
+const KILL_DAMP_FLOOR := 0.40
 
 func _try_place(p: Vector2) -> void:
 	if building_blocked:
@@ -976,8 +989,9 @@ func _start_next_wave() -> void:
 	# Via _add_coffee, zodat de half_coffee-modifier en de Out of Order-boss (die alle
 	# koffie-inkomsten stopzet) hier net zo goed voor gelden als voor kills.
 	if wave_index > 0 and not _coffee_blocked():
-		_add_coffee(float(WAVE_INCOME))
-		_flash_msg("Payday: +%dC for surviving wave %d." % [WAVE_INCOME, wave_index])
+		var pay: int = WAVE_INCOME_BASE + wave_index
+		_add_coffee(float(pay))
+		_flash_msg("Payday: +%dC for surviving wave %d." % [pay, wave_index])
 	wave_index += 1
 	# Onthul-paden: bij elke trigger-wave opent een extra vijand-pad. In corridor-levels wordt de
 	# strook eromheen meteen bouwbaar. De speler zag dit vooraf niet aankomen.
@@ -1093,16 +1107,20 @@ func _on_enemy_died(e) -> void:
 		return
 	var was_at: Vector2 = e.position
 	_stats["kills"][e.type_id] = int(_stats["kills"].get(e.type_id, 0)) + 1
-	_stats["coffee_earned"] = float(_stats["coffee_earned"]) + e.coffee_reward
-	_add_coffee(e.coffee_reward)
+	# De demping hoort HIER en niet in _add_coffee: alleen kills lopen terug, het
+	# wave-salaris en de Coffee Machine niet. Anders zou de economie-toren juist
+	# minder waard worden naarmate je verder komt, en dat is het omgekeerde.
+	var reward: float = e.coffee_reward * _kill_income_mult()
+	_stats["coffee_earned"] = float(_stats["coffee_earned"]) + reward
+	_add_coffee(reward)
 	run_score += 1
 	# Zwaardere vijanden geven een grotere poef, zodat een tank neerhalen anders voelt
 	# dan een vodje wegtikken.
 	_fx_puff(was_at, e.color, clampf(e.radius * 0.9, 8.0, 34.0))
 	_play("kill")
 	# Coffee is fractioneel; onder de 1 zou "+0" in beeld komen, dus die tonen we niet.
-	if e.coffee_reward >= 1.0:
-		_fx_float(was_at + Vector2(0, -e.radius), "+%d" % int(round(e.coffee_reward)),
+	if reward >= 1.0:
+		_fx_float(was_at + Vector2(0, -e.radius), "+%d" % int(round(reward)),
 			Color(0.95, 0.8, 0.45))
 	if e.split_count > 0 and e.split_type != "":
 		for k in e.split_count:
@@ -1639,6 +1657,11 @@ func _leave_to_menu() -> void:
 	finished.emit()
 
 # ---------- Economie / labels ----------
+
+func _kill_income_mult() -> float:
+	# wave_index is de wave die nu loopt (1-based). Tot en met KILL_DAMP_FROM volle opbrengst.
+	return maxf(KILL_DAMP_FLOOR,
+		1.0 - KILL_DAMP_PER_WAVE * float(maxi(0, wave_index - KILL_DAMP_FROM)))
 
 func _add_coffee(amount: float) -> void:
 	# Out of Order-boss: zolang de "monteur" leeft krijg je geen Coffee erbij (kills én machines).
@@ -2498,6 +2521,7 @@ func _build_boss_bar(canvas: CanvasLayer) -> void:
 	_build_shop(canvas)
 	_build_controls(canvas)
 	_build_left_panel(canvas)
+	_place_msg_label()   # moet ná het paneel: die bepaalt of de melding opzij moet
 	_build_upgrade_panel(canvas)
 	_build_overlay(canvas)
 	_build_confirm(canvas)
@@ -2717,7 +2741,15 @@ func _toggle_left(by_player: bool = false) -> void:
 	left_panel.visible = left_open
 	left_toggle.text = "<" if left_open else ">"
 	left_toggle.position.x = (LEFT_W + 2) if left_open else 2
+	_place_msg_label()
 	GameState.enemy_panel_open = left_open   # keuze onthouden voor het volgende level
+
+# De meldingsregel stond op x=10 en verdween daarmee ACHTER het vijandpaneel zodra dat
+# openstond -- en dat staat het standaard. Elke melding ("Payday: +12C for surviving
+# wave 8.") was dus half onleesbaar. Hij schuift nu mee met het paneel.
+func _place_msg_label() -> void:
+	if msg_label != null:
+		msg_label.position.x = (LEFT_W + 10.0) if left_open else 10.0
 
 func _use_smoke_break() -> void:
 	if paused or game_over:

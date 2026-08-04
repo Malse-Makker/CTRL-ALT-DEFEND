@@ -153,6 +153,11 @@ func get_level(level_id: int) -> Dictionary:
 	var banned := {11: ["auto", "machinegun"]}
 	# Laag-Focus-levels (blok 3) zetten start_focus lager; blok 1-2 op 100.
 	var start_focus := 10 if level_id == 14 else 100
+	# Startkoffie loopt mee met het level. Stond op 45 voor ALLE vijftien levels, en dat is
+	# royaal voor level 1 (eerste wave 20 HP) en onspeelbaar voor level 15 (eerste wave 150,
+	# tweede 424). Gemeten: level 15 wave 2 vraagt ~177 Coffee aan verdediging terwijl je er
+	# 104 hebt. Zie 06_SYSTEEM_AUDIT.md §1.4.
+	var start_coffee := 40 + 5 * (level_id - 1)
 	var waves := []
 	for spec in WAVES.get(level_id, WAVES[1]):
 		waves.append(_parse_wave(String(spec)))
@@ -165,7 +170,7 @@ func get_level(level_id: int) -> Dictionary:
 		"path": level_paths[0],
 		"paths": level_paths,
 		"start_focus": start_focus,
-		"start_coffee": 45,
+		"start_coffee": start_coffee,
 		"waves": waves,
 		"towers": TOWERS_PER_LEVEL.get(level_id, TOWERS_PER_LEVEL[5]),
 		"hazard": hazards.get(level_id, ""),

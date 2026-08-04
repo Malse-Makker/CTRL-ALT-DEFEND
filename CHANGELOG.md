@@ -13,6 +13,12 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.79.0 — 2026-08-04
+- Starting Coffee now scales with the level: 40 on the first floor, 110 on the last. It used to be 45 everywhere, which was generous on level 1 and close to unplayable on the later floors, where wave 2 alone is heavier than the finale of level 1.
+- Surviving a wave pays more the further you get. Payday used to be a flat 4 Coffee; it now grows with the wave number, so making it through a late wave is worth something on its own.
+- Coffee from kills tapers off after wave 5, down to a floor of 40%. Late waves used to hand out far more Coffee than any defence could ever cost, which quietly made the second half of every level a formality.
+- Fixed: on-screen messages were hidden behind the enemy panel, so half of every notification was unreadable while that panel was open.
+
 ## v0.78.0 — 2026-07-26
 - When a run ends you now get a WHAT HURT YOU list: which enemies got through, how much Focus each of them actually cost you, and what to build against them next time.
 - It is sorted by Focus lost rather than by headcount, so three Old Guards rank above twenty Notifications -- which is usually the thing you needed to know.
