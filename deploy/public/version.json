@@ -1,15 +1,14 @@
 {
-  "version": "0.79.0",
+  "version": "0.80.0",
   "date": "2026-08-04",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.79.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.80.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "83679482102cad2e73f846679430b9c90305e0a94613115adb352399a0ed3303",
-  "size": 110072840,
+  "sha256": "f5bdbbc9d2d88a42c7115071c7d0b2463886033fbdbce455679322116dbf6877",
+  "size": 110074008,
   "changes": [
-    "Starting Coffee now scales with the level: 40 on the first floor, 110 on the last. It used to be 45 everywhere, which was generous on level 1 and close to unplayable on the later floors, where wave 2 alone is heavier than the finale of level 1.",
-    "Surviving a wave pays more the further you get. Payday used to be a flat 4 Coffee; it now grows with the wave number, so making it through a late wave is worth something on its own.",
-    "Coffee from kills tapers off after wave 5, down to a floor of 40%. Late waves used to hand out far more Coffee than any defence could ever cost, which quietly made the second half of every level a formality.",
-    "Fixed: on-screen messages were hidden behind the enemy panel, so half of every notification was unreadable while that panel was open."
+    "Towers now unlock one per level up to level 10, instead of two on level 1, three on level 2, one on level 3 and then all eight remaining ones at once on level 4. Every tower gets its own introduction on the floor where it makes the most sense: Quick Reply on the Meeting Room swarms, Thumbtacks in the Canteen where The Cleaner sweeps them away, Delegation in the Parking where the lanes are spread out.",
+    "Because of that, the shop on level 1 now doubles as a roadmap: every locked tower shows the level it arrives on.",
+    "No towers were removed and none were added. If you had already reached the later levels, your full toolkit is still there from level 10 onwards."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.81.0 — 2026-08-04
+- The Old Guard's shield now works the way the game always claimed it did: hits under 10 damage bounce straight off it. Auto-Reply, Quick Reply, Self-Service, Reply All and Delegation cannot dent it no matter how many you build. Office Artillery, an upgraded Pomodoro Timer and Keyboard Smash can. Deflected hits flash white on the shield so you can see what is happening.
+- Until now that shield was simply 30 extra hit points, so the tutorial was teaching you a rule the game did not actually have.
+- The Motivational Poster now buffs the nearest towers automatically the moment you place it. It used to buff only towers you had clicked on afterwards, which was never explained anywhere, so buying one and doing nothing else did literally nothing. You can still click towers to choose your own; the panel shows whether it is on auto.
+
 ## v0.80.0 — 2026-08-04
 - Towers now unlock one per level up to level 10, instead of two on level 1, three on level 2, one on level 3 and then all eight remaining ones at once on level 4. Every tower gets its own introduction on the floor where it makes the most sense: Quick Reply on the Meeting Room swarms, Thumbtacks in the Canteen where The Cleaner sweeps them away, Delegation in the Parking where the lanes are spread out.
 - Because of that, the shop on level 1 now doubles as a roadmap: every locked tower shows the level it arrives on.

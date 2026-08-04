@@ -19,6 +19,13 @@ var radius: float = 11.0
 
 var max_shield: float = 0.0
 var shield: float = 0.0
+# Drempel op het schild: een klap onder deze waarde ketst af en doet NIETS. Zonder dit is
+# een schild alleen maar extra HP, want take_damage trok er ook 1 schadepunt tegelijk vanaf.
+# Het spel beweerde op drie plekken het tegendeel ("only burst breaks the shield", en zo
+# leert de tutorial het ook), dus de speler kreeg te horen dat hij moest wisselen van toren
+# terwijl doorrammen met Auto-Reply gewoon werkte. Zie 06_SYSTEEM_AUDIT.md §3.1.
+var shield_min_hit: float = 0.0
+var _deflect: float = 0.0        # kort oplichten als er iets afketst, anders is het onzichtbaar
 var rage: float = 0.0                # snelheid neemt toe met opgelopen schade
 var split_count: int = 0             # aantal kinderen bij dood
 var split_type: String = ""
@@ -86,8 +93,8 @@ static func defs() -> Dictionary:
 			"hp": 12.0, "speed": 80.0, "reward": 1.6, "damage": 2, "radius": 15.0, "color": Color(0.85, 0.4, 0.5)},
 		"story": {"name": "User Story", "ability": "Heavy basic enemy.", "counter": "Sustained damage. Upgraded Auto-Reply or Quick Reply.",
 			"hp": 26.0, "speed": 70.0, "reward": 2.8, "damage": 4, "radius": 18.0, "color": Color(0.8, 0.45, 0.7)},
-		"tank":  {"name": "The Old Guard", "ability": "Shielded: break the shield first. Burst it down. That archive is legally required to be kept - the shredder won't touch it.", "counter": "Office Artillery. Only burst breaks the shield; chip damage bounces off.",
-			"hp": 46.0, "speed": 50.0, "reward": 4.5, "damage": 8, "radius": 19.0, "color": Color(0.55, 0.55, 0.6), "shield": 30.0, "zone_mult": 0.0},
+		"tank":  {"name": "The Old Guard", "ability": "Shielded: anything under 10 damage per hit bounces straight off. That archive is legally required to be kept, so the shredder won't touch it either.", "counter": "Office Artillery, an upgraded Pomodoro Timer or Keyboard Smash. Light, fast towers cannot dent the shield no matter how many you build.",
+			"hp": 46.0, "speed": 50.0, "reward": 4.5, "damage": 8, "radius": 19.0, "color": Color(0.55, 0.55, 0.6), "shield": 30.0, "shield_min_hit": 10.0, "zone_mult": 0.0},
 		"nudge": {"name": "The Nudge", "ability": "Very fast swarm. Needs area damage or slows.", "counter": "Area damage. A Shredder on the path slows the swarm so your towers can hit it.",
 			"hp": 3.0, "speed": 190.0, "reward": 0.35, "damage": 1, "radius": 8.0, "color": Color(0.95, 0.85, 0.3)},
 		"thread": {"name": "The Thread", "ability": "Arrives as one big printed pile. Paper - the shredder eats it.", "counter": "The Shredder. It is paper, and the zone slows the whole pile at once.",
@@ -170,6 +177,7 @@ func configure(id: String) -> void:
 	color = d["color"]
 	max_shield = float(d.get("shield", 0.0))
 	shield = max_shield
+	shield_min_hit = float(d.get("shield_min_hit", 0.0))
 	rage = float(d.get("rage", 0.0))
 	split_count = int(d.get("split_count", 0))
 	split_type = String(d.get("split_type", ""))
@@ -287,6 +295,9 @@ func _process(delta: float) -> void:
 			installing = not installing
 			_update_timer = update_dur if installing else update_interval
 			queue_redraw()
+	if _deflect > 0.0:
+		_deflect -= delta
+		queue_redraw()
 	if slow_time > 0.0:
 		slow_time -= delta
 	if slow_time <= 0.0:
@@ -400,6 +411,10 @@ func take_damage(amount: float) -> void:
 		queue_redraw()   # System Update: onkwetsbaar zolang hij 'updatet'
 		return
 	if shield > 0.0:
+		if shield_min_hit > 0.0 and amount < shield_min_hit:
+			_deflect = 0.30      # te licht: ketst af, en dat moet je kunnen zien
+			queue_redraw()
+			return
 		var over: float = amount - shield
 		shield = maxf(0.0, shield - amount)
 		if over > 0.0:
@@ -454,6 +469,12 @@ func _draw() -> void:
 		# Schild = een dossiermap die je eerst kapot moet krijgen: een boog vóór de vijand
 		# in plaats van een volle ring, zodat je ziet dat het een laag ervoor is.
 		draw_arc(Vector2.ZERO, radius + 4.0, PI * 0.15, PI * 0.85, 20, Color(0.55, 0.72, 1.0, 0.95), 3.5)
+		if _deflect > 0.0:
+			# Te lichte klap: de boog licht wit op. Zonder dit ziet de speler alleen dat
+			# zijn toren staat te schieten zonder dat er iets gebeurt, en dat leest als
+			# een bug in plaats van als "dit wapen is te licht".
+			var f: float = clampf(_deflect / 0.30, 0.0, 1.0)
+			draw_arc(Vector2.ZERO, radius + 6.0, PI * 0.10, PI * 0.90, 22, Color(1, 1, 1, f), 2.5)
 	if stun_time > 0.0:
 		# zzz boven het hoofd in plaats van een gele ring
 		var f: Font = ThemeDB.fallback_font

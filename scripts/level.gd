@@ -724,6 +724,11 @@ func _try_place(p: Vector2) -> void:
 	add_child(t)
 	t.configure(selected_def_id, 1)
 	towers.append(t)
+	# Meteen doorrekenen wie welke buff krijgt. _apply_buffs_and_disrupt hangt normaal aan
+	# _process, en die staat in de plan-fase stil (time_scale 0), dus zonder deze regel zegt
+	# een net geplaatste Poster "Buffing 0 / 1 towers" tot je op START drukt. Ook nodig als
+	# de nieuwe toren dichter bij een Poster staat dan wie die nu buft.
+	_apply_buffs_and_disrupt()
 	_play_buy()
 	_update_labels()
 	queue_redraw()
@@ -803,7 +808,10 @@ func _open_upgrade(t: Node2D) -> void:
 		scrum_selecting = t
 		upg_scrum.visible = true
 		_refresh_scrum_label()
-		_flash_msg("Click towers in range to buff (max %d)." % t.max_targets)
+		if t.buff_chosen:
+			_flash_msg("Click towers in range to change who gets the buff (max %d)." % t.max_targets)
+		else:
+			_flash_msg("Buffing the %d nearest tower(s) automatically. Click one to pick your own." % t.max_targets)
 	else:
 		scrum_selecting = null
 		upg_scrum.visible = false
@@ -845,14 +853,37 @@ func _refresh_scrum_label() -> void:
 		for x in selected_tower.buff_targets:
 			if is_instance_valid(x):
 				cnt += 1
-		upg_scrum.text = "Buffing %d / %d towers" % [cnt, selected_tower.max_targets]
+		upg_scrum.text = "Buffing %d / %d towers%s" % [cnt, selected_tower.max_targets,
+			"" if selected_tower.buff_chosen else "  (auto)"]
 
 func _on_target_selected(idx: int) -> void:
 	if selected_tower != null and idx >= 0 and idx < TARGET_MODES.size():
 		selected_tower.target_mode = TARGET_MODES[idx]
 		selected_tower.target_mode_chosen = true   # upgraden mag deze keuze niet resetten
 
+# De dichtstbijzijnde torens binnen bereik die er iets aan hébben. Economie- en
+# support-torens vallen af: buff_dmg en buff_rate raken hun koffie-interval niet, dus een
+# Coffee Machine buffen zou een slot verspillen zonder dat de speler dat kan zien.
+func _auto_buff_targets(sm: Node2D) -> Array:
+	var cand: Array = []
+	for t in towers:
+		if not is_instance_valid(t) or t == sm:
+			continue
+		if t.role == "support" or t.role == "economy":
+			continue
+		var d: float = sm.position.distance_to(t.position)
+		if d <= sm.range_radius:
+			cand.append({"t": t, "d": d})
+	cand.sort_custom(func(a, b): return a["d"] < b["d"])
+	var out: Array = []
+	for c in cand:
+		if out.size() >= sm.max_targets:
+			break
+		out.append(c["t"])
+	return out
+
 func _toggle_buff_target(sm: Node2D, t: Node2D) -> void:
+	sm.buff_chosen = true   # vanaf nu bepaalt de speler het, niet de automaat
 	if sm.buff_targets.has(t):
 		sm.buff_targets.erase(t)
 	elif sm.buff_targets.size() < sm.max_targets:
@@ -885,7 +916,7 @@ func _tower_stats_text(t: Node2D) -> String:
 				t.area_dot, int(t.range_radius), invested]
 		"support":
 			return "Buff +%d%% dmg, faster, more range\nUp to %d towers%s" % [
-				int((t.buff_dmg - 1.0) * 100.0), int(t.max_targets), invested]
+				int(round((t.buff_dmg - 1.0) * 100.0)), int(t.max_targets), invested]
 		"multi":
 			return "%.0f dmg to %d targets, every %.2fs\nRange %d%s" % [
 				t.damage, int(t.multi_shots), t.fire_rate, int(t.range_radius), invested]
@@ -1226,6 +1257,8 @@ func _apply_buffs_and_disrupt() -> void:
 			if is_instance_valid(t) and towers.has(t):
 				valid.append(t)
 		sm.buff_targets = valid
+		if not sm.buff_chosen:
+			sm.buff_targets = _auto_buff_targets(sm)
 		for t in sm.buff_targets:
 			if sm.position.distance_to(t.position) <= sm.range_radius:
 				# Alleen de sterkste buff telt. Vermenigvuldigen liet twee Transformation

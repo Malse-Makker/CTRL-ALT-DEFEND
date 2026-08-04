@@ -43,7 +43,13 @@ var target_mode_chosen: bool = false  # true zodra de speler zelf een modus koos
 # defs (niet elke tower kan ze zien), prefer_hidden is de keuze van de speler.
 var sees_hidden: bool = false
 var prefer_hidden: bool = false
-var buff_targets: Array = []          # scrum: door speler gekozen torens
+var buff_targets: Array = []          # support: welke torens hij buft
+# Zolang dit false is vult level.gd de doelen automatisch met de dichtstbijzijnde torens.
+# Reden: de Poster buffte alleen wie je HANDMATIG had aangeklikt, dus wie hem kocht en die
+# tweede, nergens aangekondigde handeling niet deed, kreeg helemaal niets -- terwijl hij
+# per Coffee de sterkste aankoop van het spel is (0,574 DPS/C) en nul keer gekocht werd.
+# Zelfde patroon als target_mode_chosen: automatisch tot de speler zelf kiest.
+var buff_chosen: bool = false
 var max_targets: int = 1
 
 # multishot: aantal doelen per salvo. chain: schot springt door naar volgende vijanden.
@@ -171,7 +177,7 @@ static func defs() -> Dictionary:
 		},
 		"scrum": {
 			"name": "Motivational Poster", "role": "support", "color": Color(0.7, 0.55, 0.85),
-			"desc": "Buffs chosen towers (damage, speed, range).",
+			"desc": "Buffs the nearest towers in range (damage, speed, range). Works the moment you place it; click a tower to choose different ones.",
 			"levels": [
 				{"name": "Hang In There", "flavour": "A cat. A branch. A message.", "cost": 25, "range": 130.0, "buff_dmg": 1.2, "buff_rate": 0.92, "buff_range": 1.03, "targets": 1},
 				{"name": "Framed Print", "flavour": "Now it has a frame. It is serious.", "cost": 28, "range": 140.0, "buff_dmg": 1.45, "buff_rate": 0.84, "buff_range": 1.06, "targets": 2},

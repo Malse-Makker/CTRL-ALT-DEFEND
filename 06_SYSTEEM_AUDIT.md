@@ -32,6 +32,7 @@ niet uit de pas lopen met de code.
 | 2026-08-04 | **Alle vijanden worden mensen (collega's).** Namen nog niet bepaald. Zie §4.6 |
 | 2026-08-04 | **Uitgebracht in v0.79.0:** D1 (start_coffee schalen) en D2 (demping + oplopend salaris) |
 | 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
+| 2026-08-04 | **Uitgebracht in v0.81.0:** B1 (`shield_min_hit`, Old Guard op 10) en A7 (Poster bufft automatisch) |
 
 ---
 
@@ -552,9 +553,9 @@ progressie en instellingen, geen torens of levelstaat.
 - [x] **D1** `start_coffee` schalen  *(v0.79.0)*
 - [x] **Z1** ontgrendelcurve uitsmeren over L4 tot L10  *(v0.80.0)*
 - [x] **D2** demping plus oplopend wave-salaris  *(v0.79.0)*
-- [ ] **B1** `shield_min_hit`
+- [x] **B1** `shield_min_hit`  *(v0.81.0)*
 - [ ] **A8** prijsladder onderkant
-- [ ] **A7** Poster als straalbuff
+- [x] **A7** Poster bufft automatisch  *(v0.81.0)*
 - [ ] **D3** reward normaliseren
 - [ ] **A3** Delegation omdraaien
 - [ ] **C5** L14-sterren, **D5** SELL_RATIO, **Z2** modifiers opschonen
