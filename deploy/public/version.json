@@ -1,16 +1,16 @@
 {
-  "version": "0.83.0",
+  "version": "0.84.0",
   "date": "2026-08-04",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.83.0/CTRL-ALT-DEFEND.exe",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.84.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "fc1dd83069a0578f97d20eabb609c912bd636b088aaac545c38fb74b4e5b4a78",
-  "size": 110078744,
+  "sha256": "dfe3b4e0aa72da334309c4a1cdde7c994d09dc9855956abca308b4d927782fa9",
+  "size": 110081224,
   "changes": [
-    "Coffee rewards now scale with how much enemy you actually had to kill. They used to vary wildly: a Notification paid over three times more per point of health than an Old Guard, so which enemies a level happened to contain mattered more than how well you played. Swarms pay a little less per point, anything that demands a specific tool (shields, immunities, invisibility) pays a little more.",
-    "The Old Guard is the big winner: 11 Coffee instead of 4.5, which finally matches what it costs you to bring the right tower.",
-    "Level 15 is no longer unaffordable at the start. Its second wave used to demand more defence than you could possibly own.",
-    "Three stars now also works on Release Night. That level starts you on 10 Focus, and three stars needed 90% of it, so losing a single point cost you the star. You can now lose up to 3. Normal levels are completely unchanged.",
-    "Tidied up: selling always paid 60% but the number lived in three separate places, and five code comments described features as unfinished that have been done since v0.71."
+    "Towers now have an approach: WRITTEN (Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation) or IN PERSON (Office Artillery, The Shredder, Thumbtacks, Pomodoro Timer, Keyboard Smash). It is shown in the shop and on the tower panel.",
+    "Immunities target the approach instead of one specific tower. The Board Member is never actually in the building, so nothing in-person touches him at all; The Cold Caller does not read email, so nothing written does. Both used to shrug off exactly one tower, which you could ignore by owning almost any other.",
+    "That also closes some holes: Shredder zones, Pomodoro bursts and Keyboard Smash never checked immunity at all, so they quietly hit enemies that were supposed to be immune.",
+    "Hits that bounce off now flash white on the enemy, so \"my tower is firing and nothing is happening\" reads as the wrong weapon rather than a bug.",
+    "Fixed: advice on the results screen ran off the right-hand edge of the screen if it was long. It now wraps."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

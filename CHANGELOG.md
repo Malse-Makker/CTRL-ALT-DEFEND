@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.85.0 — 2026-08-04
+- New enemy: The Steering Committee. "A decision will be made about your decision." It arrives on level 6 behind a heavy shield that light hits bounce off, and when you finally crack it open it releases four Board Members - who are immune to every single tower that could crack a shield.
+- This is deliberate. Up to now level 14 asked for the same defence as level 3, only more of it. From level 6 onwards you need both approaches standing at the same time.
+- It shows up three times on Work From Home and once on the medior finale.
+
 ## v0.84.0 — 2026-08-04
 - Towers now have an approach: WRITTEN (Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation) or IN PERSON (Office Artillery, The Shredder, Thumbtacks, Pomodoro Timer, Keyboard Smash). It is shown in the shop and on the tower panel.
 - Immunities target the approach instead of one specific tower. The Board Member is never actually in the building, so nothing in-person touches him at all; The Cold Caller does not read email, so nothing written does. Both used to shrug off exactly one tower, which you could ignore by owning almost any other.

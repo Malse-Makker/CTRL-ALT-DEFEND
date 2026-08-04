@@ -139,6 +139,16 @@ static func defs() -> Dictionary:
 			"hp": 34.0, "speed": 86.0, "reward": 5.1, "damage": 5, "radius": 16.0, "color": Color(0.45, 0.7, 0.85), "aggro": true},
 		"update": {"name": "System Update", "ability": "Installing... briefly invulnerable while it updates, then keeps coming. Burst it between updates.", "counter": "Burst it between updates - it is invulnerable while installing.",
 			"hp": 30.0, "speed": 70.0, "reward": 4.5, "damage": 5, "radius": 16.0, "color": Color(0.4, 0.6, 0.9), "update_interval": 3.5, "update_dur": 1.5},
+		# --- De klasse-breuk (blok 2, debuut L6 wave 5). Zie 06_SYSTEEM_AUDIT.md §4.2 (B6).
+		# Blok 2 gebruikte exact dezelfde vijandtypes als blok 1, alleen in grotere aantallen, dus
+		# je verdediging van level 3 werkte nog op level 14 -- alleen groter. Dit is het ding dat
+		# die gewoonte breekt: de schil vraagt zware klappen (drempel 10, dezelfde regel als de
+		# Old Guard, dus die les is al geleerd), maar wat eruit komt is juist IMMUUN voor alles
+		# wat in person is. Het antwoord op de buitenkant is het verkeerde gereedschap voor de
+		# binnenkant. HP-equivalent 120 + 4x40 = 280.
+		"steering": {"name": "The Steering Committee", "ability": "A decision will be made about your decision. Heavy shield: light hits bounce off. Breaks open into four Board Members.", "counter": "Artillery cracks it open. Artillery cannot touch what comes out - keep something written ready.",
+			"hp": 40.0, "speed": 40.0, "reward": 18.0, "damage": 20, "radius": 22.0, "color": Color(0.45, 0.48, 0.58),
+			"shield": 80.0, "shield_min_hit": 10.0, "split_count": 4, "split_type": "board"},
 		"boss":  {"name": "The Performance Review", "ability": "3 phases: shield, spawns Feedback, then speeds up and slows your towers. Barely affected by stuns.",
 			"hp": 420.0, "speed": 46.0, "reward": 40.0, "damage": 50, "radius": 30.0, "color": Color(0.8, 0.3, 0.35), "shield": 120.0, "boss": true, "boss_kind": "review", "boss_add": "feedback", "stun_resist": 0.3},
 		# Finale-variant (L15): "360° feedback" — vanaf fase 2 keren eerdere bosses terug als

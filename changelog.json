@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "0.84.0",
+      "date": "2026-08-04",
+      "items": [
+        "Towers now have an approach: WRITTEN (Auto-Reply, Quick Reply, Reply All, Self-Service, Delegation) or IN PERSON (Office Artillery, The Shredder, Thumbtacks, Pomodoro Timer, Keyboard Smash). It is shown in the shop and on the tower panel.",
+        "Immunities target the approach instead of one specific tower. The Board Member is never actually in the building, so nothing in-person touches him at all; The Cold Caller does not read email, so nothing written does. Both used to shrug off exactly one tower, which you could ignore by owning almost any other.",
+        "That also closes some holes: Shredder zones, Pomodoro bursts and Keyboard Smash never checked immunity at all, so they quietly hit enemies that were supposed to be immune.",
+        "Hits that bounce off now flash white on the enemy, so \"my tower is firing and nothing is happening\" reads as the wrong weapon rather than a bug.",
+        "Fixed: advice on the results screen ran off the right-hand edge of the screen if it was long. It now wraps."
+      ]
+    },
+    {
       "version": "0.83.0",
       "date": "2026-08-04",
       "items": [
