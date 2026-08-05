@@ -95,7 +95,20 @@ var splash_falloff: float = 0.6        # omstanders krijgen damage × dit
 # burst (Pomodoro): laadt op (fire_rate = laadtijd) en lost dan één AoE-klap op alles in bereik.
 # forcequit (Ctrl+Alt+Del): laadt op (charge_time) en force-quit dan de sterkste vijand. Eenmalig.
 var charge_time: float = 30.0
-var _spent: bool = false               # Ctrl+Alt+Del: al gebruikt
+var _spent: bool = false
+# burst/mortier: hij mikt op een TEGEL, niet op een vijand. aim_pos is die tegel, blast_radius
+# de klap eromheen, en zicht-muren doen hem niets (je lobt eroverheen).
+var aim_pos: Vector2 = Vector2.ZERO
+var aim_chosen: bool = false
+var blast_radius: float = 60.0
+var ignores_los: bool = false
+var global_range: bool = false
+# Quick Reply: elke treffer op HETZELFDE doel telt op. Wissel je van doel, dan begin je opnieuw.
+var ramps: bool = false
+var _ramp: float = 1.0
+var _ramp_on: Node2D = null
+const RAMP_PER_HIT := 0.06
+const RAMP_MAX := 2.0               # Ctrl+Alt+Del: al gebruikt
 
 # special: gedeelde vlaggen
 var is_special: bool = false
@@ -153,25 +166,32 @@ static func defs() -> Dictionary:
 		},
 		"ceo": {
 			"name": "Office Artillery", "role": "damage", "class": "in_person", "color": Color(0.85, 0.35, 0.35),
-			"desc": "Slow, huge single-target hit. Staples one distraction shut.",
+			"desc": "Reaches the ENTIRE floor - it does not matter where you put it. Slow to reload, one enormous hit.",
+			"global_range": true,
 			"levels": [
-				{"name": "Rubber Band", "flavour": "Ow. That actually stung.", "cost": 25, "range": 220.0, "rate": 2.6, "damage": 15.0},
-				{"name": "Stapler", "flavour": "It\'s a Swingline.", "cost": 28, "range": 228.0, "rate": 2.5, "damage": 35.0},
-				{"name": "Industrial Tacker", "flavour": "That is going in the wall.", "cost": 45, "range": 236.0, "rate": 2.4, "damage": 80.0},
+				# Bereik over de hele verdieping (sniper-archetype). Stond op 220-236, en dat was
+				# alleen "meer dan de rest": een getalsverschil, geen ander werkwoord. Nu is dit de
+				# toren waarbij plaatsing niet uitmaakt, wat hem de enige maakt die je in een hoek
+				# kwijt kunt op krappe maps. Betaald met een tragere herlaadtijd.
+				{"name": "Rubber Band", "flavour": "Ow. That actually stung.", "cost": 25, "range": 9999.0, "rate": 3.2, "damage": 15.0},
+				{"name": "Stapler", "flavour": "It\'s a Swingline.", "cost": 28, "range": 9999.0, "rate": 3.0, "damage": 35.0},
+				{"name": "Industrial Tacker", "flavour": "That is going in the wall.", "cost": 45, "range": 9999.0, "rate": 2.8, "damage": 80.0},
 			],
 		},
 		"phones": {
 			"name": "Headphones", "role": "stun", "color": Color(0.6, 0.75, 0.4),
-			"desc": "Slows one target; the top tier stops it dead.",
+			"desc": "Everyone within range goes quiet at once. The top tier stops them dead.",
 			"levels": [
 				# Ladder: eerst dempen, dan sterker dempen, dan helemaal afsnijden. Alleen
 				# lvl 3 stunt echt — en dat is ook de enige die de Kletskous stilkrijgt.
-				{"name": "Earbuds", "flavour": "Can\'t quite hear you.", "cost": 20, "range": 130.0, "rate": 2.0, "slow": 0.65, "slow_dur": 1.6},
-				{"name": "Over-Ear", "flavour": "Can\'t hear anything.", "cost": 22, "range": 136.0, "rate": 1.8, "slow": 0.45, "slow_dur": 2.2},
+				# Straal in plaats van één doelwit: noise cancelling werkt op de kamer, niet op een
+				# persoon. Betaald met een langere cooldown en een kortere stun.
+				{"name": "Earbuds", "flavour": "Can\'t quite hear you.", "cost": 20, "range": 120.0, "rate": 3.0, "slow": 0.65, "slow_dur": 1.6},
+				{"name": "Over-Ear", "flavour": "Can\'t hear anything.", "cost": 22, "range": 128.0, "rate": 2.7, "slow": 0.45, "slow_dur": 2.2},
 				# Stun én vertraging: de stun verzwakt bij herhaald gebruik op hetzelfde
 				# doel (STUN_FALLOFF), dus zonder de slow erbij zou lvl 3 een doelwit
 				# minder ophouden dan lvl 2 — en dat mag nooit.
-				{"name": "Noise Cancelling", "flavour": "Blissful silence.", "cost": 35, "range": 142.0, "rate": 1.6, "stun": 3.2, "slow": 0.40, "slow_dur": 3.0},
+				{"name": "Noise Cancelling", "flavour": "Blissful silence.", "cost": 35, "range": 136.0, "rate": 2.4, "stun": 2.0, "slow": 0.40, "slow_dur": 3.0},
 			],
 		},
 		"filter": {
@@ -227,7 +247,8 @@ static func defs() -> Dictionary:
 		},
 		"machinegun": {
 			"name": "Quick Reply", "role": "damage", "class": "written", "color": Color(0.55, 0.60, 0.68),
-			"desc": "Fast, tiny replies. Shorter and faster each level. Chews through weak swarms, but the hits are far too light to dent a shield.",
+			"desc": "Every reply on the SAME target hits harder than the last, up to double. Switch target and it starts over. Hopeless against a swarm, relentless against one big problem.",
+			"ramp": true,
 			"levels": [
 				{"name": "\"Got it\"", "flavour": "Two words. Efficient.", "cost": 16, "range": 115.0, "rate": 0.13, "damage": 0.5},
 				{"name": "\"OK\"", "flavour": "Down to two letters.", "cost": 20, "range": 120.0, "rate": 0.10, "damage": 0.9},
@@ -236,22 +257,29 @@ static func defs() -> Dictionary:
 		},
 		"multishot": {
 			"name": "Self-Service", "role": "multi", "class": "written", "color": Color(0.90, 0.55, 0.25),
-			"desc": "Deflects several distractions at once. Great vs crowds.",
+			"desc": "Fires in EVERY direction at once and hits everything around it, however many there are. Short reach, so where you put it is the whole game: a corner the path wraps around is worth three straight ones.",
 			"levels": [
-				# shots = aantal doelen per salvo (2 → 5 → 8). Slecht tegen één sterk doel.
-				{"name": "Send the FAQ", "flavour": "It\'s all in there. Probably.", "cost": 25, "range": 125.0, "rate": 0.9, "damage": 1.5, "shots": 2},
-				{"name": "Send the Wiki", "flavour": "Fourth link, third heading.", "cost": 28, "range": 132.0, "rate": 0.8, "damage": 2.5, "shots": 5},
-				{"name": "Send to Service Desk", "flavour": "They\'ll get back to you. Eventually.", "cost": 45, "range": 140.0, "rate": 0.7, "damage": 4.0, "shots": 8},
+				# Tack-shooter-archetype: geen doelwit en geen limiet op het aantal, maar een kórt
+				# bereik. Was "tot 8 doelen binnen 140", en dat is hetzelfde werkwoord als Delegation
+				# en Reply All met een ander getal. Nu bepaalt de PLEK zijn waarde: op een bocht
+				# waar het pad twee keer langs hem loopt is hij dubbel zo goed, op een recht stuk
+				# half zo goed. shots staat hoog genoeg om nooit te knijpen.
+				{"name": "Send the FAQ", "flavour": "It\'s all in there. Probably.", "cost": 25, "range": 95.0, "rate": 0.9, "damage": 1.5, "shots": 99},
+				{"name": "Send the Wiki", "flavour": "Fourth link, third heading.", "cost": 28, "range": 102.0, "rate": 0.8, "damage": 2.5, "shots": 99},
+				{"name": "Send to Service Desk", "flavour": "They\'ll get back to you. Eventually.", "cost": 45, "range": 110.0, "rate": 0.7, "damage": 4.0, "shots": 99},
 			],
 		},
 		"pomodoro": {
 			"name": "Pomodoro Timer", "role": "burst", "class": "in_person", "color": Color(0.9, 0.35, 0.3),
-			"desc": "Charges up, then unleashes one big AoE burst on everything in range.",
+			"desc": "You pick a tile on the path and it hammers THAT tile, over and over, straight through walls. Click it to aim somewhere else.",
+			"ignores_los": true, "aims_at_tile": true,
 			"levels": [
-				# rate = laadtijd (sec); damage = burst-klap op iedereen in bereik. Loont een druk pad.
-				{"name": "Pomodoro Timer", "flavour": "25 minutes. Go.", "cost": 26, "range": 130.0, "rate": 4.0, "damage": 6.0},
-				{"name": "Focus Sprint", "flavour": "Do not disturb.", "cost": 28, "range": 138.0, "rate": 3.5, "damage": 12.0},
-				{"name": "Deep Work", "flavour": "In the zone.", "cost": 45, "range": 145.0, "rate": 3.0, "damage": 22.0},
+				# Mortier-archetype: hij mikt op een PLEK en niet op een vijand, en zicht-muren doen
+				# hem niets. Was "AoE op alles in bereik", en dat is hetzelfde werkwoord als Reply All
+				# bij exact dezelfde prijs. Nu is range hoe VER hij kan lobben en blast de klap zelf.
+				{"name": "Pomodoro Timer", "flavour": "25 minutes. Go.", "cost": 26, "range": 200.0, "rate": 4.0, "damage": 6.0, "blast": 58.0},
+				{"name": "Focus Sprint", "flavour": "Do not disturb.", "cost": 28, "range": 220.0, "rate": 3.5, "damage": 12.0, "blast": 66.0},
+				{"name": "Deep Work", "flavour": "In the zone.", "cost": 45, "range": 240.0, "rate": 3.0, "damage": 22.0, "blast": 74.0},
 			],
 		},
 		"splash": {
@@ -344,6 +372,10 @@ func configure(id: String, lvl: int) -> void:
 	splash_radius = float(s.get("splash_radius", 0.0))
 	splash_falloff = float(s.get("splash_falloff", 0.6))
 	charge_time = float(s.get("charge", 30.0))
+	blast_radius = float(s.get("blast", 60.0))
+	ignores_los = bool(d.get("ignores_los", false))
+	global_range = bool(d.get("global_range", false))
+	ramps = bool(d.get("ramp", false))
 	# Burst laadt op via fire_rate, force-quit via charge_time; bij plaatsing eerst vol laten laden.
 	if role == "burst" and _cooldown <= 0.0:
 		_cooldown = fire_rate
@@ -356,6 +388,8 @@ func configure(id: String, lvl: int) -> void:
 	barrier_duration = float(s.get("barrier", 2.5))
 	if role == "smash":
 		_smash_cd = smash_cooldown
+	if role == "burst" and not aim_chosen:
+		aim_pos = _tile(_closest_path_point())
 	if role == "trap":
 		# trap_pos is de doeltegel voor lvl 3 (default = dichtstbijzijnde pad-punt tot je kiest).
 		# Alleen zetten zolang de speler niet zelf koos — configure() draait ook bij elke upgrade.
@@ -414,6 +448,15 @@ func _random_path_point_in_range() -> Vector2:
 	return cands[randi() % cands.size()]
 
 # Zet de doeltegel (lvl 3) op een door de speler gekozen punt, begrensd tot binnen bereik.
+func set_aim_spot(p: Vector2) -> bool:
+	# Mortier opnieuw richten. Binnen loop-afstand (range_radius) van de toren zelf.
+	if position.distance_to(p) > range_radius * buff_range_mult:
+		return false
+	aim_pos = _tile(p)
+	aim_chosen = true
+	queue_redraw()
+	return true
+
 func set_trap_spot(p: Vector2) -> bool:
 	if position.distance_to(p) > range_radius * buff_range_mult:
 		return false
@@ -466,7 +509,7 @@ func _apply_side() -> void:
 				if side_step >= 2:
 					buff_rate *= 0.92
 			"stun":
-				max_targets += 1
+				range_radius *= 1.20      # grotere stille zone (was "+1 doel", zinloos bij een straal)
 				if side_step >= 2:
 					stun_dur *= 1.25
 					cc_slow_dur *= 1.25
@@ -484,6 +527,10 @@ func _apply_side() -> void:
 					damage *= 1.25
 			"trap":
 				throw_interval *= 0.75
+				if side_step >= 2:
+					damage *= 1.25
+			"multi":
+				range_radius *= 1.15      # grotere ring (het aantal doelen was al onbeperkt)
 				if side_step >= 2:
 					damage *= 1.25
 			_:
@@ -617,17 +664,16 @@ func _process(delta: float) -> void:
 				if _cooldown <= 0.0:
 					var t := _find_target()
 					if t != null:
-						# max_targets > 1 komt van het Escalation-zijpad: meerdere tegelijk stil.
+						# Noise cancelling werkt op de KAMER, niet op één persoon: alles binnen
+						# bereik gaat tegelijk stil. Was single-target, en dat las als een zwakke
+						# schadetoren in plaats van als crowd control.
 						var picks: Array = [t]
-						if max_targets > 1:
-							for e in _valid_targets():
-								if picks.size() >= max_targets:
-									break
-								if e == t:
-									continue
-								if e.cc_immune_below > 0 and level < e.cc_immune_below:
-									continue
-								picks.append(e)
+						for e in _valid_targets():
+							if e == t:
+								continue
+							if e.cc_immune_below > 0 and level < e.cc_immune_below:
+								continue
+							picks.append(e)
 						for pk in picks:
 							if stun_dur > 0.0:
 								pk.call("apply_stun", stun_dur, level)
@@ -659,18 +705,19 @@ func _process(delta: float) -> void:
 					if _chain_fire():
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
 		"burst":
-			# Pomodoro: laadt op (fire_rate = laadtijd), lost dan één AoE-klap op alles in bereik.
+			# Mortier: laadt op (fire_rate = laadtijd) en slaat dan op de GEKOZEN TEGEL, niet op
+			# wie er toevallig in bereik van de toren staat. Muren doen niet mee (ignores_los).
 			if not silenced:
 				_cooldown -= delta
 				if _cooldown <= 0.0:
-					var r: float = range_radius * buff_range_mult
+					var r: float = blast_radius
 					var first: Node2D = null
 					var hit_any := false
 					if get_enemies.is_valid():
 						for e in get_enemies.call().duplicate():
 							if not is_instance_valid(e):
 								continue
-							if position.distance_to(e.position) <= r and _los_clear(e.position):
+							if aim_pos.distance_to(e.position) <= r:
 								e.call("take_damage", damage * buff_dmg_mult, damage_class)
 								if on_damage.is_valid():
 									on_damage.call(def_id, damage * buff_dmg_mult)
@@ -678,10 +725,9 @@ func _process(delta: float) -> void:
 									first = e
 								hit_any = true
 					_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
-					if hit_any:
-						_shot_time = 0.15
-						if on_fire.is_valid() and first != null:
-							on_fire.call(position, first.position, def_id, role)
+					_shot_time = 0.15
+					if on_fire.is_valid():
+						on_fire.call(position, aim_pos, def_id, role)
 					queue_redraw()
 		"splash":
 			# Reply All: raakt één doel + splash-schade rondom dat doel (beweegt mee met het doel).
@@ -730,9 +776,19 @@ func _process(delta: float) -> void:
 				if _cooldown <= 0.0:
 					var t := _find_target()
 					if t != null:
-						t.call("take_damage", damage * buff_dmg_mult, damage_class)
+						# Quick Reply bouwt op zolang hij op HETZELFDE doel blijft. Tegen een zwerm
+						# wisselt hij doorlopend en komt hij nooit op gang; tegen een tank of boss
+						# loopt hij in ongeveer een seconde naar het dubbele.
+						if ramps:
+							if t == _ramp_on:
+								_ramp = minf(RAMP_MAX, _ramp + RAMP_PER_HIT)
+							else:
+								_ramp = 1.0
+								_ramp_on = t
+						var dmg_out: float = damage * buff_dmg_mult * _ramp
+						t.call("take_damage", dmg_out, damage_class)
 						if on_damage.is_valid():
-							on_damage.call(def_id, damage * buff_dmg_mult)
+							on_damage.call(def_id, dmg_out)
 						# multi_shots > 1 komt van het Escalation-zijpad: hetzelfde salvo
 						# raakt er nog een paar. Een gewone damage-toren heeft er 1.
 						if multi_shots > 1:
@@ -742,9 +798,9 @@ func _process(delta: float) -> void:
 									break
 								if e == t:
 									continue
-								e.call("take_damage", damage * buff_dmg_mult, damage_class)
+								e.call("take_damage", dmg_out, damage_class)
 								if on_damage.is_valid():
-									on_damage.call(def_id, damage * buff_dmg_mult)
+									on_damage.call(def_id, dmg_out)
 								extra += 1
 						_cooldown = fire_rate * buff_rate_mult * disrupt_rate_mult
 						_flash(t)
@@ -822,6 +878,8 @@ func _valid_targets() -> Array:
 
 func _los_clear(target: Vector2) -> bool:
 	# Vals als er een zicht-muur tussen de toren en het doel zit (line-of-sight geblokkeerd).
+	if ignores_los:
+		return true      # mortier: je lobt eroverheen
 	if not get_walls.is_valid():
 		return true
 	for w in get_walls.call():
@@ -909,7 +967,21 @@ func _draw() -> void:
 		draw_arc(Vector2.ZERO, range_radius * buff_range_mult, 0.0, TAU, 48, Color(col.r, col.g, col.b, 0.5), 1.5)
 	elif role == "support":
 		draw_arc(Vector2.ZERO, range_radius, 0.0, TAU, 48, Color(col.r, col.g, col.b, 0.25), 1.5)
-	elif role == "damage" or role == "stun" or role == "multi" or role == "chain" or role == "burst" or role == "splash":
+	elif role == "burst":
+		# Loop-afstand licht, en de inslagtegel met zijn klap-straal duidelijk: dáár gebeurt het.
+		draw_arc(Vector2.ZERO, range_radius * buff_range_mult, 0.0, TAU, 40, Color(1, 1, 1, 0.05), 1.0)
+		var a: Vector2 = aim_pos - position
+		draw_line(Vector2.ZERO, a, Color(col.r, col.g, col.b, 0.25), 1.0)
+		draw_circle(a, blast_radius, Color(col.r, col.g, col.b, 0.13))
+		draw_arc(a, blast_radius, 0.0, TAU, 32, Color(col.r, col.g, col.b, 0.6), 1.5)
+		var pulse: float = 1.0 - clampf(_cooldown / maxf(fire_rate, 0.01), 0.0, 1.0)
+		draw_arc(a, blast_radius * pulse, 0.0, TAU, 24, Color(col.r, col.g, col.b, 0.35), 2.0)
+	elif global_range:
+		# Bereik is de hele verdieping: een cirkel tekenen heeft geen zin. Een klein baken
+		# maakt duidelijk dat plaatsing er bij deze toren niet toe doet.
+		draw_arc(Vector2.ZERO, 20.0, 0.0, TAU, 24, Color(col.r, col.g, col.b, 0.35), 1.0)
+		draw_arc(Vector2.ZERO, 26.0, 0.0, TAU, 28, Color(col.r, col.g, col.b, 0.18), 1.0)
+	elif role == "damage" or role == "stun" or role == "multi" or role == "chain" or role == "splash":
 		draw_arc(Vector2.ZERO, range_radius * buff_range_mult, 0.0, TAU, 48, Color(1, 1, 1, 0.06), 1.0)
 	if not use_sprite:
 		draw_circle(Vector2.ZERO, 17.0, col)

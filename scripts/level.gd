@@ -133,6 +133,7 @@ var hover_pos: Vector2 = Vector2(-999, -999)
 var _arrows_were_on: bool = false    # richting-pijltjes stonden vorig frame aan (om ze schoon te wissen)
 var scrum_selecting: Node2D = null
 var trap_selecting: Node2D = null    # lvl-3 trap-tower waarvan je de val-plek kiest
+var aim_selecting: Node2D = null     # mortier waarvan je de inslagtegel verlegt
 var hazard_type: String = ""
 var hazard_active: bool = false
 var building_blocked: bool = false
@@ -371,6 +372,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var raw: Vector2 = get_global_mouse_position()
 		# lvl-3 trap: klik op het pad verlegt de val. Klik op een tower valt hieronder door.
+		if aim_selecting != null and is_instance_valid(aim_selecting):
+			var on_t := false
+			for t in towers:
+				if raw.distance_to(t.position) <= 22.0:
+					on_t = true
+					break
+			if not on_t and raw.x < SCREEN_W - SHOP_W:
+				if aim_selecting.set_aim_spot(raw):
+					_flash_msg("Now hammering that tile.")
+				else:
+					_flash_msg("Too far to lob it there.")
+				return
 		if trap_selecting != null and is_instance_valid(trap_selecting):
 			var on_tower := false
 			for t in towers:
@@ -556,6 +569,8 @@ func _dist_point_segment(p: Vector2, a: Vector2, b: Vector2) -> float:
 func _placement_max_dist(id: String) -> float:
 	var d: Dictionary = TowerScript.defs()[id]
 	var r: String = String(d["role"])
+	if r == "burst":
+		return float(d["levels"][0].get("range", 200.0)) - 20.0   # mortier: binnen loop-afstand
 	if r == "damage" or r == "stun" or r == "area" or r == "trap" or r == "multi" or r == "chain":
 		# trap moet binnen bereik van het pad staan, zodat de auto-plek gegarandeerd raakt.
 		return float(d["levels"][0].get("range", 130.0)) - 8.0
@@ -563,6 +578,9 @@ func _placement_max_dist(id: String) -> float:
 
 func _selected_range() -> float:
 	if selected_def_id == "":
+		return 0.0
+	# Sniper: bereik is de hele verdieping, dus een cirkel zegt niets en zou het scherm vullen.
+	if bool(TowerScript.defs()[selected_def_id].get("global_range", false)):
 		return 0.0
 	return float(TowerScript.defs()[selected_def_id]["levels"][0].get("range", 0.0))
 
@@ -639,6 +657,9 @@ func _tower_summary(id: String, lvl: int) -> String:
 		"smash":
 			return "\n%.0f AoE damage, then blocks the path %.1fs (every %.0fs)" % [
 				float(s.get("smash_damage", 0.0)), float(s.get("barrier", 0.0)), float(s.get("smash_cooldown", 0.0))]
+		"burst":
+			return "\n%.0f dmg on the tile you aim at, every %.1fs (blast %.0f, ignores walls)" % [
+				float(s.get("damage", 0.0)), float(s.get("rate", 1.0)), float(s.get("blast", 60.0))]
 		_:
 			var dps: float = float(s.get("damage", 0.0)) / maxf(float(s.get("rate", 1.0)), 0.01)
 			return "\n%.1f damage/s (%.0f per shot)" % [dps, float(s.get("damage", 0.0))]
@@ -833,6 +854,9 @@ func _open_upgrade(t: Node2D) -> void:
 	else:
 		scrum_selecting = null
 		upg_scrum.visible = false
+	aim_selecting = t if t.role == "burst" else null
+	if t.role == "burst":
+		_flash_msg("Click anywhere in range to move where it lands.")
 	# lvl-3 trap: laat de speler de val-plek verleggen door op het pad te klikken.
 	if t.role == "trap" and t.pick_spot:
 		trap_selecting = t
@@ -872,6 +896,7 @@ func _close_upgrade() -> void:
 	selected_tower = null
 	scrum_selecting = null
 	trap_selecting = null
+	aim_selecting = null
 	panel.visible = false
 
 func _refresh_scrum_label() -> void:
@@ -945,8 +970,11 @@ func _tower_stats_text(t: Node2D) -> String:
 			return "Buff +%d%% dmg, faster, more range\nUp to %d towers%s" % [
 				int(round((t.buff_dmg - 1.0) * 100.0)), int(t.max_targets), invested]
 		"multi":
-			return "%.0f dmg to %d targets, every %.2fs\nRange %d%s" % [
-				t.damage, int(t.multi_shots), t.fire_rate, int(t.range_radius), invested]
+			return "%.1f dmg to EVERYTHING around it, every %.2fs\nRing radius %d  -  put it where the path bends%s" % [
+				t.damage, t.fire_rate, int(t.range_radius), invested]
+		"burst":
+			return "%.0f dmg to everything on the target tile, every %.1fs\nBlast %d  -  lobs up to %d, straight through walls%s" % [
+				t.damage, t.fire_rate, int(t.blast_radius), int(t.range_radius), invested]
 		"chain":
 			return "%.0f dmg, jumps to %d more (x%d%% each)\nRange %d%s" % [
 				t.damage, int(t.chain_jumps), int(t.chain_falloff * 100.0),
@@ -960,6 +988,14 @@ func _tower_stats_text(t: Node2D) -> String:
 				t.smash_damage, t.barrier_duration, t.smash_cooldown, int(t.range_radius), invested]
 		_:
 			var dps: float = float(t.damage) / maxf(t.fire_rate, 0.01)
+			if t.global_range:
+				return "%.1f damage/s  (%d per shot, every %.2fs)\nReaches the WHOLE floor  -  %.3f DPS per Coffee%s" % [
+					t.damage / maxf(t.fire_rate, 0.01), int(t.damage), t.fire_rate,
+					(t.damage / maxf(t.fire_rate, 0.01)) / maxf(float(t.invested), 1.0), invested]
+			if t.ramps:
+				return "%.1f damage/s, up to %.1f on a held target\nRange %d  -  every reply on the same one hits harder%s" % [
+					t.damage / maxf(t.fire_rate, 0.01), t.damage * 2.0 / maxf(t.fire_rate, 0.01),
+					int(t.range_radius), invested]
 			return "%.1f damage/s  (%d per shot, every %.2fs)\nRange %d  -  %.3f DPS per Coffee%s" % [
 				dps, int(t.damage), t.fire_rate, int(t.range_radius),
 				dps / maxf(float(t.invested), 1.0), invested]

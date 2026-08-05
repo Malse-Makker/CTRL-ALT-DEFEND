@@ -34,6 +34,8 @@ niet uit de pas lopen met de code.
 | 2026-08-04 | **Uitgebracht in v0.80.0:** Z1, een toren per level tot en met L10 (volgorde in `TOWERS_PER_LEVEL`) |
 | 2026-08-04 | **Uitgebracht in v0.81.0:** B1 (`shield_min_hit`, Old Guard op 10) en A7 (Poster bufft automatisch) |
 | 2026-08-04 | **Uitgebracht in v0.82.0:** A3 (Delegation escaleert) en A8 (prijsladder: auto 14/dmg 1,4, Quick Reply 16) |
+| 2026-08-05 | **Speeltest-feedback:** torens voelen hetzelfde, onduidelijk wat er gebeurt, te weinig te doen. NIET te moeilijk |
+| 2026-08-05 | **Uitgebracht in v0.87.0:** vijf torens een eigen werkwoord (Artillery globaal bereik, Pomodoro mortier, Self-Service ring, Headphones straal, Quick Reply opbouwend) |
 | 2026-08-04 | **Uitgebracht in v0.86.0:** A1, zijpaden OVERTIME/ESCALATION op 11 torens |
 | 2026-08-04 | **Uitgebracht in v0.85.0:** B6, The Steering Committee op L6 (waves 5, 10, 13) en L10 (wave 11) |
 | 2026-08-04 | **Uitgebracht in v0.84.0:** B3, maar met TWEE klassen (written / in_person) van elk vijf torens in plaats van drie: Headphones en Motivational Poster doen nul schade, dus een derde klasse zou er een van één toren zijn geworden |
@@ -519,6 +521,40 @@ er nog uit als een stapel papier.
 3. **The Subscription Renewal (E1).** Maakt lekken duur op het moment dat je investeert.
 
 ---
+
+## 4bis. Elke toren een eigen werkwoord (speeltest 2026-08-05)
+
+De audit keek naar getallen (damage/pierce/rate). De speeltest wees op iets anders: bijna elke
+toren doet hetzelfde WERKWOORD, namelijk "richt op een vijand in bereik en doe schade". De
+verschillen zaten in hoe vaak en hoe hard. Diepte in BTD6 komt juist uit verschillende
+werkwoorden: de mortier mikt op een plek, de spike factory legt munitie klaar, de sniper negeert
+afstand, het dorp raakt geen enkele vijand.
+
+**Gedaan in v0.87.0:**
+
+| Toren | Nieuw werkwoord | Archetype |
+|---|---|---|
+| Office Artillery | bereik over de hele verdieping, plaatsing doet er niet toe | Sniper |
+| Pomodoro Timer | mikt op een TEGEL, negeert zicht-muren, speler richt | Mortar |
+| Self-Service | raakt alles in een kleine ring om zich heen, onbeperkt aantal | Tack Shooter |
+| Headphones | legt een hele straal tegelijk stil | Ice Monkey |
+| Quick Reply | bouwt op zolang hij hetzelfde doel vasthoudt (tot x2) | ramping DPS |
+
+**Nog open uit deze richting:**
+
+| Toren / gat | Voorstel | Werk |
+|---|---|---|
+| The Shredder | schade blijft PLAKKEN: wie de zone verlaat bloedt door | 2 uur |
+| Thumbtacks | punaises negeren zicht + raken meerdere vijanden (C1/A4) | 2 uur |
+| Motivational Poster | level 3 geeft ook KORTING op torens in de straal (Village) | 1 uur |
+| Keyboard Smash | schade eruit, blokkade langer: hij is een slagboom | 1 uur |
+| Detectie-verlener | **The Whiteboard**: onthult onzichtbaren in een straal. `sees_hidden` is al geprogrammeerd en wordt door niets gebruikt | 2 uur |
+| Engineer-archetype | **The Intern**: zet zelf tijdelijke mini-torens neer | 1 dag |
+| Pad-onafhankelijk | **The Robot Vacuum**: rijdt zijn eigen route | 1 dag |
+
+**Nog niet aangepakt uit de speeltest:** "onduidelijk wat er gebeurt" (leesbaarheid: waarom
+landt schade niet, wat weert deze vijand af) en "te weinig te doen" (abilities; A2 Ctrl+Alt+Del
+als knop staat nog open).
 
 ## 5. Prioriteitenlijst
 

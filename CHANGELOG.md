@@ -13,6 +13,14 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.87.0 — 2026-08-05
+Five towers stopped being "the same tower with different numbers" and got their own verb.
+- **Office Artillery reaches the entire floor.** Where you put it no longer matters at all, only how slowly it reloads. Put it in the corner nobody else wants.
+- **Pomodoro Timer is now a mortar.** You pick a tile and it hammers that tile, over and over, straight through walls. Click it to aim somewhere else. It is the only tower that works behind a sight-blocking wall.
+- **Self-Service fires in every direction at once** and hits everything around it, however many there are, but its reach is short. A corner that the path wraps around is worth three straight ones.
+- **Headphones silence a whole radius** instead of one target. Noise cancelling works on the room, not on a person. Longer cooldown to pay for it.
+- **Quick Reply builds up.** Every reply on the same target hits harder than the last, up to double, and switching target starts it over. Hopeless against a swarm, relentless against one big problem.
+
 ## v0.86.0 — 2026-08-04
 - Every tower now has two side tracks on top of its normal 1-2-3 upgrades, and you may only go down one of them. OVERTIME ("just one more thing before I log off") makes it fire faster and then reach further. ESCALATION ("I'm going to have to loop in a few more people") makes it hit an extra target and then hit harder.
 - Buying the first step of one track locks the other on that tower forever, so two Auto-Replies on the same floor can now be completely different towers. There is a small coloured marker under each tower showing which way it went.
