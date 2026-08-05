@@ -1,16 +1,16 @@
 {
-  "version": "0.86.0",
-  "date": "2026-08-04",
-  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.86.0/CTRL-ALT-DEFEND.exe",
+  "version": "0.87.0",
+  "date": "2026-08-05",
+  "exe_url": "https://github.com/Malse-Makker/CTRL-ALT-DEFEND/releases/download/v0.87.0/CTRL-ALT-DEFEND.exe",
   "exe": "CTRL-ALT-DEFEND.exe",
-  "sha256": "97ddb84ce79c5fcccee507a8e7ed0f11fbd5a6057037948935d3bdb8db14fea2",
-  "size": 110101016,
+  "sha256": "cd647c6e8aa5c78c8ca250dbf6decc978747d4c52ddf45aab3bd311e65e8e223",
+  "size": 110105832,
   "changes": [
-    "Every tower now has two side tracks on top of its normal 1-2-3 upgrades, and you may only go down one of them. OVERTIME (\"just one more thing before I log off\") makes it fire faster and then reach further. ESCALATION (\"I'm going to have to loop in a few more people\") makes it hit an extra target and then hit harder.",
-    "Buying the first step of one track locks the other on that tower forever, so two Auto-Replies on the same floor can now be completely different towers. There is a small coloured marker under each tower showing which way it went.",
-    "Side steps are cheap on purpose: half the tower's starting price for the first, the full price for the second. Auto-Reply is 7 and 14. This is where your spare change goes when you have 14 Coffee and nothing to buy.",
-    "To give a sense of it: a maxed Auto-Reply does 12.5 damage per second. With Overtime it does 15.6 and reaches 180 instead of 150. With Escalation it does 15.6 against one target but 31.2 against a crowd. Same price, completely different answer depending on the floor.",
-    "Coffee Machine, Keyboard Smash and Ctrl+Alt+Del have no side tracks."
+    "**Office Artillery reaches the entire floor.** Where you put it no longer matters at all, only how slowly it reloads. Put it in the corner nobody else wants.",
+    "**Pomodoro Timer is now a mortar.** You pick a tile and it hammers that tile, over and over, straight through walls. Click it to aim somewhere else. It is the only tower that works behind a sight-blocking wall.",
+    "**Self-Service fires in every direction at once** and hits everything around it, however many there are, but its reach is short. A corner that the path wraps around is worth three straight ones.",
+    "**Headphones silence a whole radius** instead of one target. Noise cancelling works on the room, not on a person. Longer cooldown to pay for it.",
+    "**Quick Reply builds up.** Every reply on the same target hits harder than the last, up to double, and switching target starts it over. Hopeless against a swarm, relentless against one big problem."
   ],
   "changelog_url": "https://game.makkers.net/changelog.html"
 }

@@ -75,6 +75,7 @@ const EARLY_POINTS_MAX := 40      # cap per wave: zonder cap was alles direct op
 const EnemyScript = preload("res://scripts/enemy.gd")
 const TowerScript = preload("res://scripts/tower.gd")
 const Playtest = preload("res://scripts/playtest.gd")
+const FeedbackSend = preload("res://scripts/feedback_send.gd")
 const Sfx = preload("res://scripts/sfx.gd")
 const FxLayer = preload("res://scripts/fx_layer.gd")
 
@@ -196,6 +197,7 @@ var overlay: Control
 var overlay_label: Label
 var overlay_stats: Label
 var overlay_buttons: HBoxContainer
+var overlay_body: VBoxContainer
 var confirm: Control
 var pause_menu: Control
 var panel: PanelContainer
@@ -2143,10 +2145,11 @@ func _show_overlay(text: String, tint: Color, _won: bool, detail: String = "") -
 		var nxt: int = level_id + 1
 		overlay_buttons.add_child(_button("Next Level", func(): retry.emit(nxt), 120, 36))
 	overlay_buttons.add_child(_button("Level Select", func(): finished.emit(), 130, 36))
-	# Knoppen onder de tekst schuiven: het "wat deed je pijn"-overzicht is langer dan de oude
-	# vaste plek toeliet, en dan stonden Retry/Level Select dwars over de adviezen heen.
-	var lines_n: int = overlay_stats.text.count("\n") + 1
-	overlay_buttons.position.y = 118.0 + float(lines_n) * 20.0 + 16.0
+	# De scroller regelt de hoogte; niets meer handmatig positioneren. Wel een eerdere
+	# feedbackbox opruimen, anders staan er twee als dit scherm nog eens getoond wordt.
+	for c in overlay_body.get_children():
+		if c != overlay_stats and c != overlay_buttons:
+			c.queue_free()
 	if Playtest.ENABLED:
 		_build_feedback(_won)
 
@@ -2214,13 +2217,8 @@ func _build_feedback(won: bool) -> void:
 	# Verschijnt na elke ronde in playtest-builds. Overslaan mag: liever een ronde
 	# zonder oordeel dan een tester die afhaakt op een verplicht formulier.
 	var box := VBoxContainer.new()
-	# Onder de knoppen beginnen, niet op een vaste hoogte: bij een lang "wat deed je pijn"-
-	# overzicht schuiven die knoppen naar beneden en stond het formulier er anders dwars doorheen.
-	box.position = Vector2(SCREEN_W / 2.0 - 210,
-		maxf(SCREEN_H / 2.0 + 84, overlay_buttons.position.y + 46.0))
-	box.custom_minimum_size = Vector2(420, 0)
 	box.add_theme_constant_override("separation", 4)
-	overlay.add_child(box)
+	overlay_body.add_child(box)
 
 	var q := Label.new()
 	q.text = "How much FUN was this level?   0 = no fun, barely playable   -   10 = loved it"
@@ -2253,6 +2251,7 @@ func _build_feedback(won: bool) -> void:
 	var note := LineEdit.new()
 	note.placeholder_text = "Anything you want to add? (optional)"
 	note.custom_minimum_size = Vector2(420, 28)
+	note.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	note.add_theme_font_size_override("font_size", 12)
 	box.add_child(note)
 
@@ -2262,22 +2261,66 @@ func _build_feedback(won: bool) -> void:
 	status.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
 	box.add_child(status)
 
-	var send := _button("Save feedback", func():
+	# Kan deze build rechtstreeks versturen? Dan hoeft de tester niet meer via het hoofdmenu
+	# naar de feedbackpagina om op SEND te drukken -- dat deed vrijwel niemand.
+	var can_send: bool = FeedbackSend.send_available()
+	var send := _button("Send feedback" if can_send else "Save feedback", func():
 		if chosen["v"] < 0:
 			status.add_theme_color_override("font_color", Color(1.0, 0.7, 0.4))
 			status.text = "Pick a number from 0 to 10 first."
 			return
 		_save_run(won, int(chosen["v"]), note.text)
-		status.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
-		status.text = "Saved. Thanks! (%d runs logged)" % Playtest.run_count()
 		note.editable = false
 		for b2 in buttons:
 			(b2 as Button).disabled = true
-		, 160, 30)
+		if not can_send:
+			status.add_theme_color_override("font_color", Color(0.55, 0.9, 0.6))
+			status.text = "Saved. Thanks! (%d runs logged)" % Playtest.run_count()
+			return
+		status.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
+		status.text = "Sending..."
+		var sender = FeedbackSend.new()
+		add_child(sender)
+		sender.done.connect(func(ok: bool, msg: String):
+			if is_instance_valid(status):
+				status.add_theme_color_override("font_color",
+					Color(0.55, 0.9, 0.6) if ok else Color(1.0, 0.7, 0.4))
+				# Mislukt versturen is geen ramp: het staat lokaal opgeslagen en gaat
+				# alsnog mee via de feedbackpagina in het hoofdmenu.
+				status.text = ("Sent. Thanks!" if ok else msg + "  (saved locally anyway)")
+			sender.queue_free())
+		sender.send(_round_report(won, int(chosen["v"]), note.text),
+			Playtest.player_id(), Playtest.version())
+		, 170, 30)
 	var send_row := HBoxContainer.new()
 	send_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	send_row.add_child(send)
 	box.add_child(send_row)
+
+func _round_report(won: bool, fun: int, comment: String) -> String:
+	# Alleen DEZE ronde, niet de hele geschiedenis: dit gaat direct na afloop de deur uit.
+	var dur: float = float(Time.get_ticks_msec() - int(_stats["t0"])) / 1000.0
+	var lines: Array = [
+		"CTRL-ALT-DEFEND playtest - single round",
+		"version %s   player %s   %s" % [Playtest.version(), Playtest.player_id(),
+			Time.get_datetime_string_from_system()],
+		"",
+		"%s - %s, wave %d/%d, %d Focus left of %d, %.0f seconds" % [
+			level_name, "WON" if won else "LOST", wave_index, total_waves, focus, start_focus, dur],
+		"fun %d/10" % fun,
+		"comment: " + (comment if comment.strip_edges() != "" else "(none)"),
+		"",
+		_run_summary(),
+		"",
+		"built: " + str(_stats["built"]),
+		"upgraded: " + str(_stats["upgraded"]),
+		"leaks: " + str(_stats["leaks"]),
+		"kills: " + str(_stats["kills"]),
+		"coffee earned %d, spent %d, sold %d, early calls %d, max speed %.0fx" % [
+			int(float(_stats["coffee_earned"])), int(_stats["coffee_spent"]),
+			int(_stats["sold"]), int(_stats["early_calls"]), float(_stats["max_speed"])],
+	]
+	return "\n".join(lines)
 
 func _save_run(won: bool, fun: int, comment: String) -> void:
 	var dur: float = float(Time.get_ticks_msec() - int(_stats["t0"])) / 1000.0
@@ -3033,17 +3076,28 @@ func _build_overlay(canvas: CanvasLayer) -> void:
 	overlay_label.size = Vector2(500, 90)
 	overlay_label.add_theme_font_size_override("font_size", 24)
 	overlay.add_child(overlay_label)
+	# Alles ONDER de titel zit in een scroller. Het stond op vaste posities met een handmatig
+	# berekende knop-hoogte, en dan viel het feedbackformulier van het scherm zodra het
+	# "wat deed je pijn"-overzicht lang was -- precies wanneer je het meest te melden hebt.
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(40, 106)
+	scroll.custom_minimum_size = Vector2(SCREEN_W - 80, SCREEN_H - 118)
+	scroll.size = Vector2(SCREEN_W - 80, SCREEN_H - 118)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	overlay.add_child(scroll)
+	overlay_body = VBoxContainer.new()
+	overlay_body.custom_minimum_size = Vector2(SCREEN_W - 100, 0)
+	overlay_body.add_theme_constant_override("separation", 10)
+	scroll.add_child(overlay_body)
 	overlay_stats = Label.new()
 	overlay_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	overlay_stats.position = Vector2(SCREEN_W / 2.0 - 250, 118)
-	overlay_stats.size = Vector2(500, 120)
 	overlay_stats.add_theme_font_size_override("font_size", 12)
 	overlay_stats.add_theme_color_override("font_color", Color(0.82, 0.86, 0.92))
-	overlay.add_child(overlay_stats)
+	overlay_body.add_child(overlay_stats)
 	overlay_buttons = HBoxContainer.new()
+	overlay_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	overlay_buttons.add_theme_constant_override("separation", 12)
-	overlay_buttons.position = Vector2(SCREEN_W / 2.0 - 125, 252)
-	overlay.add_child(overlay_buttons)
+	overlay_body.add_child(overlay_buttons)
 
 func _build_confirm(canvas: CanvasLayer) -> void:
 	confirm = Control.new()

@@ -13,6 +13,11 @@ de website (`changelog.html`), het update-scherm in de game (`version.json`) en 
 `tools/make_release.sh` leest dit bestand en weigert te releasen als de bovenste versie niet
 overeenkomt met `VERSION`.
 
+## v0.88.0 — 2026-08-05
+- **The results screen scrolls now.** With a lot of towers built and several enemies that got through, the feedback form fell off the bottom of the screen and there was no way to reach the send button. Exactly when you had the most to report.
+- **Feedback goes straight to me when you press the button.** No more going back to the main menu and finding the Feedback page: rate the level, add a note if you want, press Send, done. It reports just that round: result, wave reached, Focus left, what got through, what you built and what everything did.
+- If sending fails for any reason it is still saved locally and still goes out via the Feedback page in the main menu, so nothing is lost.
+
 ## v0.87.0 — 2026-08-05
 Five towers stopped being "the same tower with different numbers" and got their own verb.
 - **Office Artillery reaches the entire floor.** Where you put it no longer matters at all, only how slowly it reloads. Put it in the corner nobody else wants.
