@@ -16,11 +16,15 @@ tegen collega's. Er bestaat al een speelbare Godot-versie (v0.89.0, alpha). Die 
 basis voor ALLE ideeën: torens, collega's, bosses, levels, economie, mini-games, toon. We bouwen
 hem opnieuw in een andere engine, met echte modellen, en als browsergame.
 
-WAT ER ANDERS WORDT
+WAT ER ANDERS WORDT (besloten)
 - Engine: Unity (Unity 6, build target Web), met een Unity MCP-server.
-- Modellen, maps en alle assets maken we met Blender (via de Blender MCP-server) en Unity.
+- De game wordt 3D. Modellen, maps en alle assets maken we met Blender (via de Blender
+  MCP-server) en Unity.
 - Het wordt een BROWSERGAME op game.makkers.net. Geen .exe meer, geen updater, geen
   SmartScreen-gedoe: een tester opent een link en speelt.
+- Nieuwe repo: ctrl-alt-defend-game, in /home/mick/projecten/ctrl-alt-defend-game, op GitHub
+  onder Malse-Makker. De oude repo blijft staan als naslag.
+- Feedback na een ronde gaat met een knop naar Discord of Mattermost (allebei prima).
 - Alles wat inhoudelijk is (torens, collega's, bosses, levels, economie) blijft zoals beschreven
   in de ontwerpbijbel, tenzij ik iets anders besluit.
 
@@ -48,12 +52,14 @@ EERSTE STAPPEN (stel dit als keuzevragen, met je aanrader erbij, en wacht op mij
 1. Unity op NixOS: welke installatieroute, en werkt een Web-build vanaf deze machine? Lukt het
    niet binnen redelijke tijd, stel dan een plan B voor (bijvoorbeeld een web-native engine)
    met eerlijke voor- en nadelen. Kies niet zelf.
-2. Stijl: 3D low-poly met een vaste top-down/isometrische camera, of 2D-sprites die we in
-   Blender renderen? Laat van allebei zien wat het betekent voor werk en uitstraling.
-3. Feedback naar Discord: in een browser is een webhook-URL voor iedereen zichtbaar in de
-   devtools. Stel opties voor (accepteren en roteren, een kleine relay met rate limit, of via
-   mijn bestaande Discord-bot my-makker op makkers.net) en adviseer.
-4. Nieuwe repo: naam, publiek of privé, en waar de map komt.
+2. Art direction voor de 3D-versie: stel twee of drie richtingen voor (camera top-down of
+   isometrisch, hoe low-poly, kleurpalet, hoe een collega eruitziet) en maak van je aanrader
+   één testmodel in Blender zodat ik het kan zien voordat we er veertig maken.
+3. Feedback naar Discord of Mattermost: in een browser is een webhook-URL voor iedereen
+   zichtbaar in de devtools, dus iemand kan dan het kanaal volspammen. Stel opties voor
+   (accepteren en roteren, een kleine relay met rate limit op makkers.net, of via mijn
+   bestaande Discord-bot my-makker) en adviseer.
+4. De nieuwe repo: publiek (zoals de oude) of privé?
 Pas daarna: een bouwplan in fases, waarbij fase 1 één speelbaar level is met twee torens en
 drie collega's, in de browser, op game.makkers.net.
 
